@@ -14,9 +14,11 @@ agente de frontend está em
 | Mobile First | `[CONCLUÍDO]` | bottom navigation até `md`, sidebar a partir de `lg`; alvo de toque 44px |
 | PWA | `[CONCLUÍDO]` | manifest + service worker gerados no build (offline só de leitura — D-041) |
 | Estado global | `[CONCLUÍDO]` | Context API (D-018); estado de servidor no TanStack Query |
-| Camada de API | `[CONCLUÍDO]` | `services/api.ts` — só HTTP, sem regra de negócio |
-| Autenticação na UI | `[PENDENTE]` | Fase 2 (ADR-008: Bearer em memória + refresh por cookie httpOnly) |
-| RBAC na UI | `[PENDENTE]` | Fase 2 |
+| Camada de API | `[CONCLUÍDO]` | `services/api.ts` — só HTTP, sem regra de negócio; `credentials:'include'` já ligado (backend entrega refresh token em cookie httpOnly) |
+| Estrutura por feature (`features/<domínio>/`) | `[CONCLUÍDO]` | reorganizado ao fechar a Fase 2 do backend, antes das entidades da Fase 3 chegarem — ver README |
+| Backend da Fase 2 (auth/usuários/tenants) | `[PRONTO NA API]` | login/refresh/logout/logout-all, CRUD de usuários — tudo por `curl`/Postgres, nenhuma tela ainda (decisão formal: [D-063](../crm-spec/docs/00-governance/decision-register.md#d-063--fase-2-não-exige-interface-mínima-opção-b), Fase 2 não exige UI) |
+| Autenticação na UI | `[PENDENTE — sem fase associada]` | Bearer em memória + refresh por cookie httpOnly (ADR-008); constrói quando a UI de negócio começar, não amarrado a um número de fase |
+| RBAC na UI | `[PENDENTE — sem fase associada]` | idem acima |
 | Telas de negócio (leads, pipeline, atendimento) | `[PENDENTE]` | Fases 3 e 4 |
 | E2E (Playwright) | `[PENDENTE]` | D-020 decidiu a ferramenta; os fluxos só existem na Fase 2 — ver `test.md` |
 | Paleta de marca | `[BLOQUEADO]` | D-043 — validação de negócio; hoje há paleta neutra em tokens |

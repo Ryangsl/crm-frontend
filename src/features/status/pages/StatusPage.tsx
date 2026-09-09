@@ -1,9 +1,9 @@
-import { Alert } from '../components/ui/Alert';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { Spinner } from '../components/ui/Spinner';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Spinner } from '@/components/ui/Spinner';
 import { useHealth } from '../hooks/useHealth';
-import { apiBaseUrl } from '../services/api';
+import { apiBaseUrl } from '@/services/api';
 
 /*
  * Pagina de infraestrutura: mostra se o frontend consegue falar com a API.

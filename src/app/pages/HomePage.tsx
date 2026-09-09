@@ -1,8 +1,8 @@
-import { Alert } from '../components/ui/Alert';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { EmptyState } from '../components/ui/EmptyState';
-import { Input } from '../components/ui/Input';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { Input } from '@/components/ui/Input';
 
 /*
  * Vitrine da fundacao visual. Nao ha tela de negocio na Fase 1 — leads, pipeline e

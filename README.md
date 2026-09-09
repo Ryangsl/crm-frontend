@@ -42,20 +42,29 @@ O backend precisa estar de pé em `http://localhost:3000` (ver [README do worksp
 
 ## Estrutura
 
+Organização **por feature/domínio**, não por tipo de arquivo — decidida ao fechar a Fase 2
+backend, antes de Customers/Leads/Opportunities/... da Fase 3 chegarem (detalhe e motivo em
+[`crm-spec/docs/09-testing/phase-acceptance/phase-02.md`](../crm-spec/docs/09-testing/phase-acceptance/phase-02.md)
+seção 11):
+
 ```
 src/
-  app/          bootstrap, providers (TanStack Query + Context de UI)
+  app/               bootstrap, providers (TanStack Query + Context de UI), a "casca" do app
+    pages/           HomePage, NotFoundPage — não são feature de domínio
+  features/
+    status/          exemplo do padrão: pages/ + services/ + hooks/ + types/ próprios
+    <dominio>/        cada entidade nova da Fase 3+ ganha uma pasta aqui, mesmo padrão
   components/
-    ui/         design system base (Button, Input, Card, Alert, Spinner, EmptyState)
-    layout/     AppShell — bottom navigation no mobile, sidebar no desktop
-  pages/        telas
-  routes/       definição de rotas
-  services/     acesso HTTP à API
-  hooks/        hooks compartilhados
-  types/        tipos de contrato
-  styles/       tokens do design system (Tailwind @theme)
-  test/         setup do Vitest
+    ui/               design system base (Button, Input, Card, Alert, Spinner, EmptyState)
+    layout/           AppShell — bottom navigation no mobile, sidebar no desktop
+  routes/             definição de rotas
+  services/           cliente HTTP base COMPARTILHADO (api.ts) — não confundir com
+                      services/ de dentro de uma feature, que é específico dela
+  styles/             tokens do design system (Tailwind @theme)
+  test/               setup do Vitest
 ```
+
+**Regra ao criar uma feature nova**: `features/<dominio>/{pages,components,hooks,services,types}` — só as subpastas que a feature realmente usa, não criar as cinco por hábito. Import de algo de outra feature ou de `components/ui` usa o alias `@/`, nunca `../../../`.
 
 ## Regras que não se quebram aqui
 

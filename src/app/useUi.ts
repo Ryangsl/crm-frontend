@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
-import { UiContext } from '../app/ui-context';
-import type { UiState } from '../app/ui-context';
+import { UiContext } from './ui-context';
+import type { UiState } from './ui-context';
 
 export function useUi(): UiState {
   const context = useContext(UiContext);
