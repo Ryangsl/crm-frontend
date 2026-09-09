@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+/*
+ * Fundacao visual — crm-spec/docs/06-frontend/design-system.md.
+ *
+ * A paleta abaixo e PLACEHOLDER neutra (D-043 — VALIDACAO DE NEGOCIO). Trocar a marca
+ * significa alterar apenas estes tokens; nenhum componente referencia cor literal.
+ * Breakpoints seguem crm-spec/docs/06-frontend/responsive.md (Mobile First: xs -> xl).
+ */
+@theme {
+  /* Marca (placeholder — substituir quando D-043 for decidida) */
+  --color-brand-50: oklch(0.97 0.01 250);
+  --color-brand-100: oklch(0.93 0.02 250);
+  --color-brand-200: oklch(0.87 0.04 250);
+  --color-brand-300: oklch(0.78 0.07 250);
+  --color-brand-400: oklch(0.68 0.1 250);
+  --color-brand-500: oklch(0.58 0.12 250);
+  --color-brand-600: oklch(0.5 0.11 250);
+  --color-brand-700: oklch(0.42 0.09 250);
+  --color-brand-800: oklch(0.34 0.07 250);
+  --color-brand-900: oklch(0.26 0.05 250);
+
+  /* Semanticas de feedback */
+  --color-success: oklch(0.65 0.14 155);
+  --color-warning: oklch(0.75 0.14 80);
+  --color-danger: oklch(0.6 0.18 25);
+
+  /* Superficies */
+  --color-surface: oklch(1 0 0);
+  --color-surface-muted: oklch(0.97 0 0);
+  --color-border-subtle: oklch(0.9 0 0);
+
+  /* Tipografia */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Breakpoints — Mobile First (xs e o baseline de 360px do RNF-12) */
+  --breakpoint-xs: 22.5rem;
+
+  /* Alvo minimo de toque (44px) exigido em responsive.md secao 4 */
+  --spacing-touch: 2.75rem;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-surface-muted text-neutral-900 font-sans antialiased;
+  }
+
+  /* Foco visivel e requisito de acessibilidade (design-system.md secao 7) */
+  :focus-visible {
+    @apply outline-brand-600 outline-2 outline-offset-2;
+  }
+}
