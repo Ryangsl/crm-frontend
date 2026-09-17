@@ -2,9 +2,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
+import { AuthProvider } from '../features/auth/AuthProvider';
 import { UiProvider } from './UiProvider';
 
-// Estado de servidor fica no TanStack Query; estado de UI no UiProvider (D-018).
+// Estado de servidor fica no TanStack Query; estado de UI no UiProvider (D-018); sessao
+// no AuthProvider (D-066) — precisa envolver o router, ja que ProtectedRoute consome
+// useAuth().
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -17,7 +20,9 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <UiProvider>{children}</UiProvider>
+      <AuthProvider>
+        <UiProvider>{children}</UiProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
