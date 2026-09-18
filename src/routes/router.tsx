@@ -10,6 +10,10 @@ import { CustomerListPage } from '../features/customers/pages/CustomerListPage';
 import { CustomerNewPage } from '../features/customers/pages/CustomerNewPage';
 import { CustomerDetailPage } from '../features/customers/pages/CustomerDetailPage';
 import { CustomerEditPage } from '../features/customers/pages/CustomerEditPage';
+import { LeadListPage } from '../features/leads/pages/LeadListPage';
+import { LeadNewPage } from '../features/leads/pages/LeadNewPage';
+import { LeadDetailPage } from '../features/leads/pages/LeadDetailPage';
+import { LeadEditPage } from '../features/leads/pages/LeadEditPage';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -26,6 +30,10 @@ export const router = createBrowserRouter([
           { path: 'customers/new', element: <CustomerNewPage /> },
           { path: 'customers/:id', element: <CustomerDetailPage /> },
           { path: 'customers/:id/edit', element: <CustomerEditPage /> },
+          { path: 'leads', element: <LeadListPage /> },
+          { path: 'leads/new', element: <LeadNewPage /> },
+          { path: 'leads/:id', element: <LeadDetailPage /> },
+          { path: 'leads/:id/edit', element: <LeadEditPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
