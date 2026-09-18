@@ -23,6 +23,11 @@ export class ApiError extends Error {
     readonly code: string,
     message: string,
     readonly details: ApiErrorDetail[] = [],
+    // Corpo completo da resposta de erro, alem de `error` — algumas excecoes de dominio
+    // trazem dado estruturado adicional ao lado de `error` (ex.: `candidates` no 409 de
+    // deduplicacao de Customer, D-067). Generico de proposito: este modulo nao conhece
+    // formatos especificos por recurso, quem chama extrai o que precisar.
+    readonly body: unknown = undefined,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -59,11 +64,18 @@ function isAuthPath(path: string): boolean {
   return path.startsWith('/v1/auth/');
 }
 
-async function parseErrorBody(response: Response): Promise<StandardErrorBody['error']> {
+async function parseErrorBody(
+  response: Response,
+): Promise<StandardErrorBody['error'] & { body?: unknown }> {
   try {
     const body = (await response.json()) as Partial<StandardErrorBody>;
     if (body.error?.code && body.error.message) {
-      return { code: body.error.code, message: body.error.message, details: body.error.details ?? [] };
+      return {
+        code: body.error.code,
+        message: body.error.message,
+        details: body.error.details ?? [],
+        body,
+      };
     }
   } catch {
     // Corpo vazio/nao-JSON — cai no fallback abaixo.
@@ -115,8 +127,8 @@ async function request<T>(path: string, init: RequestInit = {}, retrying = false
   }
 
   if (!response.ok) {
-    const { code, message, details } = await parseErrorBody(response);
-    throw new ApiError(response.status, code, message, details);
+    const { code, message, details, body } = await parseErrorBody(response);
+    throw new ApiError(response.status, code, message, details, body);
   }
 
   if (response.status === 204) {

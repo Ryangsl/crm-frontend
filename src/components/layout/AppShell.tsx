@@ -9,8 +9,9 @@ import { useAuth } from '@/features/auth/useAuth';
  * largura de viewport (D-042). A mesma hierarquia de itens vale nos dois modos.
  */
 const NAV_ITEMS = [
-  { to: '/', label: 'Inicio', icon: '■' },
-  { to: '/status', label: 'Status', icon: '●' },
+  { to: '/', label: 'Inicio', icon: '■', end: true },
+  { to: '/customers', label: 'Clientes', icon: '◆', end: false },
+  { to: '/status', label: 'Status', icon: '●', end: true },
 ] as const;
 
 function navClasses(isActive: boolean) {
@@ -35,7 +36,7 @@ export function AppShell() {
               <li key={item.to}>
                 <NavLink
                   to={item.to}
-                  end
+                  end={item.end}
                   className={({ isActive }) =>
                     `min-h-touch hover:bg-surface-muted flex items-center gap-2 rounded-lg px-3 text-sm ${navClasses(isActive)}`
                   }
@@ -84,7 +85,7 @@ export function AppShell() {
               <li key={item.to} className="flex-1">
                 <NavLink
                   to={item.to}
-                  end
+                  end={item.end}
                   className={({ isActive }) =>
                     `min-h-touch flex flex-col items-center justify-center gap-0.5 py-2 text-xs ${navClasses(isActive)}`
                   }
