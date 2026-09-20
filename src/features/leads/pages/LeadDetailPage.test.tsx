@@ -138,6 +138,23 @@ describe('LeadDetailPage', () => {
     await waitFor(() => expect(leadsService.reopenLead).toHaveBeenCalledWith('l1'));
   });
 
+  it('lead convertido com cliente: oferece "Criar oportunidade" so com opportunities:create', async () => {
+    const converted = newLead({ status: 'converted', customer_id: 'c1' });
+    const { unmount } = renderPage(converted, ['leads:read', 'opportunities:create']);
+    expect(await screen.findByRole('button', { name: 'Criar oportunidade' })).toBeInTheDocument();
+    unmount();
+
+    renderPage(converted, ['leads:read']);
+    await screen.findByText('Convertido');
+    expect(screen.queryByRole('button', { name: 'Criar oportunidade' })).not.toBeInTheDocument();
+  });
+
+  it('lead ainda nao convertido nao oferece "Criar oportunidade"', async () => {
+    renderPage(newLead(), ['leads:read', 'opportunities:create']);
+    await screen.findByText('Novo');
+    expect(screen.queryByRole('button', { name: 'Criar oportunidade' })).not.toBeInTheDocument();
+  });
+
   it('exclusao pede confirmacao antes de chamar a API', async () => {
     const user = userEvent.setup();
     vi.mocked(leadsService.deleteLead).mockResolvedValue(undefined);

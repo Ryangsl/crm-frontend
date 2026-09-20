@@ -110,7 +110,11 @@ export function LeadDetailPage() {
               )}
             </div>
             {canUpdate && (
-              <Button variant="secondary" size="sm" onClick={() => navigate(`/leads/${lead.id}/edit`)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => navigate(`/leads/${lead.id}/edit`)}
+              >
                 Editar
               </Button>
             )}
@@ -152,6 +156,20 @@ export function LeadDetailPage() {
                   Converter
                 </Button>
               )}
+              {hasPermission('opportunities:create') &&
+                lead.status === 'converted' &&
+                lead.customer_id && (
+                  <Button
+                    size="sm"
+                    onClick={() =>
+                      navigate(
+                        `/opportunities/new?lead_id=${lead.id}&customer_id=${lead.customer_id}`,
+                      )
+                    }
+                  >
+                    Criar oportunidade
+                  </Button>
+                )}
               {hasPermission('leads:delete') && panel !== 'delete' && (
                 <Button size="sm" variant="danger" onClick={() => setPanel('delete')}>
                   Excluir
@@ -160,7 +178,10 @@ export function LeadDetailPage() {
             </div>
 
             {panel === 'disqualify' && (
-              <form onSubmit={(event) => void handleDisqualify(event)} className="mt-4 flex flex-col gap-3">
+              <form
+                onSubmit={(event) => void handleDisqualify(event)}
+                className="mt-4 flex flex-col gap-3"
+              >
                 <Input
                   label="Motivo da desqualificação"
                   required
@@ -171,7 +192,12 @@ export function LeadDetailPage() {
                   <Button type="submit" size="sm" loading={disqualifyMutation.isPending}>
                     Confirmar
                   </Button>
-                  <Button type="button" size="sm" variant="secondary" onClick={() => setPanel('none')}>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setPanel('none')}
+                  >
                     Cancelar
                   </Button>
                 </div>
@@ -189,13 +215,18 @@ export function LeadDetailPage() {
             )}
 
             {panel === 'delete' && (
-              <Alert tone="warning" title="Excluir este lead?" >
+              <Alert tone="warning" title="Excluir este lead?">
                 <p className="mb-2">
-                  O lead deixará de aparecer nas listagens. Esta ação só pode ser revertida por
-                  quem tem acesso ao banco de dados.
+                  O lead deixará de aparecer nas listagens. Esta ação só pode ser revertida por quem
+                  tem acesso ao banco de dados.
                 </p>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="danger" loading={deleteMutation.isPending} onClick={() => void handleDelete()}>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    loading={deleteMutation.isPending}
+                    onClick={() => void handleDelete()}
+                  >
                     Confirmar exclusão
                   </Button>
                   <Button size="sm" variant="secondary" onClick={() => setPanel('none')}>

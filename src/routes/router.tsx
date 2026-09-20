@@ -14,6 +14,11 @@ import { LeadListPage } from '../features/leads/pages/LeadListPage';
 import { LeadNewPage } from '../features/leads/pages/LeadNewPage';
 import { LeadDetailPage } from '../features/leads/pages/LeadDetailPage';
 import { LeadEditPage } from '../features/leads/pages/LeadEditPage';
+import { OpportunityListPage } from '../features/opportunities/pages/OpportunityListPage';
+import { OpportunityNewPage } from '../features/opportunities/pages/OpportunityNewPage';
+import { OpportunityDetailPage } from '../features/opportunities/pages/OpportunityDetailPage';
+import { OpportunityEditPage } from '../features/opportunities/pages/OpportunityEditPage';
+import { PipelineBoardPage } from '../features/opportunities/pages/PipelineBoardPage';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -34,6 +39,11 @@ export const router = createBrowserRouter([
           { path: 'leads/new', element: <LeadNewPage /> },
           { path: 'leads/:id', element: <LeadDetailPage /> },
           { path: 'leads/:id/edit', element: <LeadEditPage /> },
+          { path: 'opportunities', element: <OpportunityListPage /> },
+          { path: 'opportunities/new', element: <OpportunityNewPage /> },
+          { path: 'opportunities/:id', element: <OpportunityDetailPage /> },
+          { path: 'opportunities/:id/edit', element: <OpportunityEditPage /> },
+          { path: 'pipeline', element: <PipelineBoardPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

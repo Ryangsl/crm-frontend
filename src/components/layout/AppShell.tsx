@@ -12,6 +12,8 @@ const NAV_ITEMS = [
   { to: '/', label: 'Inicio', icon: '■', end: true },
   { to: '/customers', label: 'Clientes', icon: '◆', end: false },
   { to: '/leads', label: 'Leads', icon: '▲', end: false },
+  { to: '/opportunities', label: 'Oportunid.', icon: '◇', end: false },
+  { to: '/pipeline', label: 'Pipeline', icon: '▤', end: false },
   { to: '/status', label: 'Status', icon: '●', end: true },
 ] as const;
 
