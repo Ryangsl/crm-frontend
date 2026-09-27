@@ -7,12 +7,15 @@ import { Card } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
 import { ApiError } from '@/services/api';
+import { AppointmentsSection } from '@/features/follow-up/components/AppointmentsSection';
+import { NotesSection } from '@/features/follow-up/components/NotesSection';
+import { TasksSection } from '@/features/follow-up/components/TasksSection';
 import { ContactsSection } from '../components/ContactsSection';
 import { useDeleteCustomer } from '../hooks/useCustomerMutations';
 import { useCustomerQuery } from '../hooks/useCustomers';
 
-// Detalhe do cliente (secao 14): dados principais + contatos. Timeline/oportunidades/
-// tarefas/notas ficam para incrementos futuros — fora do escopo da 3.3.
+// Detalhe do cliente (secao 14): dados principais + contatos + follow-up (Notes/Tasks/
+// Appointments, Fase 3.6, D-031). Timeline unificada de interacoes fica para a Fase 4.
 export function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -124,6 +127,16 @@ export function CustomerDetailPage() {
 
           <Card>
             <ContactsSection customerId={customer.id} />
+          </Card>
+
+          <Card>
+            <NotesSection entityType="customer" entityId={customer.id} />
+          </Card>
+          <Card>
+            <TasksSection entityType="customer" entityId={customer.id} />
+          </Card>
+          <Card>
+            <AppointmentsSection entityType="customer" entityId={customer.id} />
           </Card>
         </>
       )}

@@ -9,6 +9,9 @@ import { Input } from '@/components/ui/Input';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
 import { ApiError } from '@/services/api';
+import { AppointmentsSection } from '@/features/follow-up/components/AppointmentsSection';
+import { NotesSection } from '@/features/follow-up/components/NotesSection';
+import { TasksSection } from '@/features/follow-up/components/TasksSection';
 import { LeadConvertForm } from '../components/LeadConvertForm';
 import { LeadStatusBadge } from '../components/LeadStatusBadge';
 import {
@@ -235,6 +238,16 @@ export function LeadDetailPage() {
                 </div>
               </Alert>
             )}
+          </Card>
+
+          <Card>
+            <NotesSection entityType="lead" entityId={leadId} />
+          </Card>
+          <Card>
+            <TasksSection entityType="lead" entityId={leadId} />
+          </Card>
+          <Card>
+            <AppointmentsSection entityType="lead" entityId={leadId} />
           </Card>
         </>
       )}

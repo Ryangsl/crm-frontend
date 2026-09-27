@@ -7,6 +7,9 @@ import { Card } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
 import { ApiError } from '@/services/api';
+import { AppointmentsSection } from '@/features/follow-up/components/AppointmentsSection';
+import { NotesSection } from '@/features/follow-up/components/NotesSection';
+import { TasksSection } from '@/features/follow-up/components/TasksSection';
 import { OpportunityActionPanel } from '../components/OpportunityActionPanel';
 import type { ActionMode } from '../components/OpportunityActionPanel';
 import { OpportunityStatusBadge } from '../components/OpportunityStatusBadge';
@@ -181,6 +184,16 @@ export function OpportunityDetailPage() {
                 </Alert>
               </div>
             )}
+          </Card>
+
+          <Card>
+            <NotesSection entityType="opportunity" entityId={opportunityId} />
+          </Card>
+          <Card>
+            <TasksSection entityType="opportunity" entityId={opportunityId} />
+          </Card>
+          <Card>
+            <AppointmentsSection entityType="opportunity" entityId={opportunityId} />
           </Card>
         </>
       )}
