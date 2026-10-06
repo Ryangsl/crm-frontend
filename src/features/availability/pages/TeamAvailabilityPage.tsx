@@ -80,8 +80,9 @@ export function TeamAvailabilityPage() {
       <header>
         <h1 className="text-lg font-semibold text-neutral-900">Disponibilidade da equipe</h1>
         <p className="text-sm text-neutral-500">
-          Estado atual de cada usuario ativo. So quem esta Disponivel recebe distribuicao automatica
-          (quando aplicada). Quem nunca alterou o estado aparece como Indisponivel.
+          Estado atual de cada usuario ativo. Com a disponibilidade habilitada, so quem esta
+          Disponivel recebe novos Leads pela distribuicao automatica. Quem nunca alterou o estado
+          aparece como Indisponivel.
         </p>
       </header>
 
