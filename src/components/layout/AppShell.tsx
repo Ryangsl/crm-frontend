@@ -8,21 +8,39 @@ import { useAuth } from '@/features/auth/useAuth';
  * bottom navigation ate `md`, sidebar a partir de `lg` — o criterio e apenas
  * largura de viewport (D-042). A mesma hierarquia de itens vale nos dois modos.
  */
-const NAV_ITEMS = [
+interface NavItem {
+  to: string;
+  label: string;
+  icon: string;
+  end: boolean;
+  // Quando presente, o item so aparece para quem tem a permissao (apenas UX — o backend e a
+  // autoridade).
+  permission?: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Inicio', icon: '■', end: true },
   { to: '/customers', label: 'Clientes', icon: '◆', end: false },
   { to: '/leads', label: 'Leads', icon: '▲', end: false },
   { to: '/opportunities', label: 'Oportunid.', icon: '◇', end: false },
   { to: '/pipeline', label: 'Pipeline', icon: '▤', end: false },
   { to: '/status', label: 'Status', icon: '●', end: true },
-] as const;
+  {
+    to: '/settings/business-hours',
+    label: 'Config.',
+    icon: '⚙',
+    end: false,
+    permission: 'tenant_settings:read',
+  },
+];
 
 function navClasses(isActive: boolean) {
   return isActive ? 'text-brand-700 font-semibold' : 'text-neutral-500';
 }
 
 export function AppShell() {
-  const { user, logout } = useAuth();
+  const { user, logout, hasPermission } = useAuth();
+  const navItems = NAV_ITEMS.filter((item) => !item.permission || hasPermission(item.permission));
 
   function handleLogout() {
     void logout();
@@ -35,7 +53,7 @@ export function AppShell() {
         <p className="mb-6 text-sm font-bold tracking-wide text-neutral-900">CRM + Call Center</p>
         <nav aria-label="Principal">
           <ul className="flex flex-col gap-1">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <li key={item.to}>
                 <NavLink
                   to={item.to}
@@ -84,7 +102,7 @@ export function AppShell() {
           className="border-border-subtle bg-surface fixed inset-x-0 bottom-0 z-10 border-t lg:hidden"
         >
           <ul className="flex">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <li key={item.to} className="flex-1">
                 <NavLink
                   to={item.to}

@@ -19,6 +19,7 @@ import { OpportunityNewPage } from '../features/opportunities/pages/OpportunityN
 import { OpportunityDetailPage } from '../features/opportunities/pages/OpportunityDetailPage';
 import { OpportunityEditPage } from '../features/opportunities/pages/OpportunityEditPage';
 import { PipelineBoardPage } from '../features/opportunities/pages/PipelineBoardPage';
+import { BusinessHoursPage } from '../features/settings/pages/BusinessHoursPage';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
           { path: 'opportunities/:id', element: <OpportunityDetailPage /> },
           { path: 'opportunities/:id/edit', element: <OpportunityEditPage /> },
           { path: 'pipeline', element: <PipelineBoardPage /> },
+          { path: 'settings/business-hours', element: <BusinessHoursPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

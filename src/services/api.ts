@@ -151,6 +151,15 @@ export function apiPost<T>(path: string, body?: unknown, init?: RequestInit): Pr
   });
 }
 
+export function apiPut<T>(path: string, body?: unknown, init?: RequestInit): Promise<T> {
+  return request<T>(path, {
+    ...init,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...init?.headers },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+}
+
 export function apiPatch<T>(path: string, body?: unknown, init?: RequestInit): Promise<T> {
   return request<T>(path, {
     ...init,
