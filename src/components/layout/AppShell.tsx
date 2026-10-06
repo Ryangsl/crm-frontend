@@ -1,6 +1,8 @@
 import { NavLink, Outlet } from 'react-router-dom';
 
 import { Button } from '@/components/ui/Button';
+import { AvailabilityNavItem } from '@/features/availability/components/AvailabilityNavItem';
+import { AvailabilitySelector } from '@/features/availability/components/AvailabilitySelector';
 import { useAuth } from '@/features/auth/useAuth';
 
 /*
@@ -67,11 +69,13 @@ export function AppShell() {
                 </NavLink>
               </li>
             ))}
+            <AvailabilityNavItem variant="sidebar" />
           </ul>
         </nav>
 
         {user && (
           <div className="border-border-subtle mt-auto border-t pt-4">
+            <AvailabilitySelector className="mb-3" />
             <p className="truncate text-sm text-neutral-700">{user.name}</p>
             <p className="truncate text-xs text-neutral-500">{user.email}</p>
             <Button variant="ghost" size="sm" className="mt-2 w-full" onClick={handleLogout}>
@@ -90,6 +94,9 @@ export function AppShell() {
             </Button>
           )}
         </header>
+
+        {/* Seletor de disponibilidade no mobile/tablet (na sidebar a partir de `lg`) */}
+        <AvailabilitySelector className="px-4 pt-3 lg:hidden" />
 
         {/* pb-20 reserva espaco para a bottom nav fixa no mobile */}
         <main className="flex-1 px-4 py-4 pb-20 lg:px-8 lg:pb-8">
@@ -116,6 +123,7 @@ export function AppShell() {
                 </NavLink>
               </li>
             ))}
+            <AvailabilityNavItem variant="bottom" />
           </ul>
         </nav>
       </div>
