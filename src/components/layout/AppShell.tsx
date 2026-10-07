@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { AvailabilityNavItem } from '@/features/availability/components/AvailabilityNavItem';
 import { AvailabilitySelector } from '@/features/availability/components/AvailabilitySelector';
 import { useAuth } from '@/features/auth/useAuth';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 
 /*
  * Navegacao Mobile First (crm-spec/docs/06-frontend/design-system.md secao 4):
@@ -52,7 +53,10 @@ export function AppShell() {
     <div className="flex min-h-dvh flex-col lg:flex-row">
       {/* Sidebar — desktop */}
       <aside className="border-border-subtle bg-surface hidden w-60 shrink-0 flex-col border-r p-4 lg:flex">
-        <p className="mb-6 text-sm font-bold tracking-wide text-neutral-900">CRM + Call Center</p>
+        <div className="mb-6 flex items-center justify-between gap-2">
+          <p className="text-sm font-bold tracking-wide text-neutral-900">CRM + Call Center</p>
+          {user && <NotificationBell align="left" />}
+        </div>
         <nav aria-label="Principal">
           <ul className="flex flex-col gap-1">
             {navItems.map((item) => (
@@ -89,9 +93,12 @@ export function AppShell() {
         <header className="border-border-subtle bg-surface sticky top-0 z-10 flex items-center justify-between border-b px-4 py-3 lg:hidden">
           <p className="text-sm font-bold text-neutral-900">CRM + Call Center</p>
           {user && (
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              Sair
-            </Button>
+            <div className="flex items-center gap-1">
+              <NotificationBell align="right" />
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
+                Sair
+              </Button>
+            </div>
           )}
         </header>
 
