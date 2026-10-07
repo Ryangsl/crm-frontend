@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { timelineQueryKey } from '@/features/interactions/hooks/useTimeline';
 import { createNote, deleteNote, listNotes, updateNote } from '../services/followUp';
 import type { CrmEntityType, NoteCreateInput, NoteUpdateInput } from '../types/followUp';
 
@@ -22,6 +23,7 @@ export function useCreateNote(entityType: CrmEntityType, entityId: string) {
     mutationFn: (input: NoteCreateInput) => createNote(input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKey(entityType, entityId) });
+      void queryClient.invalidateQueries({ queryKey: timelineQueryKey(entityType, entityId) });
     },
   });
 }
@@ -33,6 +35,7 @@ export function useUpdateNote(entityType: CrmEntityType, entityId: string) {
       updateNote(noteId, input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKey(entityType, entityId) });
+      void queryClient.invalidateQueries({ queryKey: timelineQueryKey(entityType, entityId) });
     },
   });
 }
@@ -43,6 +46,7 @@ export function useDeleteNote(entityType: CrmEntityType, entityId: string) {
     mutationFn: (noteId: string) => deleteNote(noteId),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKey(entityType, entityId) });
+      void queryClient.invalidateQueries({ queryKey: timelineQueryKey(entityType, entityId) });
     },
   });
 }

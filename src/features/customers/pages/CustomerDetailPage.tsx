@@ -8,6 +8,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
 import { ApiError } from '@/services/api';
 import { AppointmentsSection } from '@/features/follow-up/components/AppointmentsSection';
+import { TimelineSection } from '@/features/interactions/components/TimelineSection';
 import { NotesSection } from '@/features/follow-up/components/NotesSection';
 import { TasksSection } from '@/features/follow-up/components/TasksSection';
 import { ContactsSection } from '../components/ContactsSection';
@@ -127,6 +128,10 @@ export function CustomerDetailPage() {
 
           <Card>
             <ContactsSection customerId={customer.id} />
+          </Card>
+
+          <Card>
+            <TimelineSection entityType="customer" entityId={customer.id} />
           </Card>
 
           <Card>

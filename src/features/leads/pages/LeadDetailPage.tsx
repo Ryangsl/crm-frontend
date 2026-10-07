@@ -10,6 +10,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
 import { ApiError } from '@/services/api';
 import { AppointmentsSection } from '@/features/follow-up/components/AppointmentsSection';
+import { TimelineSection } from '@/features/interactions/components/TimelineSection';
 import { NotesSection } from '@/features/follow-up/components/NotesSection';
 import { TasksSection } from '@/features/follow-up/components/TasksSection';
 import { LeadConvertForm } from '../components/LeadConvertForm';
@@ -238,6 +239,10 @@ export function LeadDetailPage() {
                 </div>
               </Alert>
             )}
+          </Card>
+
+          <Card>
+            <TimelineSection entityType="lead" entityId={leadId} />
           </Card>
 
           <Card>

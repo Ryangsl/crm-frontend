@@ -8,6 +8,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
 import { ApiError } from '@/services/api';
 import { AppointmentsSection } from '@/features/follow-up/components/AppointmentsSection';
+import { TimelineSection } from '@/features/interactions/components/TimelineSection';
 import { NotesSection } from '@/features/follow-up/components/NotesSection';
 import { TasksSection } from '@/features/follow-up/components/TasksSection';
 import { OpportunityActionPanel } from '../components/OpportunityActionPanel';
@@ -184,6 +185,10 @@ export function OpportunityDetailPage() {
                 </Alert>
               </div>
             )}
+          </Card>
+
+          <Card>
+            <TimelineSection entityType="opportunity" entityId={opportunityId} />
           </Card>
 
           <Card>
