@@ -23,6 +23,17 @@ agente de frontend está em
 | E2E (Playwright) | `[PENDENTE]` | D-020 decidiu a ferramenta; os fluxos só existem na Fase 2 — ver `test.md` |
 | Paleta de marca | `[BLOQUEADO]` | D-043 — validação de negócio; hoje há paleta neutra em tokens |
 
+## FASES 3–4 — ESTADO E REGRAS DA UI (resumo; fonte de verdade: `crm-spec/PROJECT-CONTEXT.md`)
+
+> A tabela acima é histórica (Fases 1–2). Hoje existem telas de negócio de Customers, Leads, Opportunities/Pipeline, follow-up (Notes/Tasks/Appointments), disponibilidade (seletor + `/team/availability`), configurações (`/settings/business-hours`), histórico (`TimelineSection`) e conversas (F4.6).
+
+**Conversas (F4.6, D-081):**
+- Rotas `/conversations` (lista) e `/conversations/:id` (contexto CRM, responsável, encerrar/reabrir, mensagens com cursor). O item de menu só aparece com `conversations:read`; a seção "Conversas" (`EntityConversationsSection`) fica no detalhe de Cliente, Lead e Oportunidade e é o ponto de entrada para abrir uma conversa.
+- A UI é do **core agnóstico de canal**: registra mensagens **manualmente** (direção opcional). Não há envio a canal, status de entrega, anexo, tempo real, inbox omnichannel nem tela de configuração de canal — tudo isso é da Fase 5. Não adicionar.
+- Atribuição é **manual** (`conversations:assign`); o seletor de usuários só aparece com `users:read`. Permissão na UI é apenas UX; o backend é a autoridade.
+- Mensagens vêm da API da mais recente para a mais antiga (cursor opaco `next_cursor`, nunca montado no cliente); a tela inverte para ordem cronológica e oferece "Carregar anteriores".
+- Testes de conversas usam o helper `features/conversations/testing.tsx`.
+
 ## Antes de implementar qualquer coisa
 
 1. [Decision Register](../crm-spec/docs/00-governance/decision-register.md) — o que está
