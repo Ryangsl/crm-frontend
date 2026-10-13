@@ -33,6 +33,11 @@ agente de frontend está em
 - Atribuição é **manual** (`conversations:assign`); o seletor de usuários só aparece com `users:read`. Permissão na UI é apenas UX; o backend é a autoridade.
 - Mensagens vêm da API da mais recente para a mais antiga (cursor opaco `next_cursor`, nunca montado no cliente); a tela inverte para ordem cronológica e oferece "Carregar anteriores".
 - Testes de conversas usam o helper `features/conversations/testing.tsx`.
+- O backend devolve `context.*` (nome/estado de Cliente, Lead, Oportunidade) como `null` quando o usuário não tem a leitura do recurso (BR-32). A UI já cai em rótulos genéricos ("Ver cliente", título "Oportunidade"/"Conversa"): nunca assumir que o nome existe.
+
+**Notificações (F4.5, D-080):** `NotificationBell` no `AppShell` (polling de 30 s; sem permissão própria; só o próprio usuário). **Qualquer teste que renderize o `AppShell` precisa de `QueryClientProvider` e do serviço de notificações mockado** (ver `AppShell.test.tsx`).
+
+**Sessão × cache (regra):** o `AuthProvider` cancela as consultas e esvazia o cache do TanStack Query em todo fim efetivo de sessão (logout, logout-all, 401 após refresh falho, falha ao restaurar) e no login; renovar o token com sucesso **não** limpa. As chaves do React Query não incluem o usuário, então **não** remover essa limpeza nem criar outro caminho de encerramento de sessão que a ignore. Testes: `AuthProvider.session-cache.test.tsx`.
 
 ## Antes de implementar qualquer coisa
 
