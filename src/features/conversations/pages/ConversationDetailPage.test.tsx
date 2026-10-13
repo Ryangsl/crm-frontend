@@ -51,6 +51,35 @@ describe('ConversationDetailPage', () => {
     expect(service.listMessages).not.toHaveBeenCalled();
   });
 
+  it('contexto ocultado pelo backend (sem leitura dos recursos): a conversa abre com rotulos genericos', async () => {
+    vi.mocked(service.listMessages).mockResolvedValue(messagesPage([]));
+    renderDetail(READ, {
+      ...CONVERSATION,
+      lead_id: 'lead-1',
+      opportunity_id: 'opp-1',
+      context: {
+        customer_name: null,
+        lead_name: null,
+        lead_status: null,
+        opportunity_status: null,
+      },
+    });
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Oportunidade' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Ver cliente' })).toHaveAttribute(
+      'href',
+      '/customers/cust-1',
+    );
+    expect(screen.getByRole('link', { name: 'Ver lead' })).toHaveAttribute('href', '/leads/lead-1');
+    expect(screen.getByRole('link', { name: 'Ver oportunidade' })).toHaveAttribute(
+      'href',
+      '/opportunities/opp-1',
+    );
+    expect(screen.queryByText('Ana Cliente')).not.toBeInTheDocument();
+  });
+
   it('conversa inexistente (404): mostra "nao encontrada"', async () => {
     vi.mocked(service.getConversation).mockRejectedValue(new ApiError(404, 'NOT_FOUND', 'x'));
     vi.mocked(service.listMessages).mockResolvedValue(messagesPage([]));
