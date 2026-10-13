@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -27,6 +28,18 @@ function Probe() {
   );
 }
 
+// O AuthProvider esvazia o cache do TanStack Query ao encerrar a sessao: precisa de QueryClient.
+function renderAuth(queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })) {
+  render(
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>
+    </QueryClientProvider>,
+  );
+  return queryClient;
+}
+
 describe('AuthProvider', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -42,11 +55,7 @@ describe('AuthProvider', () => {
         ),
     );
 
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
+    renderAuth();
 
     expect(screen.getByTestId('status')).toHaveTextContent('loading');
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('unauthenticated'));
@@ -68,11 +77,7 @@ describe('AuthProvider', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
+    renderAuth();
 
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('authenticated'));
     expect(screen.getByTestId('user')).toHaveTextContent('ana@x.com');
@@ -99,11 +104,7 @@ describe('AuthProvider', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
+    renderAuth();
 
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('unauthenticated'));
     await user.click(screen.getByText('login'));
@@ -129,11 +130,7 @@ describe('AuthProvider', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
+    renderAuth();
 
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('unauthenticated'));
     await user.click(screen.getByText('login'));
@@ -160,11 +157,7 @@ describe('AuthProvider', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
+    renderAuth();
 
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('authenticated'));
     await user.click(screen.getByText('logout'));
@@ -193,11 +186,7 @@ describe('AuthProvider', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
+    renderAuth();
 
     await waitFor(() => expect(screen.getByTestId('perm')).toHaveTextContent('yes'));
   });
@@ -217,11 +206,7 @@ describe('AuthProvider', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
+    renderAuth();
 
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('authenticated'));
     expect(screen.getByTestId('perm')).toHaveTextContent('no');
