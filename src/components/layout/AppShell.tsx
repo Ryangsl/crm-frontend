@@ -27,6 +27,13 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/leads', label: 'Leads', icon: '▲', end: false },
   { to: '/opportunities', label: 'Oportunid.', icon: '◇', end: false },
   { to: '/pipeline', label: 'Pipeline', icon: '▤', end: false },
+  {
+    to: '/conversations',
+    label: 'Conversas',
+    icon: '✉',
+    end: false,
+    permission: 'conversations:read',
+  },
   { to: '/status', label: 'Status', icon: '●', end: true },
   {
     to: '/settings/business-hours',
