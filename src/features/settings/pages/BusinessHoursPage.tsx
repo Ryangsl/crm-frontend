@@ -5,6 +5,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
 import { ApiError } from '@/services/api';
 import { BusinessHoursForm } from '../components/BusinessHoursForm';
+import { BusinessHoursRestrictionToggle } from '@/features/access-control/components/BusinessHoursRestrictionToggle';
 import { useBusinessHoursQuery } from '../hooks/useBusinessHours';
 import type { BusinessHours } from '../types/businessHours';
 
@@ -45,8 +46,9 @@ export function BusinessHoursPage() {
       </header>
 
       <Alert tone="info">
-        Por enquanto o horario apenas fica registrado: ele ainda nao restringe acessos, nao altera a
-        distribuicao de leads e nao muda o status de nenhum consultor.
+        O horario nunca altera a distribuicao de leads nem o status de ninguem. Ele so restringe o
+        acesso de vendedores a Leads e Conversas se o Admin ligar a restricao por horario, mais
+        abaixo (desligada por padrao).
       </Alert>
 
       {isPending && (
@@ -83,6 +85,8 @@ export function BusinessHoursPage() {
           <BusinessHoursForm initial={data.business_hours ?? SUGGESTED} readOnly={!canUpdate} />
         </Card>
       )}
+
+      {data && <BusinessHoursRestrictionToggle hoursConfigured={data.configured} />}
     </div>
   );
 }

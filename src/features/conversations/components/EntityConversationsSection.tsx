@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
+import { OutsideBusinessHoursAlert } from '@/features/access-control/components/OutsideBusinessHoursAlert';
+import { isOutsideBusinessHours } from '@/features/access-control/lib/labels';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Spinner } from '@/components/ui/Spinner';
@@ -84,7 +86,9 @@ export function EntityConversationsSection({
         </p>
       )}
 
-      {isError && (
+      {isError && isOutsideBusinessHours(error) && <OutsideBusinessHoursAlert />}
+
+      {isError && !isOutsideBusinessHours(error) && (
         <Alert tone="danger" title="Nao foi possivel carregar as conversas">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
