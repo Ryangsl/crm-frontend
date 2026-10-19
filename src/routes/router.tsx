@@ -21,6 +21,7 @@ import { OpportunityEditPage } from '../features/opportunities/pages/Opportunity
 import { PipelineBoardPage } from '../features/opportunities/pages/PipelineBoardPage';
 import { BusinessHoursPage } from '../features/settings/pages/BusinessHoursPage';
 import { TeamAvailabilityPage } from '../features/availability/pages/TeamAvailabilityPage';
+import { AccessExceptionsPage } from '../features/access-control/pages/AccessExceptionsPage';
 import { ConversationListPage } from '../features/conversations/pages/ConversationListPage';
 import { ConversationDetailPage } from '../features/conversations/pages/ConversationDetailPage';
 
@@ -52,6 +53,7 @@ export const router = createBrowserRouter([
           { path: 'conversations/:id', element: <ConversationDetailPage /> },
           { path: 'settings/business-hours', element: <BusinessHoursPage /> },
           { path: 'team/availability', element: <TeamAvailabilityPage /> },
+          { path: 'settings/access-exceptions', element: <AccessExceptionsPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

@@ -7,10 +7,12 @@ import { AuthContext } from '@/features/auth/auth-context';
 import type { AuthState } from '@/features/auth/auth-context';
 import { ApiError } from '@/services/api';
 import { BusinessHoursPage } from './BusinessHoursPage';
+import * as accessService from '@/features/access-control/services/accessControl';
 import * as service from '../services/businessHours';
 import type { BusinessHours, BusinessHoursResponse } from '../types/businessHours';
 
 vi.mock('../services/businessHours');
+vi.mock('@/features/access-control/services/accessControl');
 
 const HOURS: BusinessHours = {
   schema_version: 1,
@@ -25,6 +27,7 @@ const CONFIGURED: BusinessHoursResponse = {
 const EMPTY: BusinessHoursResponse = { configured: false, business_hours: null, updated_at: null };
 
 function renderPage(permissions: string[]) {
+  vi.mocked(accessService.getRestrictionSetting).mockResolvedValue({ enabled: false });
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const authValue: AuthState = {
     status: 'authenticated',
@@ -69,10 +72,20 @@ describe('BusinessHoursPage', () => {
     expect(screen.queryByText(/nenhum horario configurado/i)).not.toBeInTheDocument();
   });
 
-  it('avisa que o horario ainda nao tem efeito operacional', async () => {
+  // F4.7: o horario deixou de ser so um registro, mas continua sem alterar disponibilidade e
+  // distribuicao; so restringe o acesso se o Admin ligar a restricao (desligada por padrao).
+  it('explica que o horario so restringe acesso se o Admin ligar a restricao', async () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue(CONFIGURED);
     renderPage(ADMIN);
-    expect(await screen.findByText(/apenas fica registrado/i)).toBeInTheDocument();
+    expect(await screen.findByText(/nunca altera a distribuicao de leads/i)).toBeInTheDocument();
+    expect(await screen.findByTestId('restriction-state')).toHaveTextContent('desligada');
+  });
+
+  it('so o Admin (tenant_settings:update) liga a restricao; quem so le ve o estado sem botao', async () => {
+    vi.mocked(service.getBusinessHours).mockResolvedValue(CONFIGURED);
+    renderPage(['tenant_settings:read']);
+    expect(await screen.findByTestId('restriction-state')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Ligar restricao' })).not.toBeInTheDocument();
   });
 
   it('tenant sem configuracao: mostra a sugestao e nada e gravado sem salvar', async () => {

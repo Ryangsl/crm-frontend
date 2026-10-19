@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
+import { OutsideBusinessHoursAlert } from '@/features/access-control/components/OutsideBusinessHoursAlert';
+import { isOutsideBusinessHours } from '@/features/access-control/lib/labels';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -23,6 +25,7 @@ import { conversationErrorMessage, conversationTitle, DIRECTION_LABELS } from '.
 
 function actionError(err: unknown, fallback: string): string {
   if (err instanceof ApiError) {
+    if (isOutsideBusinessHours(err)) return 'Acesso indisponivel fora do horario de funcionamento.';
     if (err.status === 403) return 'Voce nao tem permissao para esta acao.';
     return conversationErrorMessage(err.code, err.message);
   }
@@ -64,6 +67,17 @@ export function ConversationDetailPage() {
       <p className="flex items-center gap-2 text-neutral-600">
         <Spinner size="sm" /> Carregando conversa...
       </p>
+    );
+  }
+
+  if (isOutsideBusinessHours(conversationQuery.error)) {
+    return (
+      <div className="flex flex-col gap-3">
+        <OutsideBusinessHoursAlert />
+        <Link to="/conversations" className="text-brand-700 text-sm underline">
+          Voltar para conversas
+        </Link>
+      </div>
     );
   }
 

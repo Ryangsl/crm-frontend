@@ -3,6 +3,8 @@ import type { FormEvent } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
+import { OutsideBusinessHoursAlert } from '@/features/access-control/components/OutsideBusinessHoursAlert';
+import { isOutsideBusinessHours } from '@/features/access-control/lib/labels';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -87,7 +89,9 @@ export function LeadDetailPage() {
         </p>
       )}
 
-      {isError && (
+      {isError && isOutsideBusinessHours(error) && <OutsideBusinessHoursAlert />}
+
+      {isError && !isOutsideBusinessHours(error) && (
         <Alert tone="danger" title="Nao foi possivel carregar o lead">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">

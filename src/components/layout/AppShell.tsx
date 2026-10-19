@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { AvailabilityNavItem } from '@/features/availability/components/AvailabilityNavItem';
 import { AvailabilitySelector } from '@/features/availability/components/AvailabilitySelector';
 import { useAuth } from '@/features/auth/useAuth';
+import { AccessStatusBanner } from '@/features/access-control/components/AccessStatusBanner';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 
 /*
@@ -35,6 +36,13 @@ const NAV_ITEMS: NavItem[] = [
     permission: 'conversations:read',
   },
   { to: '/status', label: 'Status', icon: '●', end: true },
+  {
+    to: '/settings/access-exceptions',
+    label: 'Liberacoes',
+    icon: '⏱',
+    end: false,
+    permission: 'access_exceptions:manage',
+  },
   {
     to: '/settings/business-hours',
     label: 'Config.',
@@ -114,6 +122,8 @@ export function AppShell() {
 
         {/* pb-20 reserva espaco para a bottom nav fixa no mobile */}
         <main className="flex-1 px-4 py-4 pb-20 lg:px-8 lg:pb-8">
+          {/* F4.7: aviso preventivo de acesso fora do horario (so para quem e restringido) */}
+          {user && <AccessStatusBanner />}
           <Outlet />
         </main>
 

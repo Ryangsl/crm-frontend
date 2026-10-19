@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
+import { OutsideBusinessHoursAlert } from '@/features/access-control/components/OutsideBusinessHoursAlert';
+import { isOutsideBusinessHours } from '@/features/access-control/lib/labels';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -95,7 +97,9 @@ export function LeadListPage() {
         </p>
       )}
 
-      {isError && (
+      {isError && isOutsideBusinessHours(error) && <OutsideBusinessHoursAlert />}
+
+      {isError && !isOutsideBusinessHours(error) && (
         <Alert tone="danger" title="Nao foi possivel carregar os leads">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">

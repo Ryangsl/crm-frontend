@@ -39,6 +39,8 @@ agente de frontend está em
 
 **Sessão × cache (regra):** o `AuthProvider` cancela as consultas e esvazia o cache do TanStack Query em todo fim efetivo de sessão (logout, logout-all, 401 após refresh falho, falha ao restaurar) e no login; renovar o token com sucesso **não** limpa. As chaves do React Query não incluem o usuário, então **não** remover essa limpeza nem criar outro caminho de encerramento de sessão que a ignore. Testes: `AuthProvider.session-cache.test.tsx`.
 
+**Restrição por horário (F4.7, D-082/D-083):** `features/access-control/`. O backend decide (`403 OUTSIDE_BUSINESS_HOURS`); a UI só informa: banner `AccessStatusBanner` no `AppShell` (a partir de `GET /v1/access-status`, reconsultado a cada minuto), `OutsideBusinessHoursAlert` nas telas de Leads e Conversas (sem "tentar novamente": repetir não muda o resultado), toggle global em `/settings/business-hours` (**só quem tem `tenant_settings:update`**, i.e. o Admin; o Gerente não vê botão) e a tela `/settings/access-exceptions` ("Liberações", `access_exceptions:manage` — Admin e Gerente). Não assumir que um recurso está liberado: nunca esconder/mostrar acesso por conta própria, só pelo status devolvido. Testes: `features/access-control/**` e `AppShell.access-control.test.tsx`; testes que renderizam telas de Leads/Conversas com erro 403 usam `OutsideBusinessHours.test.tsx` como modelo.
+
 ## Antes de implementar qualquer coisa
 
 1. [Decision Register](../crm-spec/docs/00-governance/decision-register.md) — o que está
