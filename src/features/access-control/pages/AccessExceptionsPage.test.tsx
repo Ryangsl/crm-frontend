@@ -105,6 +105,21 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
     });
   });
 
+  it('motivo longo sem espacos (1.000 caracteres) pode quebrar em qualquer ponto e nao estoura a largura (D1)', async () => {
+    const longo = 'a'.repeat(1000);
+    vi.mocked(service.listAccessExceptions).mockResolvedValue(
+      page([{ ...VIGENTE, reason: longo }]),
+    );
+    vi.mocked(service.listExceptionUsers).mockResolvedValue({ data: [] });
+    renderPage(MANAGER);
+
+    const motivo = await screen.findByText(longo);
+    // jsdom nao calcula layout: o que se garante aqui e a regra de CSS (overflow-wrap: anywhere) no
+    // paragrafo e o min-w-0 no item flex que o contem. A largura real foi conferida no navegador (MAT-014).
+    expect(motivo).toHaveClass('wrap-anywhere');
+    expect(motivo.parentElement).toHaveClass('min-w-0');
+  });
+
   it('o filtro pede so vigentes (active=true) ou so revogadas/expiradas (active=false)', async () => {
     const user = userEvent.setup();
     mockLists();
