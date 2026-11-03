@@ -260,11 +260,12 @@ export function AccessExceptionsPage() {
                 <li key={item.id}>
                   <Card>
                     <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div className="flex flex-col gap-1">
+                      <div className="flex min-w-0 flex-col gap-1">
                         <p className="font-medium text-neutral-900">
                           {userNames.get(item.user_id) ?? 'Usuario'} · {SCOPE_LABELS[item.scope]}
                         </p>
-                        <p className="text-sm text-neutral-700">{item.reason}</p>
+                        {/* Motivo livre (ate 1.000 caracteres): sem espacos nao quebraria e estouraria a largura. */}
+                        <p className="wrap-anywhere text-sm text-neutral-700">{item.reason}</p>
                         <p className="text-xs text-neutral-500">
                           {formatDateTime(item.starts_at)} ate {formatDateTime(item.expires_at)} ·{' '}
                           <span data-testid={`status-${item.id}`}>
