@@ -45,6 +45,7 @@ interface StandardErrorBody {
 let accessToken: string | null = null;
 let unauthorizedHandler: (() => void) | null = null;
 let refreshPromise: Promise<string | null> | null = null;
+let apiErrorListener: ((error: ApiError) => void) | null = null;
 
 export function setAccessToken(token: string | null): void {
   accessToken = token;
@@ -56,6 +57,12 @@ export function getAccessToken(): string | null {
 
 export function setUnauthorizedHandler(handler: (() => void) | null): void {
   unauthorizedHandler = handler;
+}
+
+// Observador de toda resposta de erro da API. Generico: este modulo nao conhece codigos de negocio;
+// quem registra decide o que fazer (hoje, os avisos de plano no AppShell).
+export function setApiErrorListener(listener: ((error: ApiError) => void) | null): void {
+  apiErrorListener = listener;
 }
 
 // Rotas de auth nunca levam Bearer (fazem sentido sem sessao) e nunca disparam o
@@ -128,7 +135,9 @@ async function request<T>(path: string, init: RequestInit = {}, retrying = false
 
   if (!response.ok) {
     const { code, message, details, body } = await parseErrorBody(response);
-    throw new ApiError(response.status, code, message, details, body);
+    const error = new ApiError(response.status, code, message, details, body);
+    apiErrorListener?.(error);
+    throw error;
   }
 
   if (response.status === 204) {

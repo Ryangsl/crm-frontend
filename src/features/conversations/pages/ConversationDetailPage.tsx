@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { ConversationStatusBadge } from '../components/ConversationStatusBadge';
 import { MessageComposer } from '../components/MessageComposer';
@@ -26,7 +27,7 @@ import { conversationErrorMessage, conversationTitle, DIRECTION_LABELS } from '.
 function actionError(err: unknown, fallback: string): string {
   if (err instanceof ApiError) {
     if (isOutsideBusinessHours(err)) return 'Acesso indisponivel fora do horario de funcionamento.';
-    if (err.status === 403) return 'Voce nao tem permissao para esta acao.';
+    if (isPermissionDenied(err)) return 'Voce nao tem permissao para esta acao.';
     return conversationErrorMessage(err.code, err.message);
   }
   return fallback;
@@ -194,6 +195,7 @@ export function ConversationDetailPage() {
             <div className="flex flex-wrap gap-2">
               {canListUsers && (
                 <Button
+                  writes
                   size="sm"
                   variant="secondary"
                   disabled={!selectedUser || assignMutation.isPending}
@@ -210,6 +212,7 @@ export function ConversationDetailPage() {
               )}
               {user && conversation.assigned_to !== user.id && (
                 <Button
+                  writes
                   size="sm"
                   variant="secondary"
                   disabled={assignMutation.isPending}
@@ -225,6 +228,7 @@ export function ConversationDetailPage() {
               )}
               {conversation.assigned_to && (
                 <Button
+                  writes
                   size="sm"
                   variant="ghost"
                   disabled={assignMutation.isPending}
@@ -247,6 +251,7 @@ export function ConversationDetailPage() {
         <div className="flex gap-2">
           {isOpen ? (
             <Button
+              writes
               size="sm"
               variant="secondary"
               loading={closeMutation.isPending}
@@ -259,6 +264,7 @@ export function ConversationDetailPage() {
             </Button>
           ) : (
             <Button
+              writes
               size="sm"
               variant="secondary"
               loading={reopenMutation.isPending}

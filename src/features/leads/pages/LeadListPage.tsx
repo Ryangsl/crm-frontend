@@ -54,7 +54,7 @@ export function LeadListPage() {
           <p className="text-sm text-neutral-500">Captação e qualificação de leads do tenant.</p>
         </div>
         {hasPermission('leads:create') && (
-          <Button onClick={() => navigate('/leads/new')}>Novo lead</Button>
+          <Button writes onClick={() => navigate('/leads/new')}>Novo lead</Button>
         )}
       </header>
 
@@ -116,7 +116,7 @@ export function LeadListPage() {
           description="Ajuste os filtros ou cadastre um novo lead."
           action={
             hasPermission('leads:create') ? (
-              <Button size="sm" onClick={() => navigate('/leads/new')}>
+              <Button writes size="sm" onClick={() => navigate('/leads/new')}>
                 Novo lead
               </Button>
             ) : undefined

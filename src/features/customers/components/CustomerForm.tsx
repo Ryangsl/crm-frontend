@@ -4,6 +4,7 @@ import type { FormEvent } from 'react';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { useCreateCustomer, useUpdateCustomer } from '../hooks/useCustomerMutations';
 import type { Customer, CustomerDuplicateCandidate, CustomerInput } from '../types/customer';
@@ -76,7 +77,7 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
         setDuplicates(body?.candidates ?? []);
         return;
       }
-      if (err instanceof ApiError && err.status === 403) {
+      if (isPermissionDenied(err)) {
         setErrorMessage('Voce nao tem permissao para realizar esta acao.');
         return;
       }
@@ -140,7 +141,7 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
       />
 
       <div className="flex gap-2">
-        <Button type="submit" loading={submitting} disabled={submitting}>
+        <Button writes type="submit" loading={submitting} disabled={submitting}>
           {customer ? 'Salvar alteracoes' : 'Criar cliente'}
         </Button>
         {onCancel && (

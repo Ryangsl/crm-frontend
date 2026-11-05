@@ -5,6 +5,7 @@ import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { useCreateLead, useUpdateLead } from '../hooks/useLeadMutations';
 import { useLeadSourcesQuery } from '../hooks/useLeads';
@@ -40,7 +41,7 @@ export function LeadForm({ lead, onSuccess, onCancel }: LeadFormProps) {
         : await createMutation.mutateAsync({ source_id: sourceId });
       onSuccess(result);
     } catch (err) {
-      if (err instanceof ApiError && err.status === 403) {
+      if (isPermissionDenied(err)) {
         setErrorMessage('Voce nao tem permissao para realizar esta acao.');
         return;
       }
@@ -87,7 +88,7 @@ export function LeadForm({ lead, onSuccess, onCancel }: LeadFormProps) {
       )}
 
       <div className="flex gap-2">
-        <Button type="submit" loading={submitting} disabled={submitting || !sourceId}>
+        <Button writes type="submit" loading={submitting} disabled={submitting || !sourceId}>
           {lead ? 'Salvar alteracoes' : 'Criar lead'}
         </Button>
         {onCancel && (

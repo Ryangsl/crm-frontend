@@ -66,6 +66,7 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
       </Select>
       <div>
         <Button
+          writes
           type="submit"
           size="sm"
           loading={mutation.isPending}

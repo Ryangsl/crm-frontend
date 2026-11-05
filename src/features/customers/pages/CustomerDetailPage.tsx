@@ -79,6 +79,7 @@ export function CustomerDetailPage() {
             <div className="flex gap-2">
               {hasPermission('customers:update') && (
                 <Button
+                  writes
                   variant="secondary"
                   size="sm"
                   onClick={() => navigate(`/customers/${customer.id}/edit`)}
@@ -87,7 +88,7 @@ export function CustomerDetailPage() {
                 </Button>
               )}
               {hasPermission('customers:delete') && !confirmingDelete && (
-                <Button variant="danger" size="sm" onClick={() => setConfirmingDelete(true)}>
+                <Button writes variant="danger" size="sm" onClick={() => setConfirmingDelete(true)}>
                   Excluir
                 </Button>
               )}
@@ -108,6 +109,7 @@ export function CustomerDetailPage() {
               </p>
               <div className="flex gap-2">
                 <Button
+                  writes
                   size="sm"
                   variant="danger"
                   loading={deleteMutation.isPending}

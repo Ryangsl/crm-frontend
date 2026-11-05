@@ -120,6 +120,7 @@ export function LeadDetailPage() {
             </div>
             {canUpdate && (
               <Button
+                writes
                 variant="secondary"
                 size="sm"
                 onClick={() => navigate(`/leads/${lead.id}/edit`)}
@@ -139,6 +140,7 @@ export function LeadDetailPage() {
             <div className="flex flex-wrap gap-2">
               {canUpdate && QUALIFIABLE.includes(lead.status) && (
                 <Button
+                  writes
                   size="sm"
                   loading={qualifyMutation.isPending}
                   onClick={() => void runAction(() => qualifyMutation.mutateAsync())}
@@ -147,12 +149,13 @@ export function LeadDetailPage() {
                 </Button>
               )}
               {canUpdate && DISQUALIFIABLE.includes(lead.status) && panel !== 'disqualify' && (
-                <Button size="sm" variant="secondary" onClick={() => setPanel('disqualify')}>
+                <Button writes size="sm" variant="secondary" onClick={() => setPanel('disqualify')}>
                   Desqualificar
                 </Button>
               )}
               {canUpdate && REOPENABLE.includes(lead.status) && (
                 <Button
+                  writes
                   size="sm"
                   loading={reopenMutation.isPending}
                   onClick={() => void runAction(() => reopenMutation.mutateAsync())}
@@ -161,7 +164,7 @@ export function LeadDetailPage() {
                 </Button>
               )}
               {canUpdate && CONVERTIBLE.includes(lead.status) && panel !== 'convert' && (
-                <Button size="sm" variant="secondary" onClick={() => setPanel('convert')}>
+                <Button writes size="sm" variant="secondary" onClick={() => setPanel('convert')}>
                   Converter
                 </Button>
               )}
@@ -169,6 +172,7 @@ export function LeadDetailPage() {
                 lead.status === 'converted' &&
                 lead.customer_id && (
                   <Button
+                    writes
                     size="sm"
                     onClick={() =>
                       navigate(
@@ -180,7 +184,7 @@ export function LeadDetailPage() {
                   </Button>
                 )}
               {hasPermission('leads:delete') && panel !== 'delete' && (
-                <Button size="sm" variant="danger" onClick={() => setPanel('delete')}>
+                <Button writes size="sm" variant="danger" onClick={() => setPanel('delete')}>
                   Excluir
                 </Button>
               )}
@@ -198,7 +202,7 @@ export function LeadDetailPage() {
                   onChange={(event) => setReason(event.target.value)}
                 />
                 <div className="flex gap-2">
-                  <Button type="submit" size="sm" loading={disqualifyMutation.isPending}>
+                  <Button writes type="submit" size="sm" loading={disqualifyMutation.isPending}>
                     Confirmar
                   </Button>
                   <Button
@@ -231,6 +235,7 @@ export function LeadDetailPage() {
                 </p>
                 <div className="flex gap-2">
                   <Button
+                    writes
                     size="sm"
                     variant="danger"
                     loading={deleteMutation.isPending}

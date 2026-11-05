@@ -63,6 +63,7 @@ export function EntityConversationsSection({
         <h2 className="text-base font-semibold text-neutral-900">Conversas</h2>
         {canCreate && (
           <Button
+            writes
             size="sm"
             variant="secondary"
             loading={createMutation.isPending}

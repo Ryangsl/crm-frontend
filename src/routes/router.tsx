@@ -24,6 +24,7 @@ import { TeamAvailabilityPage } from '../features/availability/pages/TeamAvailab
 import { AccessExceptionsPage } from '../features/access-control/pages/AccessExceptionsPage';
 import { ConversationListPage } from '../features/conversations/pages/ConversationListPage';
 import { ConversationDetailPage } from '../features/conversations/pages/ConversationDetailPage';
+import { PlanPage } from '../features/plan/pages/PlanPage';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -54,6 +55,7 @@ export const router = createBrowserRouter([
           { path: 'settings/business-hours', element: <BusinessHoursPage /> },
           { path: 'team/availability', element: <TeamAvailabilityPage /> },
           { path: 'settings/access-exceptions', element: <AccessExceptionsPage /> },
+          { path: 'plan', element: <PlanPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

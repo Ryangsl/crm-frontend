@@ -65,7 +65,7 @@ export function TimelineSection({ entityType, entityId }: TimelineSectionProps) 
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold text-neutral-900">Historico</h2>
         {canCreate && !creating && (
-          <Button size="sm" variant="secondary" onClick={() => setCreating(true)}>
+          <Button writes size="sm" variant="secondary" onClick={() => setCreating(true)}>
             Registrar interacao
           </Button>
         )}
@@ -136,6 +136,7 @@ export function TimelineSection({ entityType, entityId }: TimelineSectionProps) 
                 </div>
                 {item.type === 'interaction' && canDelete && (
                   <Button
+                    writes
                     size="sm"
                     variant="ghost"
                     loading={deleteMutation.isPending && deleteMutation.variables === item.id}

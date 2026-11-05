@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -37,6 +37,15 @@ function renderShell(permissions: string[]) {
     </QueryClientProvider>,
   );
 }
+
+describe('AppShell — item de plano (D-085)', () => {
+  it('aparece na sidebar para todo usuario e nao entra na barra inferior, que ja esta cheia', () => {
+    renderShell([]);
+    const [sidebar, bottom] = screen.getAllByRole('navigation', { name: 'Principal' });
+    expect(within(sidebar).getByRole('link', { name: /plano/i })).toHaveAttribute('href', '/plan');
+    expect(within(bottom).queryByRole('link', { name: /plano/i })).not.toBeInTheDocument();
+  });
+});
 
 describe('AppShell — item de configuracoes', () => {
   it('sem tenant_settings:read o item de configuracoes nao aparece (sidebar e bottom nav)', () => {
