@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { listCustomers } from '@/features/customers/services/customers';
 import type { Customer } from '@/features/customers/types/customer';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { useConvertLead } from '../hooks/useLeadMutations';
 import type { ConvertLeadInput, Lead } from '../types/lead';
@@ -73,7 +74,7 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
         setDuplicates(body?.candidates ?? []);
         return;
       }
-      if (err instanceof ApiError && err.status === 403) {
+      if (isPermissionDenied(err)) {
         setErrorMessage('Voce nao tem permissao para realizar esta acao.');
         return;
       }
@@ -201,7 +202,7 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
       )}
 
       <div className="flex gap-2">
-        <Button type="submit" loading={convertMutation.isPending} disabled={!canSubmit}>
+        <Button writes type="submit" loading={convertMutation.isPending} disabled={!canSubmit}>
           Converter
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel} disabled={convertMutation.isPending}>

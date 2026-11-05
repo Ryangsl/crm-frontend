@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import {
   useAvailabilityListQuery,
@@ -24,7 +25,7 @@ function manageError(error: unknown): string {
       return 'A disponibilidade foi desabilitada para esta empresa.';
     }
     if (error.code === 'AVAILABILITY_USER_INACTIVE') return 'O usuario esta inativo.';
-    if (error.status === 403) return 'Voce nao tem permissao para esta acao.';
+    if (isPermissionDenied(error)) return 'Voce nao tem permissao para esta acao.';
     if (error.status === 404) return 'Usuario nao encontrado.';
   }
   return 'Nao foi possivel concluir a acao.';
@@ -174,6 +175,7 @@ export function TeamAvailabilityPage() {
                         </div>
                         {canManage && !isSelf && (
                           <Button
+                            writes
                             size="sm"
                             variant="secondary"
                             disabled={mutation.isPending}

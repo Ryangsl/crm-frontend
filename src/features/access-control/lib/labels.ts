@@ -1,3 +1,4 @@
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import type { AccessException, AccessExceptionScope } from '../types/accessControl';
 
@@ -30,7 +31,7 @@ export function accessControlErrorMessage(error: unknown, fallback: string): str
       case 'ACCESS_EXCEPTION_EXPIRY_INVALID':
         return 'A expiracao da liberacao deve estar no futuro.';
       default:
-        if (error.status === 403) return 'Voce nao tem permissao para esta acao.';
+        if (isPermissionDenied(error)) return 'Voce nao tem permissao para esta acao.';
         if (error.status === 404) return 'Registro nao encontrado.';
     }
   }

@@ -5,6 +5,7 @@ import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import {
   useLoseOpportunity,
@@ -115,7 +116,7 @@ export function OpportunityActionPanel({
         setError(
           'A etapa de destino exige valor: informe o valor da oportunidade e envie novamente.',
         );
-      } else if (err instanceof ApiError && err.status === 403) {
+      } else if (isPermissionDenied(err)) {
         setError('Você não tem permissão para realizar esta ação.');
       } else {
         setError(err instanceof ApiError ? err.message : 'Não foi possível concluir a ação.');
@@ -216,7 +217,7 @@ export function OpportunityActionPanel({
       )}
 
       <div className="flex gap-2">
-        <Button type="submit" size="sm" loading={busy} disabled={!canSubmit}>
+        <Button writes type="submit" size="sm" loading={busy} disabled={!canSubmit}>
           {submitLabel}
         </Button>
         <Button type="button" size="sm" variant="secondary" onClick={onCancel} disabled={busy}>

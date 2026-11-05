@@ -6,6 +6,8 @@ import { AvailabilitySelector } from '@/features/availability/components/Availab
 import { useAuth } from '@/features/auth/useAuth';
 import { AccessStatusBanner } from '@/features/access-control/components/AccessStatusBanner';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
+import { PlanAccessProvider } from '@/features/plan/components/PlanAccessProvider';
+import { TrialShellNotice } from '@/features/plan/components/TrialShellNotice';
 
 /*
  * Navegacao Mobile First (crm-spec/docs/06-frontend/design-system.md secao 4):
@@ -20,6 +22,8 @@ interface NavItem {
   // Quando presente, o item so aparece para quem tem a permissao (apenas UX — o backend e a
   // autoridade).
   permission?: string;
+  // Fora da barra inferior, que ja nao comporta mais itens; no celular, o acesso e pelo Inicio.
+  sidebarOnly?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -36,6 +40,7 @@ const NAV_ITEMS: NavItem[] = [
     permission: 'conversations:read',
   },
   { to: '/status', label: 'Status', icon: '●', end: true },
+  { to: '/plan', label: 'Plano', icon: '★', end: true, sidebarOnly: true },
   {
     to: '/settings/access-exceptions',
     label: 'Liberacoes',
@@ -57,6 +62,14 @@ function navClasses(isActive: boolean) {
 }
 
 export function AppShell() {
+  return (
+    <PlanAccessProvider>
+      <AppShellLayout />
+    </PlanAccessProvider>
+  );
+}
+
+function AppShellLayout() {
   const { user, logout, hasPermission } = useAuth();
   const navItems = NAV_ITEMS.filter((item) => !item.permission || hasPermission(item.permission));
 
@@ -124,6 +137,8 @@ export function AppShell() {
         <main className="flex-1 px-4 py-4 pb-20 lg:px-8 lg:pb-8">
           {/* F4.7: aviso preventivo de acesso fora do horario (so para quem e restringido) */}
           {user && <AccessStatusBanner />}
+          {/* D-085: modo de consulta precisa estar identificado em toda tela */}
+          {user && <TrialShellNotice />}
           <Outlet />
         </main>
 
@@ -133,7 +148,7 @@ export function AppShell() {
           className="border-border-subtle bg-surface fixed inset-x-0 bottom-0 z-10 border-t lg:hidden"
         >
           <ul className="flex">
-            {navItems.map((item) => (
+            {navItems.filter((item) => !item.sidebarOnly).map((item) => (
               <li key={item.to} className="flex-1">
                 <NavLink
                   to={item.to}

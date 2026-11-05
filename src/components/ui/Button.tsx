@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 import { Spinner } from './Spinner';
+import { useWriteBlockReason } from './write-access';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type Size = 'sm' | 'md';
@@ -9,6 +10,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
   loading?: boolean;
+  // Acao que altera dados: fica desabilitada, com o motivo, quando a escrita esta indisponivel (ex.:
+  // trial encerrado). Navegacao, filtros, paginacao e "tentar novamente" nao usam.
+  writes?: boolean;
   children: ReactNode;
 }
 
@@ -30,15 +34,20 @@ export function Button({
   variant = 'primary',
   size = 'md',
   loading = false,
+  writes = false,
   disabled,
   children,
   className = '',
+  title,
   ...rest
 }: ButtonProps) {
+  const writeBlockReason = useWriteBlockReason();
+  const blocked = writes && writeBlockReason !== null;
   return (
     <button
       {...rest}
-      disabled={disabled ?? loading}
+      title={blocked ? writeBlockReason : title}
+      disabled={blocked || (disabled ?? loading)}
       aria-busy={loading || undefined}
       className={`inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors disabled:cursor-not-allowed ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
     >

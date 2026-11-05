@@ -43,7 +43,7 @@ export function CustomerListPage() {
           <p className="text-sm text-neutral-500">Cadastro de clientes do tenant.</p>
         </div>
         {hasPermission('customers:create') && (
-          <Button onClick={() => navigate('/customers/new')}>Novo cliente</Button>
+          <Button writes onClick={() => navigate('/customers/new')}>Novo cliente</Button>
         )}
       </header>
 
@@ -86,7 +86,7 @@ export function CustomerListPage() {
           description={q ? 'Tente outro termo de busca.' : 'Comece cadastrando o primeiro cliente.'}
           action={
             hasPermission('customers:create') && !q ? (
-              <Button size="sm" onClick={() => navigate('/customers/new')}>
+              <Button writes size="sm" onClick={() => navigate('/customers/new')}>
                 Novo cliente
               </Button>
             ) : undefined

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 
 import { Select } from '@/components/ui/Select';
+import { useWriteBlockReason } from '@/components/ui/write-access';
 import { useAuth } from '@/features/auth/useAuth';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { useMyAvailabilityQuery, useSetMyAvailability } from '../hooks/useAvailability';
 import { SELF_STATUSES, STATUS_LABELS } from '../lib/labels';
@@ -15,7 +17,7 @@ function errorMessage(error: unknown): string {
     if (error.code === 'AVAILABILITY_DISABLED') {
       return 'A disponibilidade foi desabilitada para esta empresa.';
     }
-    if (error.status === 403) return 'Voce nao tem permissao para alterar a disponibilidade.';
+    if (isPermissionDenied(error)) return 'Voce nao tem permissao para alterar a disponibilidade.';
   }
   return 'Nao foi possivel alterar a disponibilidade.';
 }
@@ -23,6 +25,7 @@ function errorMessage(error: unknown): string {
 function SelectorInner({ className = '' }: { className?: string }) {
   const { data } = useMyAvailabilityQuery(true);
   const mutation = useSetMyAvailability();
+  const writeBlocked = useWriteBlockReason() !== null;
   const [error, setError] = useState<string | null>(null);
 
   // Mecanismo desabilitado (ou ainda carregando/erro): o seletor nao e exibido (D-071).
@@ -45,7 +48,7 @@ function SelectorInner({ className = '' }: { className?: string }) {
       <Select
         label="Disponibilidade"
         value={data.status}
-        disabled={locked || mutation.isPending}
+        disabled={locked || mutation.isPending || writeBlocked}
         onChange={(event) => void handleChange(event.target.value as AvailabilityStatus)}
       >
         {options.map((status) => (

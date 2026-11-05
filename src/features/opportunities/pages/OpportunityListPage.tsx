@@ -55,7 +55,7 @@ export function OpportunityListPage() {
             Ver pipeline
           </Button>
           {hasPermission('opportunities:create') && (
-            <Button onClick={() => navigate('/opportunities/new')}>Nova oportunidade</Button>
+            <Button writes onClick={() => navigate('/opportunities/new')}>Nova oportunidade</Button>
           )}
         </div>
       </header>
@@ -131,7 +131,7 @@ export function OpportunityListPage() {
           description="Ajuste os filtros ou cadastre uma nova oportunidade."
           action={
             hasPermission('opportunities:create') ? (
-              <Button size="sm" onClick={() => navigate('/opportunities/new')}>
+              <Button writes size="sm" onClick={() => navigate('/opportunities/new')}>
                 Nova oportunidade
               </Button>
             ) : undefined

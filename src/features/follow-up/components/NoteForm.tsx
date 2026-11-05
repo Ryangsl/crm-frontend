@@ -4,6 +4,7 @@ import type { FormEvent } from 'react';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { useCreateNote, useUpdateNote } from '../hooks/useNotes';
 import type { CrmEntityType, Note } from '../types/followUp';
@@ -37,7 +38,7 @@ export function NoteForm({ entityType, entityId, note, onSuccess, onCancel }: No
       }
       onSuccess();
     } catch (err) {
-      if (err instanceof ApiError && err.status === 403) {
+      if (isPermissionDenied(err)) {
         setErrorMessage('Voce nao tem permissao para realizar esta acao.');
         return;
       }
@@ -61,7 +62,7 @@ export function NoteForm({ entityType, entityId, note, onSuccess, onCancel }: No
       />
 
       <div className="flex gap-2">
-        <Button type="submit" size="sm" loading={submitting} disabled={submitting}>
+        <Button writes type="submit" size="sm" loading={submitting} disabled={submitting}>
           {note ? 'Salvar' : 'Adicionar'}
         </Button>
         <Button type="button" size="sm" variant="secondary" onClick={onCancel} disabled={submitting}>

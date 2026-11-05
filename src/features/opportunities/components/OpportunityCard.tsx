@@ -37,13 +37,13 @@ export function OpportunityCard({ opportunity, stages, canUpdate }: OpportunityC
 
       {canUpdate && isOpen && mode === null && (
         <div className="flex flex-wrap gap-1">
-          <Button size="sm" variant="secondary" onClick={() => setMode('move')}>
+          <Button writes size="sm" variant="secondary" onClick={() => setMode('move')}>
             Mover
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => setMode('win')}>
+          <Button writes size="sm" variant="ghost" onClick={() => setMode('win')}>
             Ganhar
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => setMode('lose')}>
+          <Button writes size="sm" variant="ghost" onClick={() => setMode('lose')}>
             Perder
           </Button>
         </div>

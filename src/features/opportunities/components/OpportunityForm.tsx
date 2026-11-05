@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { CustomerPicker } from '@/features/customers/components/CustomerPicker';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { useCreateOpportunity, useUpdateOpportunity } from '../hooks/useOpportunityMutations';
 import { usePipelinesQuery } from '../hooks/useOpportunities';
@@ -80,7 +81,7 @@ export function OpportunityForm({
           });
       onSuccess(result);
     } catch (err) {
-      if (err instanceof ApiError && err.status === 403) {
+      if (isPermissionDenied(err)) {
         setErrorMessage('Você não tem permissão para realizar esta ação.');
         return;
       }
@@ -152,7 +153,7 @@ export function OpportunityForm({
       />
 
       <div className="flex gap-2">
-        <Button type="submit" loading={submitting} disabled={submitting || !canSubmit}>
+        <Button writes type="submit" loading={submitting} disabled={submitting || !canSubmit}>
           {opportunity ? 'Salvar alterações' : 'Criar oportunidade'}
         </Button>
         {onCancel && (

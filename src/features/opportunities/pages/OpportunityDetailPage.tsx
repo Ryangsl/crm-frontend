@@ -104,6 +104,7 @@ export function OpportunityDetailPage() {
             </div>
             {canUpdate && (
               <Button
+                writes
                 variant="secondary"
                 size="sm"
                 onClick={() => navigate(`/opportunities/${opportunity.id}/edit`)}
@@ -129,19 +130,19 @@ export function OpportunityDetailPage() {
             <div className="flex flex-wrap gap-2">
               {canUpdate && isOpen && mode === null && (
                 <>
-                  <Button size="sm" variant="secondary" onClick={() => setMode('move')}>
+                  <Button writes size="sm" variant="secondary" onClick={() => setMode('move')}>
                     Mover
                   </Button>
-                  <Button size="sm" onClick={() => setMode('win')}>
+                  <Button writes size="sm" onClick={() => setMode('win')}>
                     Ganhar
                   </Button>
-                  <Button size="sm" variant="secondary" onClick={() => setMode('lose')}>
+                  <Button writes size="sm" variant="secondary" onClick={() => setMode('lose')}>
                     Perder
                   </Button>
                 </>
               )}
               {hasPermission('opportunities:delete') && !confirmingDelete && (
-                <Button size="sm" variant="danger" onClick={() => setConfirmingDelete(true)}>
+                <Button writes size="sm" variant="danger" onClick={() => setConfirmingDelete(true)}>
                   Excluir
                 </Button>
               )}
@@ -168,6 +169,7 @@ export function OpportunityDetailPage() {
                   </p>
                   <div className="flex gap-2">
                     <Button
+                      writes
                       size="sm"
                       variant="danger"
                       loading={deleteMutation.isPending}

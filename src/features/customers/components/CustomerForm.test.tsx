@@ -94,6 +94,20 @@ describe('CustomerForm', () => {
     expect(await screen.findByText(/voce nao tem permissao/i)).toBeInTheDocument();
   });
 
+  it('recusa por limite do plano mostra o motivo real, nao falta de permissao (D-085)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(customersService.createCustomer).mockRejectedValue(
+      new ApiError(403, 'PLAN_LIMIT_REACHED', 'O limite do plano foi atingido.'),
+    );
+    renderForm();
+
+    await user.type(screen.getByLabelText(/^nome$/i), 'Cliente Teste');
+    await user.click(screen.getByRole('button', { name: /criar cliente/i }));
+
+    expect(await screen.findByText('O limite do plano foi atingido.')).toBeInTheDocument();
+    expect(screen.queryByText(/nao tem permissao/i)).not.toBeInTheDocument();
+  });
+
   it('em modo edicao, pre-preenche os campos e chama updateCustomer', async () => {
     const user = userEvent.setup();
     vi.mocked(customersService.updateCustomer).mockResolvedValue({

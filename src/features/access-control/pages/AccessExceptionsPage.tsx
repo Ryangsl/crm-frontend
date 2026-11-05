@@ -193,6 +193,7 @@ export function AccessExceptionsPage() {
 
           <div>
             <Button
+              writes
               type="submit"
               size="sm"
               loading={createMutation.isPending}
@@ -276,6 +277,7 @@ export function AccessExceptionsPage() {
                       </div>
                       {active && (
                         <Button
+                          writes
                           size="sm"
                           variant="secondary"
                           disabled={revokeMutation.isPending}

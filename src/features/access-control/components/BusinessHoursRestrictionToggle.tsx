@@ -85,6 +85,7 @@ export function BusinessHoursRestrictionToggle({ hoursConfigured }: Props) {
               )}
               <div>
                 <Button
+                  writes
                   size="sm"
                   variant={enabled ? 'secondary' : 'primary'}
                   loading={mutation.isPending}

@@ -45,7 +45,7 @@ export function ContactsSection({ customerId }: ContactsSectionProps) {
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold text-neutral-900">Contatos</h2>
         {canCreate && mode === null && (
-          <Button size="sm" variant="secondary" onClick={() => setMode({ kind: 'create' })}>
+          <Button writes size="sm" variant="secondary" onClick={() => setMode({ kind: 'create' })}>
             Adicionar contato
           </Button>
         )}
@@ -109,6 +109,7 @@ export function ContactsSection({ customerId }: ContactsSectionProps) {
                   <div className="flex shrink-0 gap-1">
                     {canEdit && (
                       <Button
+                        writes
                         size="sm"
                         variant="ghost"
                         onClick={() => setMode({ kind: 'edit', contact })}
@@ -118,6 +119,7 @@ export function ContactsSection({ customerId }: ContactsSectionProps) {
                     )}
                     {canDelete && (
                       <Button
+                        writes
                         size="sm"
                         variant="ghost"
                         loading={deleteMutation.isPending}

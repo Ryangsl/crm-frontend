@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { fromDatetimeLocalValue, toDatetimeLocalValue } from '@/features/follow-up/lib/datetime';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { useCreateInteraction } from '../hooks/useTimeline';
 import type { CrmEntityType, InteractionDirection } from '../types/interactions';
@@ -55,7 +56,7 @@ export function InteractionForm({
       });
       onSuccess();
     } catch (err) {
-      if (err instanceof ApiError && err.status === 403) {
+      if (isPermissionDenied(err)) {
         setErrorMessage('Voce nao tem permissao para realizar esta acao.');
         return;
       }
@@ -111,7 +112,7 @@ export function InteractionForm({
       />
 
       <div className="flex gap-2">
-        <Button type="submit" size="sm" loading={submitting} disabled={submitting}>
+        <Button writes type="submit" size="sm" loading={submitting} disabled={submitting}>
           Registrar
         </Button>
         <Button

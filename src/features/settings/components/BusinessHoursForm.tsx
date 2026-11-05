@@ -5,6 +5,7 @@ import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { useSaveBusinessHours } from '../hooks/useBusinessHours';
 import type { BusinessHours } from '../types/businessHours';
@@ -119,7 +120,7 @@ export function BusinessHoursForm({ initial, readOnly = false }: BusinessHoursFo
       });
       setSaved(true);
     } catch (err) {
-      if (err instanceof ApiError && err.status === 403) {
+      if (isPermissionDenied(err)) {
         setFormError('Voce nao tem permissao para alterar esta configuracao.');
         return;
       }
@@ -223,7 +224,7 @@ export function BusinessHoursForm({ initial, readOnly = false }: BusinessHoursFo
           <Button type="button" variant="secondary" onClick={addWindow} disabled={submitting}>
             Adicionar janela
           </Button>
-          <Button type="submit" loading={submitting} disabled={submitting}>
+          <Button writes type="submit" loading={submitting} disabled={submitting}>
             Salvar
           </Button>
         </div>
