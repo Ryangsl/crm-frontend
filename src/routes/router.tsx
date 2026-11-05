@@ -28,11 +28,8 @@ import { PlanPage } from '../features/plan/pages/PlanPage';
 import { BrandIdentityPage } from '../features/branding/pages/BrandIdentityPage';
 import { FollowUpsPage } from '../features/follow-up/pages/FollowUpsPage';
 import { SearchPage } from '../features/search/pages/SearchPage';
-import {
-  RolesPage,
-  SettingsHomePage,
-  UsersPage,
-} from '../features/settings/pages/SettingsPages';
+import { RolesPage, SettingsHomePage } from '../features/settings/pages/SettingsPages';
+import { UsersPage } from '../features/users/pages/UsersPage';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
