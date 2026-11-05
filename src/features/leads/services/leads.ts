@@ -13,6 +13,7 @@ export interface ListLeadsParams {
   status?: string;
   owner_id?: string;
   source_id?: string;
+  q?: string;
 }
 
 export function listLeads(params: ListLeadsParams = {}): Promise<LeadListResponse> {
@@ -22,6 +23,7 @@ export function listLeads(params: ListLeadsParams = {}): Promise<LeadListRespons
   if (params.status) query.set('status', params.status);
   if (params.owner_id) query.set('owner_id', params.owner_id);
   if (params.source_id) query.set('source_id', params.source_id);
+  if (params.q) query.set('q', params.q);
   const qs = query.toString();
   return apiGet<LeadListResponse>(`/v1/leads${qs ? `?${qs}` : ''}`);
 }

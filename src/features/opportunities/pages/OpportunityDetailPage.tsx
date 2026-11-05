@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
@@ -78,10 +79,16 @@ export function OpportunityDetailPage() {
 
       {opportunity && (
         <>
+          <Breadcrumb
+            items={[
+              { label: 'Oportunidades', to: '/opportunities' },
+              { label: opportunity.customer.name },
+            ]}
+          />
           <header className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-semibold text-neutral-900">
+                <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
                   {opportunity.customer.name}
                 </h1>
                 <OpportunityStatusBadge status={opportunity.status} />

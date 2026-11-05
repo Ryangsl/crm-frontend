@@ -1,3 +1,5 @@
+import { Badge } from '@/components/ui/Badge';
+import type { BadgeTone } from '@/components/ui/Badge';
 import type { LeadStatus } from '../types/lead';
 
 const LABELS: Record<LeadStatus, string> = {
@@ -8,18 +10,14 @@ const LABELS: Record<LeadStatus, string> = {
   converted: 'Convertido',
 };
 
-const CLASSES: Record<LeadStatus, string> = {
-  new: 'bg-brand-50 text-brand-900',
-  in_progress: 'bg-brand-50 text-brand-900',
-  qualified: 'bg-surface text-success border border-success',
-  disqualified: 'bg-surface text-danger border border-danger',
-  converted: 'bg-surface text-success border border-success',
+const TONES: Record<LeadStatus, BadgeTone> = {
+  new: 'info',
+  in_progress: 'warning',
+  qualified: 'success',
+  disqualified: 'danger',
+  converted: 'success',
 };
 
 export function LeadStatusBadge({ status }: { status: LeadStatus }) {
-  return (
-    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${CLASSES[status]}`}>
-      {LABELS[status]}
-    </span>
-  );
+  return <Badge tone={TONES[status]}>{LABELS[status]}</Badge>;
 }

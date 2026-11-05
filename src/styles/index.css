@@ -1,44 +1,97 @@
 @import 'tailwindcss';
 
 /*
- * Fundacao visual — crm-spec/docs/06-frontend/design-system.md.
+ * Design tokens do CRM Universal (D-086): identidade institucional "Executive", tema claro.
+ * crm-spec/docs/06-frontend/design-system.md.
  *
- * A paleta abaixo e PLACEHOLDER neutra (D-043 — VALIDACAO DE NEGOCIO). Trocar a marca
- * significa alterar apenas estes tokens; nenhum componente referencia cor literal.
- * Breakpoints seguem crm-spec/docs/06-frontend/responsive.md (Mobile First: xs -> xl).
+ * Unica fonte de cor do frontend: nenhum componente usa cor literal. A identidade de um tenant
+ * sobrepoe estas variaveis em tempo de execucao (features/branding/lib/theme.ts); sem identidade, ou
+ * se ela nao carregar, valem os valores abaixo. `static` emite todos os tokens, usados ou nao, porque
+ * a sobreposicao acontece fora do build.
  */
-@theme {
-  /* Marca (placeholder — substituir quando D-043 for decidida) */
-  --color-brand-50: oklch(0.97 0.01 250);
-  --color-brand-100: oklch(0.93 0.02 250);
-  --color-brand-200: oklch(0.87 0.04 250);
-  --color-brand-300: oklch(0.78 0.07 250);
-  --color-brand-400: oklch(0.68 0.1 250);
-  --color-brand-500: oklch(0.58 0.12 250);
-  --color-brand-600: oklch(0.5 0.11 250);
-  --color-brand-700: oklch(0.42 0.09 250);
-  --color-brand-800: oklch(0.34 0.07 250);
-  --color-brand-900: oklch(0.26 0.05 250);
+@theme static {
+  /* Marca: interacao, links, foco e destaques. 600 = cor primaria. */
+  --color-brand-50: #edf5ff;
+  --color-brand-100: #d0e2ff;
+  --color-brand-200: #a6c8ff;
+  --color-brand-300: #78a9ff;
+  --color-brand-400: #4589ff;
+  --color-brand-500: #2a74ff;
+  --color-brand-600: #0f62fe;
+  --color-brand-700: #0043ce;
+  --color-brand-800: #002d9c;
+  --color-brand-900: #001d6c;
 
-  /* Semanticas de feedback */
-  --color-success: oklch(0.65 0.14 155);
-  --color-warning: oklch(0.75 0.14 80);
-  --color-danger: oklch(0.6 0.18 25);
+  /* Botao principal e a tinta legivel sobre ele */
+  --color-button: #0f62fe;
+  --color-button-hover: #0043ce;
+  --color-on-button: #ffffff;
 
-  /* Superficies */
-  --color-surface: oklch(1 0 0);
-  --color-surface-muted: oklch(0.97 0 0);
-  --color-border-subtle: oklch(0.9 0 0);
+  /* Barra lateral */
+  --color-sidebar: #0b2545;
+  --color-sidebar-ink: #ffffff;
+  --color-sidebar-muted: #b6c4d6;
+  --color-sidebar-hover: #1b3556;
+  --color-sidebar-active: #0f62fe;
+  --color-on-sidebar-active: #ffffff;
+  --color-sidebar-border: #213a59;
+
+  /* Fundo e superficies */
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f5f9;
+  --color-border-subtle: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+
+  /* Texto: 900 = titulos e texto principal; 500 = texto secundario */
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+  --color-neutral-950: #020617;
+
+  /*
+   * Estados. A cor usada como texto tem contraste AA; a "mark" so entra em ponto, barra e icone.
+   * Erro: #dc2626 em vez do #ef4444 da referencia, porque texto branco sobre #ef4444 fica em 3,76:1.
+   */
+  --color-success: #047857;
+  --color-success-mark: #10b981;
+  --color-success-soft: #ecfdf5;
+  --color-warning: #b45309;
+  --color-warning-mark: #f59e0b;
+  --color-warning-soft: #fffbeb;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-info-soft: #edf5ff;
+
+  /* Series de grafico: ordem fixa, validada para daltonismo. Nao seguem a marca do tenant. */
+  --color-chart-1: #0f62fe;
+  --color-chart-2: #059669;
+  --color-chart-3: #7c3aed;
 
   /* Tipografia */
   --font-sans:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    'Inter Variable', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial,
+    sans-serif;
 
-  /* Breakpoints — Mobile First (xs e o baseline de 360px do RNF-12) */
+  /* Raios e elevacao */
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+  --shadow-raised: 0 8px 24px -6px rgb(15 23 42 / 0.16);
+
+  /* Breakpoints: Mobile First (xs e o baseline de 360px do RNF-12) */
   --breakpoint-xs: 22.5rem;
 
-  /* Alvo minimo de toque (44px) exigido em responsive.md secao 4 */
+  /* Alvo minimo de toque (44px) e densidade de telas com ponteiro preciso */
   --spacing-touch: 2.75rem;
+  --spacing-control: 2.5rem;
 }
 
 @layer base {
@@ -47,11 +100,16 @@
   }
 
   body {
-    @apply bg-surface-muted text-neutral-900 font-sans antialiased;
+    @apply bg-background font-sans text-sm text-neutral-900 antialiased;
   }
 
   /* Foco visivel e requisito de acessibilidade (design-system.md secao 7) */
   :focus-visible {
     @apply outline-brand-600 outline-2 outline-offset-2;
+  }
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    accent-color: var(--color-brand-600);
   }
 }

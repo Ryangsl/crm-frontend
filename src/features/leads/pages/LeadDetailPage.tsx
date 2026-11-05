@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { OutsideBusinessHoursAlert } from '@/features/access-control/components/OutsideBusinessHoursAlert';
 import { isOutsideBusinessHours } from '@/features/access-control/lib/labels';
 import { Button } from '@/components/ui/Button';
@@ -104,10 +105,11 @@ export function LeadDetailPage() {
 
       {lead && (
         <>
+          <Breadcrumb items={[{ label: 'Leads', to: '/leads' }, { label: lead.name || 'Lead' }]} />
           <header className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-semibold text-neutral-900">Lead</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Lead</h1>
                 <LeadStatusBadge status={lead.status} />
               </div>
               <p className="text-sm text-neutral-500">Origem: {sourceName ?? '—'}</p>

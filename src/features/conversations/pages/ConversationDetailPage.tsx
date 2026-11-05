@@ -125,7 +125,7 @@ export function ConversationDetailPage() {
           Conversas
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h1 className="text-lg font-semibold text-neutral-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
             {conversationTitle(conversation)}
           </h1>
           <ConversationStatusBadge status={conversation.status} />
@@ -317,7 +317,16 @@ export function ConversationDetailPage() {
           {messages.length > 0 && (
             <ul className="flex flex-col gap-2">
               {messages.map((message) => (
-                <li key={message.id} className="border-border-subtle rounded-lg border p-3">
+                <li
+                  key={message.id}
+                  className={`rounded-card max-w-[85%] border p-3 ${
+                    message.direction === 'outbound'
+                      ? 'bg-brand-50 border-brand-100 self-end'
+                      : message.direction === 'inbound'
+                        ? 'bg-surface border-border-subtle self-start'
+                        : 'bg-surface-muted border-border-subtle self-center'
+                  }`}
+                >
                   <p className="text-xs text-neutral-500">
                     {message.direction ? DIRECTION_LABELS[message.direction] : 'Interna'}
                     {' · '}

@@ -34,7 +34,7 @@ export function PipelineBoardPage() {
     <div className="flex flex-col gap-4">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold text-neutral-900">Pipeline</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Pipeline</h1>
           <p className="text-sm text-neutral-500">Acompanhe onde cada negociação está no funil.</p>
         </div>
         <div className="flex flex-wrap items-end gap-2">

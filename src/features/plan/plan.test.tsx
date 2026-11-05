@@ -411,8 +411,8 @@ describe('páginas', () => {
     renderApp(<HomePage />, { permissions: ['plan:read'] });
 
     await waitFor(() => expect(planService.getPlanSituation).toHaveBeenCalled());
-    expect(screen.getByRole('link', { name: 'Clientes' })).toHaveAttribute('href', '/customers');
-    expect(screen.getByRole('link', { name: 'Plano' })).toHaveAttribute('href', '/plan');
+    expect(screen.getByRole('heading', { name: 'Olá, Ana!' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Período')).toBeInTheDocument();
   });
 
   it('Plano: lista só o que existe no produto e orienta a contratação sem inventar contato', async () => {

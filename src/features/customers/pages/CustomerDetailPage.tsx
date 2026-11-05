@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
@@ -67,9 +68,10 @@ export function CustomerDetailPage() {
 
       {customer && (
         <>
+          <Breadcrumb items={[{ label: 'Clientes', to: '/customers' }, { label: customer.name }]} />
           <header className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h1 className="text-lg font-semibold text-neutral-900">{customer.name}</h1>
+              <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">{customer.name}</h1>
               <p className="text-sm text-neutral-500">
                 {[customer.document, customer.primary_phone, customer.primary_email]
                   .filter(Boolean)

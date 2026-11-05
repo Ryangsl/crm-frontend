@@ -39,6 +39,34 @@ export function deleteNote(id: string): Promise<void> {
 
 // ----------------------------------------------------------------------------------- TASKS
 
+export interface ScheduledTasksParams {
+  assigned_to?: string;
+  status?: 'pending' | 'done' | 'overdue';
+  due_from?: string;
+  due_to?: string;
+}
+
+// Visao transversal, sem filtrar por registro de origem.
+export function listScheduledTasks(params: ScheduledTasksParams): Promise<TaskListResponse> {
+  const query = new URLSearchParams({ limit: '100' });
+  for (const [key, value] of Object.entries(params)) if (value) query.set(key, value);
+  return apiGet<TaskListResponse>(`/v1/tasks?${query.toString()}`);
+}
+
+export interface ScheduledAppointmentsParams {
+  user_id?: string;
+  starts_from?: string;
+  starts_to?: string;
+}
+
+export function listScheduledAppointments(
+  params: ScheduledAppointmentsParams,
+): Promise<AppointmentListResponse> {
+  const query = new URLSearchParams({ limit: '100' });
+  for (const [key, value] of Object.entries(params)) if (value) query.set(key, value);
+  return apiGet<AppointmentListResponse>(`/v1/appointments?${query.toString()}`);
+}
+
 export function listTasks(entityType: CrmEntityType, entityId: string): Promise<TaskListResponse> {
   return apiGet<TaskListResponse>(`/v1/tasks?${entityQuery(entityType, entityId)}&limit=100`);
 }

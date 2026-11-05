@@ -1,3 +1,4 @@
+import { Bell } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -95,7 +96,7 @@ export function NotificationBell({ align = 'right', className = '' }: Notificati
         onClick={() => setOpen((value) => !value)}
         className="min-h-touch hover:bg-surface-muted relative flex min-w-touch items-center justify-center rounded-lg px-2 text-neutral-700"
       >
-        <span aria-hidden="true">🔔</span>
+        <Bell aria-hidden="true" className="size-5 text-neutral-600" />
         {unread > 0 && (
           <span
             data-testid="notification-badge"

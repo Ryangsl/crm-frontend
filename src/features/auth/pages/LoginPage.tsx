@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
+import { BrandLockup } from '@/components/brand/BrandMark';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -50,7 +51,24 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center p-4">
+    <div className="flex min-h-dvh">
+      <aside className="bg-sidebar hidden w-1/2 max-w-xl flex-col justify-between p-10 lg:flex">
+        <BrandLockup />
+        <div>
+          <p className="text-sidebar-ink text-3xl font-semibold tracking-tight">
+            Mais clientes. Mais resultados.
+          </p>
+          <p className="text-sidebar-muted mt-3 text-sm">
+            Leads, clientes, oportunidades e conversas em um só lugar.
+          </p>
+        </div>
+        <span />
+      </aside>
+      <main className="flex flex-1 flex-col items-center justify-center gap-6 p-4">
+        <div className="flex flex-col items-center gap-2 lg:hidden">
+          <BrandLockup tone="page" />
+          <p className="text-sm text-neutral-500">Mais clientes. Mais resultados.</p>
+        </div>
       <Card title="Entrar" className="w-full max-w-sm">
         <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-4">
           {error && (
@@ -79,6 +97,7 @@ export function LoginPage() {
           </Button>
         </form>
       </Card>
+      </main>
     </div>
   );
 }

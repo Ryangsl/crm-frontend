@@ -19,7 +19,7 @@ export function Textarea({ label, error, className = '', rows = 3, ...rest }: Te
         id={id}
         rows={rows}
         aria-invalid={error ? true : undefined}
-        className={`bg-surface rounded-lg border px-3 py-2 text-base ${
+        className={`bg-surface rounded-control w-full border px-3 py-2 text-base text-neutral-900 lg:text-sm ${
           error ? 'border-danger' : 'border-border-subtle'
         } ${className}`}
       />

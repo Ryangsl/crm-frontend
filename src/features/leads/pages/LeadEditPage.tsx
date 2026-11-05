@@ -21,7 +21,7 @@ export function LeadEditPage() {
   return (
     <div className="flex flex-col gap-4">
       <header>
-        <h1 className="text-lg font-semibold text-neutral-900">Editar lead</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Editar lead</h1>
       </header>
 
       {isPending && (
