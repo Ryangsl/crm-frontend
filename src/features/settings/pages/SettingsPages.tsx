@@ -8,7 +8,6 @@ import {
   UsersRound,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
@@ -16,11 +15,10 @@ import { Badge } from '@/components/ui/Badge';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { Pagination } from '@/components/ui/Pagination';
 import { Spinner } from '@/components/ui/Spinner';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@/components/ui/Table';
 import { useAuth } from '@/features/auth/useAuth';
-import { useRolesQuery, useUsersQuery } from '@/features/users/hooks/useUsers';
+import { useRolesQuery } from '@/features/users/hooks/useUsers';
 
 interface SettingsLink {
   to: string;
@@ -125,72 +123,6 @@ function SettingsHeader({ title, description }: { title: string; description: st
       <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">{title}</h1>
       <p className="text-sm text-neutral-500">{description}</p>
     </header>
-  );
-}
-
-// Consulta. Criar e editar usuarios existe na API, mas ainda nao tem tela.
-export function UsersPage() {
-  const { hasPermission } = useAuth();
-  const canRead = hasPermission('users:read');
-  const [page, setPage] = useState(1);
-  const { data, isLoading, isError, isFetching, refetch } = useUsersQuery(page, canRead);
-  const totalPages = data ? Math.max(1, Math.ceil(data.total / data.limit)) : 1;
-
-  return (
-    <div className="flex flex-col gap-4">
-      <SettingsHeader title="Usuários" description="Pessoas com acesso ao CRM nesta empresa." />
-      {!canRead && (
-        <Alert tone="warning" title="Sem permissão">
-          Você não tem permissão para ver os usuários.
-        </Alert>
-      )}
-      {isLoading && <Spinner />}
-      {isError && (
-        <Alert tone="danger" title="Não foi possível carregar os usuários">
-          <Button size="sm" variant="secondary" className="mt-2" onClick={() => void refetch()}>
-            Tentar novamente
-          </Button>
-        </Alert>
-      )}
-      {data && data.data.length === 0 && <EmptyState title="Nenhum usuário encontrado" />}
-      {data && data.data.length > 0 && (
-        <>
-          <Table label="Usuários" busy={isFetching}>
-            <Thead>
-              <Th>Nome</Th>
-              <Th className="hidden md:table-cell">E-mail</Th>
-              <Th>Situação</Th>
-            </Thead>
-            <Tbody>
-              {data.data.map((user) => (
-                <Tr key={user.id}>
-                  <Td className="font-medium text-neutral-900">
-                    {user.name}
-                    <span className="block text-xs font-normal text-neutral-500 md:hidden">
-                      {user.email}
-                    </span>
-                  </Td>
-                  <Td className="hidden md:table-cell">{user.email}</Td>
-                  <Td>
-                    <Badge tone={user.status === 'active' ? 'success' : 'neutral'}>
-                      {user.status === 'active' ? 'Ativo' : 'Inativo'}
-                    </Badge>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-          <Pagination
-            page={data.page}
-            totalPages={totalPages}
-            total={data.total}
-            noun="usuário(s)"
-            disabled={isFetching}
-            onChange={setPage}
-          />
-        </>
-      )}
-    </div>
   );
 }
 

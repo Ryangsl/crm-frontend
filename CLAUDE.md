@@ -45,6 +45,10 @@ agente de frontend está em
 
 **Identidade visual e tema por tenant (D-086, ADR-011):** cor só por token (`src/styles/index.css`); `design-system.test.tsx` falha com cor literal fora de `styles/index.css`, `features/branding/lib/theme.ts` e `components/brand/`. A identidade do tenant (`GET /v1/branding`) é aplicada pelo `BrandingApplier` no `AppShell` e limpa ao sair; a padrão não escreve nada. A tela de Identidade Visual tem três modos: `branding:manage` (plataforma) edita; `branding:request` (Admin) vê e solicita; `branding:read` (Diretor) só vê. Componentes do design system em `components/ui` (Table, Pagination, Badge, Modal/Drawer, Dropdown, Toast...): reutilize antes de criar outro. Navegação: sidebar a partir de `lg`; abaixo disso, barra inferior com 4 atalhos + "Mais" (não adicione itens nela). Painel inicial só com dados reais (`GET /v1/dashboard/summary`).
 
+**Endereço da empresa (D-088, ADR-012):** o endereço aberto no navegador identifica a empresa no login, então a API é chamada **na mesma origem** (`VITE_API_URL` vazio; o proxy do Vite encaminha `/v1` ao backend sem trocar o `Host`). Em desenvolvimento, abra `http://exemplo.localhost:5173` ou `http://trial.localhost:5173` (seed do backend), nunca `localhost:5173` nem uma API em `localhost:3000`. Nenhuma chamada envia tenant. A tela de login mostra a empresa de `GET /v1/auth/tenant` e trata `404 TENANT_DOMAIN_NOT_FOUND`.
+
+**Usuários (D-087):** `features/users/`. Consulta, criação, edição de nome e papéis e desativação. O backend decide a concessão (`403 ROLE_ASSIGNMENT_FORBIDDEN`/`USER_MANAGEMENT_FORBIDDEN`, `409 LAST_ADMIN`); `lib/access.ts` só antecipa o motivo de uma opção indisponível e traduz os erros. Não existe reativação: não ofereça. Testes: `features/users/pages/UsersPage.test.tsx`.
+
 ## Antes de implementar qualquer coisa
 
 1. [Decision Register](../crm-spec/docs/00-governance/decision-register.md) — o que está

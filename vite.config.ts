@@ -46,6 +46,15 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    // D-088: a empresa e identificada pelo endereco (empresa.localhost:5173 em desenvolvimento). O
+    // proxy repassa /v1 ao backend SEM trocar o Host (changeOrigin: false), para o backend saber qual
+    // empresa abriu a pagina. Subdominios de localhost ja sao aceitos pelo Vite.
+    proxy: {
+      '/v1': {
+        target: process.env.CRM_API_PROXY_TARGET ?? 'http://localhost:3000',
+        changeOrigin: false,
+      },
+    },
   },
   test: {
     environment: 'jsdom',

@@ -10,7 +10,12 @@
  * POST /v1/auth/refresh simultaneo). Se o refresh falhar, o handler registrado via
  * setUnauthorizedHandler() e chamado para encerrar a sessao no AuthProvider.
  */
-const BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+//
+// D-088: a API e chamada no MESMO endereco da empresa (ex.: empresa-a.crm-universal.com.br/v1/...),
+// porque e o endereco que identifica a empresa no login. Por isso a base padrao e vazia (mesma
+// origem): em producao o proxy reverso encaminha /v1 ao backend; em desenvolvimento, o proxy do Vite
+// (vite.config.ts). VITE_API_URL so serve para outra origem que preserve o Host da empresa.
+const BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
 
 export interface ApiErrorDetail {
   field: string;

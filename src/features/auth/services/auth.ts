@@ -1,4 +1,4 @@
-import { apiGet, apiPost, setAccessToken } from '@/services/api';
+import { ApiError, apiGet, apiPost, setAccessToken } from '@/services/api';
 import type { AuthUser, LoginCredentials } from '../types/auth';
 
 interface AccessTokenResponse {
@@ -16,6 +16,22 @@ interface MeResponse {
   status: 'active' | 'inactive';
   created_at: string;
   permissions?: string[];
+  roles?: string[];
+}
+
+interface TenantContextResponse {
+  tenant_name: string;
+}
+
+// D-088: empresa do endereco aberto no navegador. null quando o endereco nao corresponde a nenhuma
+// empresa (404 TENANT_DOMAIN_NOT_FOUND); outros erros sobem para quem chama.
+export async function fetchTenantContext(): Promise<TenantContextResponse | null> {
+  try {
+    return await apiGet<TenantContextResponse>('/v1/auth/tenant');
+  } catch (error) {
+    if (error instanceof ApiError && error.code === 'TENANT_DOMAIN_NOT_FOUND') return null;
+    throw error;
+  }
 }
 
 export async function login(credentials: LoginCredentials): Promise<void> {
@@ -44,6 +60,7 @@ export async function fetchCurrentUser(): Promise<AuthUser> {
     email: me.email,
     status: me.status,
     permissions: me.permissions ?? [],
+    roles: me.roles ?? [],
   };
 }
 
