@@ -19,8 +19,8 @@ export function Select({ label, error, children, className = '', ...rest }: Sele
         {...rest}
         id={id}
         aria-invalid={error ? true : undefined}
-        className={`min-h-touch bg-surface rounded-lg border px-3 text-base ${
-          error ? 'border-danger' : 'border-border-subtle'
+        className={`min-h-touch lg:min-h-control bg-surface rounded-control w-full border px-3 text-base text-neutral-900 lg:text-sm ${
+          error ? 'border-danger' : 'border-border-strong'
         } ${className}`}
       >
         {children}

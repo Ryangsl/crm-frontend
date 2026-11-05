@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { Table, Tbody, Td, Th, Thead, Tr } from '@/components/ui/Table';
+import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
@@ -47,7 +48,7 @@ export function OpportunityListPage() {
     <div className="flex flex-col gap-4">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold text-neutral-900">Oportunidades</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Oportunidades</h1>
           <p className="text-sm text-neutral-500">Negociações em andamento e encerradas.</p>
         </div>
         <div className="flex gap-2">
@@ -141,53 +142,52 @@ export function OpportunityListPage() {
 
       {data && data.data.length > 0 && (
         <>
-          <ul className="flex flex-col gap-2" aria-busy={isFetching || undefined}>
-            {data.data.map((opportunity) => (
-              <li key={opportunity.id}>
-                <Card>
-                  <Link to={`/opportunities/${opportunity.id}`} className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-neutral-900">
-                        {opportunity.customer.name}
-                      </span>
-                      <OpportunityStatusBadge status={opportunity.status} />
-                    </div>
-                    <span className="text-sm text-neutral-600">
+          <Table label="Oportunidades" busy={isFetching}>
+            <Thead>
+              <Th>Cliente</Th>
+              <Th>Status</Th>
+              <Th className="hidden md:table-cell">Etapa</Th>
+              <Th className="hidden sm:table-cell">Valor</Th>
+              <Th className="hidden lg:table-cell">Responsável</Th>
+            </Thead>
+            <Tbody>
+              {data.data.map((opportunity) => (
+                <Tr key={opportunity.id}>
+                  <Td className="max-w-64">
+                    <Link
+                      to={`/opportunities/${opportunity.id}`}
+                      className="block truncate font-medium text-neutral-900 hover:underline"
+                    >
+                      {opportunity.customer.name}
+                    </Link>
+                    <span className="block truncate text-xs text-neutral-500 md:hidden">
                       {stageNames.get(opportunity.stage_id) ?? 'Etapa'} ·{' '}
                       {formatMoney(opportunity.value)}
                     </span>
-                    <span className="text-xs text-neutral-500">
-                      Responsável: {opportunity.owner.name}
-                    </span>
-                  </Link>
-                </Card>
-              </li>
-            ))}
-          </ul>
+                  </Td>
+                  <Td>
+                    <OpportunityStatusBadge status={opportunity.status} />
+                  </Td>
+                  <Td className="hidden md:table-cell">
+                    {stageNames.get(opportunity.stage_id) ?? 'Etapa'}
+                  </Td>
+                  <Td className="hidden whitespace-nowrap tabular-nums sm:table-cell">
+                    {formatMoney(opportunity.value)}
+                  </Td>
+                  <Td className="hidden lg:table-cell">Responsável: {opportunity.owner.name}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
 
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-neutral-500">
-              Página {data.page} de {totalPages} · {data.total} oportunidade(s)
-            </p>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={page <= 1 || isFetching}
-                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              >
-                Anterior
-              </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={page >= totalPages || isFetching}
-                onClick={() => setPage((prev) => prev + 1)}
-              >
-                Próxima
-              </Button>
-            </div>
-          </div>
+          <Pagination
+            page={data.page}
+            totalPages={totalPages}
+            total={data.total}
+            noun="oportunidade(s)"
+            disabled={isFetching}
+            onChange={setPage}
+          />
         </>
       )}
     </div>

@@ -25,6 +25,14 @@ import { AccessExceptionsPage } from '../features/access-control/pages/AccessExc
 import { ConversationListPage } from '../features/conversations/pages/ConversationListPage';
 import { ConversationDetailPage } from '../features/conversations/pages/ConversationDetailPage';
 import { PlanPage } from '../features/plan/pages/PlanPage';
+import { BrandIdentityPage } from '../features/branding/pages/BrandIdentityPage';
+import { FollowUpsPage } from '../features/follow-up/pages/FollowUpsPage';
+import { SearchPage } from '../features/search/pages/SearchPage';
+import {
+  RolesPage,
+  SettingsHomePage,
+  UsersPage,
+} from '../features/settings/pages/SettingsPages';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -56,6 +64,12 @@ export const router = createBrowserRouter([
           { path: 'team/availability', element: <TeamAvailabilityPage /> },
           { path: 'settings/access-exceptions', element: <AccessExceptionsPage /> },
           { path: 'plan', element: <PlanPage /> },
+          { path: 'search', element: <SearchPage /> },
+          { path: 'follow-ups', element: <FollowUpsPage /> },
+          { path: 'settings', element: <SettingsHomePage /> },
+          { path: 'settings/users', element: <UsersPage /> },
+          { path: 'settings/roles', element: <RolesPage /> },
+          { path: 'settings/brand-identity', element: <BrandIdentityPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

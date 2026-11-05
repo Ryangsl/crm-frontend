@@ -5,7 +5,8 @@ import { Alert } from '@/components/ui/Alert';
 import { OutsideBusinessHoursAlert } from '@/features/access-control/components/OutsideBusinessHoursAlert';
 import { isOutsideBusinessHours } from '@/features/access-control/lib/labels';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { Table, Tbody, Td, Th, Thead, Tr } from '@/components/ui/Table';
+import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
@@ -50,7 +51,7 @@ export function ConversationListPage() {
   return (
     <div className="flex flex-col gap-4">
       <header>
-        <h1 className="text-lg font-semibold text-neutral-900">Conversas</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Conversas</h1>
         <p className="text-sm text-neutral-500">
           Para abrir uma conversa, use o detalhe do cliente, lead ou oportunidade.
         </p>
@@ -110,53 +111,48 @@ export function ConversationListPage() {
 
       {data && data.data.length > 0 && (
         <>
-          <ul className="flex flex-col gap-2" aria-busy={isFetching || undefined}>
-            {data.data.map((conversation) => (
-              <li key={conversation.id}>
-                <Card>
-                  <Link to={`/conversations/${conversation.id}`} className="flex flex-col gap-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium text-neutral-900">
-                        {conversationTitle(conversation)}
-                      </span>
-                      <ConversationStatusBadge status={conversation.status} />
-                    </div>
-                    <span className="text-sm text-neutral-600">
-                      {conversation.assigned_to ? 'Com responsavel' : 'Sem responsavel'}
-                      {' · '}
-                      {conversation.last_message_at
-                        ? new Date(conversation.last_message_at).toLocaleString('pt-BR')
-                        : 'Sem mensagens'}
-                    </span>
-                  </Link>
-                </Card>
-              </li>
-            ))}
-          </ul>
+          <Table label="Conversas" busy={isFetching}>
+            <Thead>
+              <Th>Conversa</Th>
+              <Th>Status</Th>
+              <Th className="hidden md:table-cell">Responsável</Th>
+              <Th className="hidden md:table-cell">Última mensagem</Th>
+            </Thead>
+            <Tbody>
+              {data.data.map((conversation) => (
+                <Tr key={conversation.id}>
+                  <Td className="max-w-72">
+                    <Link
+                      to={`/conversations/${conversation.id}`}
+                      className="block truncate font-medium text-neutral-900 hover:underline"
+                    >
+                      {conversationTitle(conversation)}
+                    </Link>
+                  </Td>
+                  <Td>
+                    <ConversationStatusBadge status={conversation.status} />
+                  </Td>
+                  <Td className="hidden md:table-cell">
+                    {conversation.assigned_to ? 'Com responsavel' : 'Sem responsavel'}
+                  </Td>
+                  <Td className="hidden whitespace-nowrap md:table-cell">
+                    {conversation.last_message_at
+                      ? new Date(conversation.last_message_at).toLocaleString('pt-BR')
+                      : 'Sem mensagens'}
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
 
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-neutral-500">
-              Pagina {data.page} de {totalPages} · {data.total} conversa(s)
-            </p>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={page <= 1 || isFetching}
-                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              >
-                Anterior
-              </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={page >= totalPages || isFetching}
-                onClick={() => setPage((prev) => prev + 1)}
-              >
-                Proxima
-              </Button>
-            </div>
-          </div>
+          <Pagination
+            page={data.page}
+            totalPages={totalPages}
+            total={data.total}
+            noun="conversa(s)"
+            disabled={isFetching}
+            onChange={setPage}
+          />
         </>
       )}
     </div>

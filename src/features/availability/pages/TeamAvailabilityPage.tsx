@@ -54,7 +54,7 @@ export function TeamAvailabilityPage() {
   if (!canRead) {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-lg font-semibold text-neutral-900">Disponibilidade da equipe</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Disponibilidade da equipe</h1>
         <Alert tone="warning" title="Acesso restrito">
           Voce nao tem permissao para acessar a disponibilidade da equipe.
         </Alert>
@@ -79,7 +79,7 @@ export function TeamAvailabilityPage() {
   return (
     <div className="flex flex-col gap-4">
       <header>
-        <h1 className="text-lg font-semibold text-neutral-900">Disponibilidade da equipe</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Disponibilidade da equipe</h1>
         <p className="text-sm text-neutral-500">
           Estado atual de cada usuario ativo. Com a disponibilidade habilitada, so quem esta
           Disponivel recebe novos Leads pela distribuicao automatica. Quem nunca alterou o estado

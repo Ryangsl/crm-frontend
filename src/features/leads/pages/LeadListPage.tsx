@@ -5,11 +5,14 @@ import { Alert } from '@/components/ui/Alert';
 import { OutsideBusinessHoursAlert } from '@/features/access-control/components/OutsideBusinessHoursAlert';
 import { isOutsideBusinessHours } from '@/features/access-control/lib/labels';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { Table, Tbody, Td, Th, Thead, Tr } from '@/components/ui/Table';
+import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
+import { useUserNames } from '@/features/users/hooks/useUsers';
 import { LeadStatusBadge } from '../components/LeadStatusBadge';
 import { useLeadSourcesQuery, useLeadsQuery } from '../hooks/useLeads';
 import type { LeadStatus } from '../types/lead';
@@ -30,6 +33,9 @@ export function LeadListPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
   const [sourceId, setSourceId] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [q, setQ] = useState('');
+  const userNames = useUserNames();
 
   const { data: sources } = useLeadSourcesQuery();
   const sourceNames = useMemo(
@@ -42,6 +48,7 @@ export function LeadListPage() {
     limit: PAGE_SIZE,
     status: status || undefined,
     source_id: sourceId || undefined,
+    q: q || undefined,
   });
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.limit)) : 1;
@@ -50,7 +57,7 @@ export function LeadListPage() {
     <div className="flex flex-col gap-4">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold text-neutral-900">Leads</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Leads</h1>
           <p className="text-sm text-neutral-500">Captação e qualificação de leads do tenant.</p>
         </div>
         {hasPermission('leads:create') && (
@@ -58,7 +65,25 @@ export function LeadListPage() {
         )}
       </header>
 
-      <div className="flex flex-wrap gap-2">
+      <form
+        className="flex flex-wrap items-end gap-2"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setPage(1);
+          setQ(searchInput.trim());
+        }}
+      >
+        <div className="min-w-48 flex-1">
+          <Input
+            label="Buscar"
+            placeholder="Nome, documento, telefone ou e-mail"
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+          />
+        </div>
+        <Button type="submit" variant="secondary">
+          Buscar
+        </Button>
         <Select
           label="Status"
           value={status}
@@ -89,7 +114,7 @@ export function LeadListPage() {
             </option>
           ))}
         </Select>
-      </div>
+      </form>
 
       {isPending && (
         <p className="flex items-center gap-2 text-neutral-600">
@@ -126,49 +151,56 @@ export function LeadListPage() {
 
       {data && data.data.length > 0 && (
         <>
-          <ul className="flex flex-col gap-2" aria-busy={isFetching || undefined}>
-            {data.data.map((lead) => (
-              <li key={lead.id}>
-                <Card>
-                  <Link to={`/leads/${lead.id}`} className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <LeadStatusBadge status={lead.status} />
-                      <span className="text-sm text-neutral-500">
-                        {sourceNames.get(lead.source_id) ?? 'Origem'}
-                      </span>
-                    </div>
-                    <span className="text-sm text-neutral-600">
-                      {lead.owner_id ? 'Com responsável' : 'Sem responsável'}
-                    </span>
-                  </Link>
-                </Card>
-              </li>
-            ))}
-          </ul>
+          <Table label="Leads" busy={isFetching}>
+            <Thead>
+              <Th>Nome</Th>
+              <Th>Status</Th>
+              <Th className="hidden md:table-cell">Origem</Th>
+              <Th className="hidden lg:table-cell">Responsável</Th>
+              <Th className="hidden xl:table-cell">Contato</Th>
+              <Th className="hidden md:table-cell">Criado em</Th>
+            </Thead>
+            <Tbody>
+              {data.data.map((lead) => (
+                <Tr key={lead.id}>
+                  <Td className="max-w-56">
+                    <Link
+                      to={`/leads/${lead.id}`}
+                      className="block truncate font-medium text-neutral-900 hover:underline"
+                    >
+                      {lead.name || 'Lead sem nome'}
+                    </Link>
+                  </Td>
+                  <Td>
+                    <LeadStatusBadge status={lead.status} />
+                  </Td>
+                  <Td className="hidden md:table-cell">
+                    {sourceNames.get(lead.source_id) ?? 'Origem'}
+                  </Td>
+                  <Td className="hidden lg:table-cell">
+                    {lead.owner_id
+                      ? (userNames.get(lead.owner_id) ?? 'Com responsável')
+                      : 'Sem responsável'}
+                  </Td>
+                  <Td className="hidden max-w-56 truncate xl:table-cell">
+                    {lead.email ?? lead.phone ?? '—'}
+                  </Td>
+                  <Td className="hidden whitespace-nowrap md:table-cell">
+                    {new Date(lead.created_at).toLocaleDateString('pt-BR')}
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
 
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-neutral-500">
-              Pagina {data.page} de {totalPages} · {data.total} lead(s)
-            </p>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={page <= 1 || isFetching}
-                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              >
-                Anterior
-              </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={page >= totalPages || isFetching}
-                onClick={() => setPage((prev) => prev + 1)}
-              >
-                Proxima
-              </Button>
-            </div>
-          </div>
+          <Pagination
+            page={data.page}
+            totalPages={totalPages}
+            total={data.total}
+            noun="lead(s)"
+            disabled={isFetching}
+            onChange={setPage}
+          />
         </>
       )}
     </div>

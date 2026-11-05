@@ -16,14 +16,14 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'CRM + Call Center',
-        short_name: 'CRM',
-        description: 'CRM + Call Center SaaS',
+        name: 'CRM Universal',
+        short_name: 'CRM Universal',
+        description: 'CRM Universal. Mais clientes. Mais resultados.',
         lang: 'pt-BR',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',
-        theme_color: '#1f2937',
+        theme_color: '#0b2545',
         icons: [
           {
             src: 'icon.svg',

@@ -3,11 +3,12 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { getLead, listLeads, listLeadSources } from '../services/leads';
 import type { ListLeadsParams } from '../services/leads';
 
-export function useLeadsQuery(params: ListLeadsParams) {
+export function useLeadsQuery(params: ListLeadsParams, enabled = true) {
   return useQuery({
     queryKey: ['leads', params],
     queryFn: () => listLeads(params),
     placeholderData: keepPreviousData,
+    enabled,
   });
 }
 
@@ -21,9 +22,10 @@ export function useLeadQuery(id: string | undefined) {
 
 // Origens sao poucas por tenant — uma pagina de ate 100 basta para popular o seletor do
 // formulario, sem paginacao propria na UI.
-export function useLeadSourcesQuery() {
+export function useLeadSourcesQuery(enabled = true) {
   return useQuery({
     queryKey: ['lead-sources', 'all'],
     queryFn: () => listLeadSources({ limit: 100 }),
+    enabled,
   });
 }

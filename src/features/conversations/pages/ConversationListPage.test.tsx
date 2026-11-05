@@ -41,7 +41,7 @@ describe('ConversationListPage', () => {
     expect(screen.getByText('Lia Lead')).toBeInTheDocument();
     expect(screen.getByText('Aberta')).toBeInTheDocument();
     expect(screen.getByText('Encerrada')).toBeInTheDocument();
-    expect(screen.getByText(/sem responsavel/i, { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByText(/sem responsavel/i, { selector: 'td' })).toBeInTheDocument();
     expect(screen.getByText(/com responsavel/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /ana cliente/i })).toHaveAttribute(
       'href',
@@ -90,11 +90,11 @@ describe('ConversationListPage', () => {
     }));
     const user = userEvent.setup();
     renderWithProviders(<ConversationListPage />, ['conversations:read']);
-    expect(await screen.findByText(/pagina 1 de 3/i)).toBeInTheDocument();
+    expect(await screen.findByText(/página 1 de 3/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Anterior' })).toBeDisabled();
 
-    await user.click(screen.getByRole('button', { name: 'Proxima' }));
-    expect(await screen.findByText(/pagina 2 de 3/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Próxima' }));
+    expect(await screen.findByText(/página 2 de 3/i)).toBeInTheDocument();
     expect(service.listConversations).toHaveBeenLastCalledWith(
       expect.objectContaining({ page: 2 }),
     );

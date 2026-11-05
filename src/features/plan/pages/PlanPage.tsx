@@ -53,7 +53,7 @@ export function PlanPage() {
   return (
     <div className="flex flex-col gap-4">
       <header>
-        <h1 className="text-lg font-semibold text-neutral-900">Plano</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Plano</h1>
         <p className="text-sm text-neutral-500">Plano atual: {data.plan.name}</p>
       </header>
 

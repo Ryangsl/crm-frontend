@@ -43,7 +43,7 @@ describe('AppShell — F4.7 (liberacoes e banner de horario)', () => {
     vi.resetAllMocks();
   });
 
-  it('o item "Liberacoes" so aparece com access_exceptions:manage e aponta para a tela', () => {
+  it('o item "Liberações" so aparece com access_exceptions:manage e aponta para a tela', () => {
     vi.mocked(accessService.getAccessStatus).mockResolvedValue({
       restriction_enabled: false,
       applies_to_me: false,
@@ -51,11 +51,11 @@ describe('AppShell — F4.7 (liberacoes e banner de horario)', () => {
       access: { leads: true, conversations: true },
     });
     const { unmount } = renderShell(['leads:read']);
-    expect(screen.queryByText('Liberacoes')).not.toBeInTheDocument();
+    expect(screen.queryByText('Liberações')).not.toBeInTheDocument();
     unmount();
 
     renderShell(['access_exceptions:manage']);
-    const links = screen.getAllByRole('link', { name: /liberacoes/i });
+    const links = screen.getAllByRole('link', { name: /liberações/i });
     expect(links.length).toBeGreaterThan(0);
     for (const link of links) expect(link).toHaveAttribute('href', '/settings/access-exceptions');
   });

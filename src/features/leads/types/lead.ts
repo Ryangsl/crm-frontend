@@ -6,6 +6,9 @@ export interface Lead {
   source_id: string;
   customer_id: string | null;
   owner_id: string | null;
+  name?: string | null;
+  phone?: string | null;
+  email?: string | null;
   disqualify_reason: string | null;
   created_at: string;
   updated_at: string;

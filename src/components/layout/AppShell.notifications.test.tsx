@@ -43,11 +43,10 @@ describe('AppShell — sino de notificacoes (F4.5)', () => {
     vi.resetAllMocks();
   });
 
-  it('qualquer usuario autenticado ve o sino, mesmo sem nenhuma permissao (sidebar e header)', async () => {
+  it('qualquer usuario autenticado ve o sino, mesmo sem nenhuma permissao (barra superior)', async () => {
     renderShell([]);
-    // Duas instancias (sidebar desktop + header mobile); so uma e visivel por CSS.
     const bells = await screen.findAllByRole('button', { name: /notificacoes/i });
-    expect(bells).toHaveLength(2);
+    expect(bells).toHaveLength(1);
     await waitFor(() => expect(service.getUnreadCount).toHaveBeenCalled());
   });
 

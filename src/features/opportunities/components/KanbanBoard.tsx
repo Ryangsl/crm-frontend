@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useAuth } from '@/features/auth/useAuth';
+import { formatMoney } from '../lib/money';
 import type { Opportunity, Pipeline } from '../types/opportunity';
 import { OpportunityCard } from './OpportunityCard';
 
@@ -45,8 +46,18 @@ export function KanbanBoard({ pipeline, opportunities }: KanbanBoardProps) {
           >
             <header className="flex items-center justify-between px-1">
               <h2 className="text-sm font-semibold text-neutral-900">{stage.name}</h2>
-              <span className="text-xs text-neutral-500">{cards.length}</span>
+              <span className="bg-surface border-border-subtle rounded-full border px-2 text-xs text-neutral-600 tabular-nums">
+                {cards.length}
+              </span>
             </header>
+            {cards.some((card) => card.value !== null) && (
+              <p className="px-1 text-xs text-neutral-500 tabular-nums">
+                Total:{' '}
+                {formatMoney(
+                  cards.reduce((sum, card) => sum + Number(card.value ?? 0), 0).toFixed(2),
+                )}
+              </p>
+            )}
             <div className="flex flex-wrap gap-1 px-1 text-xs text-neutral-500">
               {stage.requires_value && <span>Exige valor</span>}
               {stage.is_won && <span>Etapa de ganho</span>}
