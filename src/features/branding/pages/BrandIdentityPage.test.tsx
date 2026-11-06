@@ -191,27 +191,32 @@ describe('Identidade Visual', () => {
       expect(screen.getByText(/configurada pela equipe do CRM Universal/)).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Salvar alterações' })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /Restaurar padrão/ })).not.toBeInTheDocument();
-      expect(screen.queryByLabelText('Cor primária')).not.toBeInTheDocument();
-      expect(screen.getByTestId('brand-preview')).toBeInTheDocument();
+      expect(screen.getAllByTestId('brand-preview').length).toBeGreaterThan(0);
+      // So os campos da proposta (solicitacao), nunca o editor que aplica.
+      expect(screen.getByLabelText('Propor nome, tema e cores')).toBeChecked();
     });
 
     it('Admin da empresa solicita a alteracao e acompanha', async () => {
       vi.mocked(service.createBrandingRequest).mockResolvedValue({
         pending: {
           message: 'Usar o verde da nossa marca.',
+          proposal: null,
           requested_at: '2026-11-05T12:00:00.000Z',
           requested_by: { id: 'u1', name: 'Ana' },
         },
       });
       renderPage(TENANT_ADMIN);
-      const field = await screen.findByLabelText('Descreva o que deseja alterar');
+      fireEvent.click(await screen.findByLabelText('Propor nome, tema e cores'));
+      const field = screen.getByLabelText('Descreva o que deseja alterar');
       expect(screen.getByRole('button', { name: /Enviar solicitação/ })).toBeDisabled();
 
       fireEvent.change(field, { target: { value: 'Usar o verde da nossa marca.' } });
       fireEvent.click(screen.getByRole('button', { name: /Enviar solicitação/ }));
 
       await waitFor(() =>
-        expect(service.createBrandingRequest).toHaveBeenCalledWith('Usar o verde da nossa marca.'),
+        expect(service.createBrandingRequest).toHaveBeenCalledWith({
+          message: 'Usar o verde da nossa marca.',
+        }),
       );
       expect(await screen.findByTestId('pending-request')).toHaveTextContent('por Ana');
       expect(
@@ -227,19 +232,79 @@ describe('Identidade Visual', () => {
         ]),
       );
       renderPage(TENANT_ADMIN);
-      fireEvent.change(await screen.findByLabelText('Descreva o que deseja alterar'), {
+      fireEvent.click(await screen.findByLabelText('Propor nome, tema e cores'));
+      fireEvent.change(screen.getByLabelText('Descreva o que deseja alterar'), {
         target: { value: 'Mensagem valida' },
       });
 
       fireEvent.click(screen.getByRole('button', { name: /Enviar solicitação/ }));
 
-      expect(await screen.findByRole('alert')).toHaveTextContent('deve ter entre 10 e 1000');
+      expect(await screen.findByText('deve ter entre 10 e 1000 caracteres')).toBeInTheDocument();
+    });
+
+    it('Admin da empresa propoe nome, tema e cores com pre-visualizacao', async () => {
+      vi.mocked(service.createBrandingRequest).mockResolvedValue({ pending: null });
+      renderPage(TENANT_ADMIN);
+      fireEvent.change(await screen.findByLabelText('Cor primária'), {
+        target: { value: '#047857' },
+      });
+      fireEvent.change(screen.getByLabelText('Nome de exibição'), {
+        target: { value: 'Minha Empresa' },
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: /Enviar solicitação/ }));
+
+      await waitFor(() =>
+        expect(service.createBrandingRequest).toHaveBeenCalledWith({
+          proposal: {
+            display_name: 'Minha Empresa',
+            theme: 'light',
+            colors: { ...DEFAULT_COLORS.light, primary: '#047857' },
+          },
+        }),
+      );
+      expect(service.updateBranding).not.toHaveBeenCalled();
+    });
+
+    it('a plataforma ve a proposta e a carrega no editor para aplicar', async () => {
+      const proposal = {
+        display_name: 'Proposta SA',
+        theme: 'light' as const,
+        colors: { ...DEFAULT_COLORS.light, primary: '#047857' },
+      };
+      vi.mocked(service.getBrandingRequest).mockResolvedValue({
+        pending: {
+          message: '',
+          proposal,
+          requested_at: '2026-11-05T12:00:00.000Z',
+          requested_by: { id: 'u2', name: 'Bruno' },
+        },
+      });
+      vi.mocked(service.updateBranding).mockResolvedValue({ ...DEFAULT, ...proposal });
+      renderPage(PLATFORM);
+
+      expect(await screen.findByTestId('pending-proposal')).toHaveTextContent('Proposta SA');
+      fireEvent.click(screen.getByRole('button', { name: 'Carregar proposta no editor' }));
+
+      expect(await screen.findByText('Proposta carregada')).toBeInTheDocument();
+      expect(screen.getByLabelText('Cor primária')).toHaveValue('#047857');
+      expect(screen.getByLabelText('Nome de exibição')).toHaveValue('Proposta SA');
+      fireEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+
+      await waitFor(() =>
+        expect(service.updateBranding).toHaveBeenCalledWith({
+          display_name: 'Proposta SA',
+          theme: 'light',
+          colors: proposal.colors,
+        }),
+      );
     });
 
     it('Diretor so ve: nem editar, nem solicitar', async () => {
       vi.mocked(service.getBrandingRequest).mockResolvedValue({
         pending: {
           message: 'Pedido do admin.',
+          proposal: null,
           requested_at: '2026-11-05T12:00:00.000Z',
           requested_by: { id: 'u2', name: 'Bruno' },
         },
@@ -259,6 +324,7 @@ describe('Identidade Visual', () => {
       vi.mocked(service.getBrandingRequest).mockResolvedValue({
         pending: {
           message: 'Pedido do admin.',
+          proposal: null,
           requested_at: '2026-11-05T12:00:00.000Z',
           requested_by: { id: 'u2', name: 'Bruno' },
         },
@@ -275,7 +341,7 @@ describe('Identidade Visual', () => {
 
     it('modo de consulta do Trial desabilita o envio da solicitacao', async () => {
       renderPage(TENANT_ADMIN, 'Indisponível: o período de avaliação terminou.');
-      fireEvent.change(await screen.findByLabelText('Descreva o que deseja alterar'), {
+      fireEvent.change(await screen.findByLabelText('Mensagem (opcional)'), {
         target: { value: 'Mensagem com tamanho suficiente' },
       });
 

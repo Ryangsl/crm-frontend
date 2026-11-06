@@ -8,7 +8,7 @@ import {
   resetBrandingToDefault,
   updateBranding,
 } from '../services/branding';
-import type { BrandingInput } from '../types/branding';
+import type { BrandingInput, BrandingRequestInput } from '../types/branding';
 
 export const BRANDING_KEY = ['branding'];
 export const BRANDING_REQUEST_KEY = ['branding', 'request'];
@@ -45,7 +45,7 @@ export function useBrandingRequestQuery(enabled = true) {
 export function useCreateBrandingRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (message: string) => createBrandingRequest(message),
+    mutationFn: (input: BrandingRequestInput) => createBrandingRequest(input),
     onSuccess: (state) => queryClient.setQueryData(BRANDING_REQUEST_KEY, state),
   });
 }

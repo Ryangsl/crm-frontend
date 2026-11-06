@@ -58,8 +58,8 @@ export function createMessage(conversationId: string, input: MessageCreateInput)
   return apiPost<Message>(`/v1/conversations/${conversationId}/messages`, input);
 }
 
-// Usuarios do tenant para o seletor de responsavel (exige `users:read`; o backend valida a
-// elegibilidade real na atribuicao).
+// Colegas para o seletor de responsavel: diretorio so com nomes (D-089); o backend valida a
+// elegibilidade real na atribuicao.
 export function listAssignees(): Promise<AssigneeListResponse> {
-  return apiGet<AssigneeListResponse>('/v1/users?page=1&limit=100');
+  return apiGet<AssigneeListResponse>('/v1/users/directory');
 }

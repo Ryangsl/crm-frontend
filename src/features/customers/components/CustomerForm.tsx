@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { useCreateCustomer, useUpdateCustomer } from '../hooks/useCustomerMutations';
+import { describeCustomerValidation, toE164 } from '../lib/customer-input';
 import type { Customer, CustomerDuplicateCandidate, CustomerInput } from '../types/customer';
 
 interface CustomerFormProps {
@@ -38,7 +39,7 @@ function toInput(form: FormState): CustomerInput {
   return {
     name: form.name.trim(),
     document: form.document.trim() || undefined,
-    primary_phone: form.primary_phone.trim() || undefined,
+    primary_phone: toE164(form.primary_phone),
     primary_email: form.primary_email.trim() || undefined,
   };
 }
@@ -81,7 +82,10 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
         setErrorMessage('Voce nao tem permissao para realizar esta acao.');
         return;
       }
-      setErrorMessage(err instanceof ApiError ? err.message : 'Nao foi possivel salvar o cliente.');
+      setErrorMessage(
+        describeCustomerValidation(err) ??
+          (err instanceof ApiError ? err.message : 'Nao foi possivel salvar o cliente.'),
+      );
     }
   }
 
@@ -96,9 +100,9 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
       {duplicates && (
         <Alert tone="warning" title="Ja existe cliente com esses dados">
           <p className="mb-2">
-            Encontramos {duplicates.length === 1 ? 'um cliente' : `${duplicates.length} clientes`} com
-            o mesmo documento, telefone ou e-mail neste tenant. Revise antes de continuar — nada foi
-            criado.
+            Encontramos {duplicates.length === 1 ? 'um cliente' : `${duplicates.length} clientes`}{' '}
+            com o mesmo documento, telefone ou e-mail neste tenant. Revise antes de continuar — nada
+            foi criado.
           </p>
           <ul className="flex flex-col gap-1">
             {duplicates.map((candidate) => (
@@ -129,7 +133,7 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
       />
       <Input
         label="Telefone"
-        hint="Formato internacional, ex.: +5511999999999"
+        hint="Com DDD, ex.: (11) 99999-9999. Outro país: +código, ex.: +351912345678."
         value={form.primary_phone}
         onChange={(event) => updateField('primary_phone', event.target.value)}
       />

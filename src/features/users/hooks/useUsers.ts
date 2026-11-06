@@ -89,13 +89,18 @@ export function useDeactivateUser() {
   });
 }
 
-// Nomes para mostrar responsaveis. Sem `users:read` o mapa fica vazio e a tela usa o texto generico.
+interface UserDirectoryResponse {
+  data: Array<{ id: string; name: string; status: 'active' | 'inactive' }>;
+}
+
+// Nomes para mostrar responsaveis: diretorio de colegas (D-089), sem e-mail nem papeis, aberto a todo
+// usuario autenticado. Falha = mapa vazio e a tela usa o texto generico.
 export function useUserNames(): Map<string, string> {
-  const { hasPermission } = useAuth();
+  const { status } = useAuth();
   const { data } = useQuery({
     queryKey: ['users', 'names'],
-    queryFn: () => apiGet<UserListResponse>('/v1/users?page=1&limit=100'),
-    enabled: hasPermission('users:read'),
+    queryFn: () => apiGet<UserDirectoryResponse>('/v1/users/directory'),
+    enabled: status === 'authenticated',
   });
   return useMemo(() => new Map((data?.data ?? []).map((user) => [user.id, user.name])), [data]);
 }

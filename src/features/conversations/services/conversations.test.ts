@@ -77,9 +77,9 @@ describe('conversations service', () => {
     });
   });
 
-  it('lista possiveis responsaveis em /v1/users', async () => {
+  it('lista possiveis responsaveis no diretorio de colegas (D-089)', async () => {
     vi.mocked(api.apiGet).mockResolvedValue({ data: [] });
     await listAssignees();
-    expect(api.apiGet).toHaveBeenCalledWith('/v1/users?page=1&limit=100');
+    expect(api.apiGet).toHaveBeenCalledWith('/v1/users/directory');
   });
 });

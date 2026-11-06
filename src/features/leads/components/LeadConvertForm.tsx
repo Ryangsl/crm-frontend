@@ -8,6 +8,7 @@ import { listCustomers } from '@/features/customers/services/customers';
 import type { Customer } from '@/features/customers/types/customer';
 import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
+import { describeCustomerValidation, toE164 } from '@/features/customers/lib/customer-input';
 import { useConvertLead } from '../hooks/useLeadMutations';
 import type { ConvertLeadInput, Lead } from '../types/lead';
 
@@ -35,7 +36,13 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [duplicates, setDuplicates] = useState<
-    { id: string; name: string; document: string | null; primary_phone: string | null; primary_email: string | null }[]
+    {
+      id: string;
+      name: string;
+      document: string | null;
+      primary_phone: string | null;
+      primary_email: string | null;
+    }[]
   >([]);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -78,7 +85,10 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
         setErrorMessage('Voce nao tem permissao para realizar esta acao.');
         return;
       }
-      setErrorMessage(err instanceof ApiError ? err.message : 'Nao foi possivel converter o lead.');
+      setErrorMessage(
+        describeCustomerValidation(err) ??
+          (err instanceof ApiError ? err.message : 'Nao foi possivel converter o lead.'),
+      );
     }
   }
 
@@ -86,7 +96,7 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
     return {
       name: name.trim(),
       document: document.trim() || undefined,
-      primary_phone: phone.trim() || undefined,
+      primary_phone: toE164(phone),
       primary_email: email.trim() || undefined,
     };
   }
@@ -149,7 +159,12 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
               />
             </div>
             <div className="self-end">
-              <Button type="button" variant="secondary" loading={searching} onClick={() => void handleSearch()}>
+              <Button
+                type="button"
+                variant="secondary"
+                loading={searching}
+                onClick={() => void handleSearch()}
+              >
                 Buscar
               </Button>
             </div>
@@ -189,9 +204,22 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
 
       {mode === 'new' && (
         <div className="flex flex-col gap-3">
-          <Input label="Nome" required value={name} onChange={(event) => setName(event.target.value)} />
-          <Input label="Documento" value={document} onChange={(event) => setDocument(event.target.value)} />
-          <Input label="Telefone" value={phone} onChange={(event) => setPhone(event.target.value)} />
+          <Input
+            label="Nome"
+            required
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+          <Input
+            label="Documento"
+            value={document}
+            onChange={(event) => setDocument(event.target.value)}
+          />
+          <Input
+            label="Telefone"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+          />
           <Input
             label="E-mail"
             type="email"
@@ -205,7 +233,12 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
         <Button writes type="submit" loading={convertMutation.isPending} disabled={!canSubmit}>
           Converter
         </Button>
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={convertMutation.isPending}>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onCancel}
+          disabled={convertMutation.isPending}
+        >
           Cancelar
         </Button>
       </div>

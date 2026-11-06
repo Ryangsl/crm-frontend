@@ -54,6 +54,11 @@ export default defineConfig({
         target: process.env.CRM_API_PROXY_TARGET ?? 'http://localhost:3000',
         changeOrigin: false,
       },
+      // Status do sistema (/health e /health/ready): fora do /v1, nao depende da empresa.
+      '/health': {
+        target: process.env.CRM_API_PROXY_TARGET ?? 'http://localhost:3000',
+        changeOrigin: false,
+      },
     },
   },
   test: {

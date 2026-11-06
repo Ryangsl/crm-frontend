@@ -1,101 +1,20 @@
 import { ImageOff, RotateCcw } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import type { CSSProperties, FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 
 import { Alert } from '@/components/ui/Alert';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Dialog';
-import { Input } from '@/components/ui/Input';
 import { Spinner } from '@/components/ui/Spinner';
 import { Toast } from '@/components/ui/Toast';
 import { useAuth } from '@/features/auth/useAuth';
 import { ApiError } from '@/services/api';
+import { BrandingEditorFields, Preview, Swatches, ThemeLabel } from '../components/BrandingFields';
 import { BrandingRequestPanel } from '../components/BrandingRequestPanel';
 import { useBrandingQuery, useResetBranding, useUpdateBranding } from '../hooks/useBranding';
-import { deriveThemeVars, DEFAULT_COLORS } from '../lib/theme';
-import type { Branding, BrandingColors, BrandingTheme } from '../types/branding';
-
-const COLOR_FIELDS: Array<{ key: keyof BrandingColors; label: string; hint: string }> = [
-  { key: 'primary', label: 'Cor primária', hint: 'Links, foco e destaques.' },
-  { key: 'secondary', label: 'Cor secundária', hint: 'Textos de apoio.' },
-  { key: 'button', label: 'Botões principais', hint: 'O texto do botão se ajusta sozinho.' },
-  { key: 'sidebar', label: 'Barra lateral', hint: 'O texto do menu se ajusta sozinho.' },
-  { key: 'background', label: 'Fundo', hint: 'Atrás do conteúdo.' },
-  { key: 'surface', label: 'Superfícies', hint: 'Cartões, tabelas e campos.' },
-  { key: 'text', label: 'Texto', hint: 'Títulos e texto principal.' },
-];
-
-const HEX = /^#[0-9a-fA-F]{6}$/;
-
-function ColorField({
-  label,
-  hint,
-  value,
-  onChange,
-}: {
-  label: string;
-  hint: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="flex items-start gap-2">
-      <input
-        type="color"
-        aria-label={`${label}: seletor`}
-        value={HEX.test(value) ? value : DEFAULT_COLORS.light.text}
-        onChange={(event) => onChange(event.target.value)}
-        className="border-border-strong rounded-control min-h-touch lg:min-h-control mt-6 w-12 shrink-0 cursor-pointer border bg-transparent p-1"
-      />
-      <div className="min-w-0 flex-1">
-        <Input
-          label={label}
-          hint={hint}
-          value={value}
-          maxLength={7}
-          spellCheck={false}
-          onChange={(event) => onChange(event.target.value)}
-        />
-      </div>
-    </div>
-  );
-}
-
-// Amostra com as cores do formulario, antes de salvar. As variaveis valem so dentro deste bloco.
-function Preview({ name, colors }: { name: string; colors: BrandingColors }) {
-  const vars = useMemo(
-    () => (Object.values(colors).every((c) => HEX.test(c)) ? deriveThemeVars(colors) : null),
-    [colors],
-  );
-  if (!vars) return <p className="text-neutral-500">Informe cores no formato #RRGGBB.</p>;
-  return (
-    <div
-      data-testid="brand-preview"
-      style={vars as CSSProperties}
-      className="border-border-subtle rounded-control bg-background flex overflow-hidden border"
-    >
-      <div className="bg-sidebar flex w-24 shrink-0 flex-col gap-1 p-2 text-xs sm:w-32">
-        <span className="text-sidebar-ink mb-1 truncate font-semibold">{name}</span>
-        <span className="bg-sidebar-active text-on-sidebar-active rounded px-2 py-1">Início</span>
-        <span className="text-sidebar-muted px-2 py-1">Leads</span>
-        <span className="text-sidebar-muted px-2 py-1">Clientes</span>
-      </div>
-      <div className="min-w-0 flex-1 p-3">
-        <p className="text-base font-semibold text-neutral-900">Título</p>
-        <p className="mb-2 text-xs text-neutral-500">Texto de apoio</p>
-        <div className="bg-surface border-border-subtle rounded-control flex flex-wrap items-center gap-2 border p-2">
-          <span className="bg-button text-on-button rounded-control px-3 py-1.5 text-xs font-medium">
-            Botão
-          </span>
-          <span className="text-brand-700 text-xs underline">Link</span>
-          <span className="text-xs text-neutral-900">Conteúdo</span>
-        </div>
-      </div>
-    </div>
-  );
-}
+import type { Branding, BrandingColors, BrandingProposal, BrandingTheme } from '../types/branding';
 
 function errorDetails(error: unknown): string[] {
   if (error instanceof ApiError && error.details.length > 0) {
@@ -104,9 +23,15 @@ function errorDetails(error: unknown): string[] {
   return [error instanceof Error ? error.message : 'Não foi possível salvar.'];
 }
 
+interface Draft {
+  version: number;
+  values: { display_name: string; theme: BrandingTheme; colors: BrandingColors } | null;
+}
+
 // D-086: a identidade visual e um servico administrado pelo CRM Universal. Tres modos, pelas permissoes:
-// a plataforma (`branding:manage`) aplica e restaura; o Admin da empresa (`branding:request`) ve e
-// solicita; quem tem `branding:read` (ex.: Diretor) so ve. O backend decide em todos os casos.
+// a plataforma (`branding:manage`) aplica e restaura, e pode carregar a proposta da solicitacao no
+// editor; o Admin da empresa (`branding:request`) ve e propoe; quem tem `branding:read` (ex.: Diretor)
+// so ve. O backend decide em todos os casos.
 export function BrandIdentityPage() {
   const { hasPermission } = useAuth();
   const canManage = hasPermission('branding:manage');
@@ -114,6 +39,20 @@ export function BrandIdentityPage() {
   const canRequest = hasPermission('branding:request');
   const { data, isLoading, isError, refetch } = useBrandingQuery(canRead);
   const [toast, setToast] = useState<string | null>(null);
+  const [draft, setDraft] = useState<Draft>({ version: 0, values: null });
+
+  function loadProposal(proposal: BrandingProposal) {
+    setDraft((current) => ({
+      version: current.version + 1,
+      values: {
+        display_name: proposal.display_name ?? data?.display_name ?? '',
+        theme: proposal.theme,
+        colors: proposal.colors,
+      },
+    }));
+    setToast('Proposta carregada no editor. Revise e salve para aplicar.');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   const header = (
     <header className="flex flex-col gap-1">
@@ -153,8 +92,9 @@ export function BrandIdentityPage() {
       )}
       {data && canManage && (
         <BrandIdentityForm
-          key={data.updated_at ?? 'padrao'}
+          key={`${data.updated_at ?? 'padrao'}-${draft.version}`}
           branding={data}
+          initial={draft.values}
           onSaved={() => setToast('Identidade visual salva.')}
           onReset={() => setToast('Identidade padrão restaurada.')}
         />
@@ -162,9 +102,12 @@ export function BrandIdentityPage() {
       {data && !canManage && <CurrentIdentity branding={data} />}
       {data && (
         <BrandingRequestPanel
+          key={data.updated_at ?? 'padrao'}
+          current={data}
           canRequest={canRequest && !canManage}
           canDismiss={canManage}
           onSent={() => setToast('Solicitação enviada à equipe do CRM Universal.')}
+          onUseProposal={canManage ? loadProposal : undefined}
         />
       )}
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
@@ -172,22 +115,12 @@ export function BrandIdentityPage() {
   );
 }
 
-const SWATCHES: Array<{ key: keyof BrandingColors; label: string }> = [
-  { key: 'primary', label: 'Primária' },
-  { key: 'secondary', label: 'Secundária' },
-  { key: 'button', label: 'Botões' },
-  { key: 'sidebar', label: 'Barra lateral' },
-  { key: 'background', label: 'Fundo' },
-  { key: 'surface', label: 'Superfícies' },
-  { key: 'text', label: 'Texto' },
-];
-
 // Consulta da identidade em uso, sem nenhum controle de edicao.
 function CurrentIdentity({ branding }: { branding: Branding }) {
   return (
     <div className="grid items-start gap-4 xl:grid-cols-3">
       <Card title="Identidade atual" className="xl:col-span-2">
-        <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+        <dl className="mb-4 grid gap-x-6 gap-y-3 sm:grid-cols-2">
           <div>
             <dt className="text-xs text-neutral-500">Nome de exibição</dt>
             <dd className="font-medium text-neutral-900">{branding.display_name}</dd>
@@ -195,28 +128,12 @@ function CurrentIdentity({ branding }: { branding: Branding }) {
           <div>
             <dt className="text-xs text-neutral-500">Tema</dt>
             <dd className="font-medium text-neutral-900">
-              {branding.theme === 'light' ? 'Claro' : 'Escuro'}
+              <ThemeLabel theme={branding.theme} />
               {branding.is_default ? ' · identidade padrão do CRM Universal' : ''}
             </dd>
           </div>
         </dl>
-        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {SWATCHES.map((swatch) => (
-            <li key={swatch.key} className="flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className="border-border-strong rounded-control size-8 shrink-0 border"
-                style={{ backgroundColor: branding.colors[swatch.key] }}
-              />
-              <span className="min-w-0">
-                <span className="block text-xs text-neutral-500">{swatch.label}</span>
-                <span className="block text-xs font-medium text-neutral-900">
-                  {branding.colors[swatch.key]}
-                </span>
-              </span>
-            </li>
-          ))}
-        </ul>
+        <Swatches colors={branding.colors} />
       </Card>
       <Card title="Pré-visualização">
         <Preview name={branding.display_name} colors={branding.colors} />
@@ -225,27 +142,25 @@ function CurrentIdentity({ branding }: { branding: Branding }) {
   );
 }
 
-// Nasce com os valores salvos; salvar ou restaurar gera nova versao e o formulario reinicia com ela.
+// Nasce com os valores salvos (ou com a proposta carregada); salvar ou restaurar gera nova versao e o
+// formulario reinicia com ela.
 function BrandIdentityForm({
   branding: data,
+  initial,
   onSaved,
   onReset,
 }: {
   branding: Branding;
+  initial: Draft['values'];
   onSaved: () => void;
   onReset: () => void;
 }) {
   const update = useUpdateBranding();
   const reset = useResetBranding();
-  const [name, setName] = useState(data.display_name);
-  const [theme, setTheme] = useState<BrandingTheme>(data.theme);
-  const [colors, setColors] = useState<BrandingColors>(data.colors);
+  const [name, setName] = useState(initial?.display_name ?? data.display_name);
+  const [theme, setTheme] = useState<BrandingTheme>(initial?.theme ?? data.theme);
+  const [colors, setColors] = useState<BrandingColors>(initial?.colors ?? data.colors);
   const [confirming, setConfirming] = useState(false);
-
-  function chooseTheme(next: BrandingTheme) {
-    setTheme(next);
-    setColors(DEFAULT_COLORS[next]);
-  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -266,62 +181,31 @@ function BrandIdentityForm({
         className="grid items-start gap-4 xl:grid-cols-3"
       >
         <div className="flex flex-col gap-4 xl:col-span-2">
-          <Card title="Empresa">
-            <div className="flex flex-col gap-4">
-              <Input
-                label="Nome de exibição"
-                hint="Aparece na barra superior. Em branco, usa o nome da empresa."
-                value={name}
-                maxLength={80}
-                onChange={(event) => setName(event.target.value)}
-              />
-              <div className="border-border-subtle rounded-control flex gap-3 border border-dashed p-3">
-                <ImageOff aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-neutral-500" />
-                <div>
-                  <p className="font-medium text-neutral-800">Logotipo e favicon</p>
-                  <p className="text-xs text-neutral-500">
-                    Ainda indisponíveis: o CRM não tem envio seguro de arquivos. Enquanto isso, a
-                    interface usa as iniciais da empresa.
-                  </p>
-                </div>
-              </div>
+          {initial && (
+            <Alert tone="info" title="Proposta carregada">
+              Estes valores vieram da solicitação. Salvar aplica a identidade e encerra a
+              solicitação.
+            </Alert>
+          )}
+          <BrandingEditorFields
+            idPrefix="apply"
+            name={name}
+            theme={theme}
+            colors={colors}
+            onName={setName}
+            onTheme={setTheme}
+            onColors={setColors}
+          />
+          <div className="border-border-subtle rounded-control flex gap-3 border border-dashed p-3">
+            <ImageOff aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-neutral-500" />
+            <div>
+              <p className="font-medium text-neutral-800">Logotipo e favicon</p>
+              <p className="text-xs text-neutral-500">
+                Ainda indisponíveis: o CRM não tem envio seguro de arquivos. Enquanto isso, a
+                interface usa as iniciais da empresa.
+              </p>
             </div>
-          </Card>
-
-          <Card title="Tema">
-            <fieldset className="flex flex-wrap gap-4">
-              <legend className="sr-only">Tema</legend>
-              {(['light', 'dark'] as const).map((option) => (
-                <label key={option} className="min-h-touch flex items-center gap-2 lg:min-h-0">
-                  <input
-                    type="radio"
-                    name="theme"
-                    checked={theme === option}
-                    onChange={() => chooseTheme(option)}
-                    className="size-4"
-                  />
-                  {option === 'light' ? 'Claro' : 'Escuro'}
-                </label>
-              ))}
-            </fieldset>
-            <p className="mt-2 text-xs text-neutral-500">
-              Trocar o tema preenche as cores padrão daquele tema.
-            </p>
-          </Card>
-
-          <Card title="Cores">
-            <div className="grid gap-4 md:grid-cols-2">
-              {COLOR_FIELDS.map((field) => (
-                <ColorField
-                  key={field.key}
-                  label={field.label}
-                  hint={field.hint}
-                  value={colors[field.key]}
-                  onChange={(value) => setColors((current) => ({ ...current, [field.key]: value }))}
-                />
-              ))}
-            </div>
-          </Card>
+          </div>
         </div>
 
         <div className="flex flex-col gap-4 xl:sticky xl:top-0">

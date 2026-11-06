@@ -38,7 +38,6 @@ function formatDateTime(iso: string): string {
 export function AccessExceptionsPage() {
   const { hasPermission } = useAuth();
   const canManage = hasPermission('access_exceptions:manage');
-  const canListUsers = hasPermission('users:read');
 
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<Filter>('');
@@ -58,7 +57,8 @@ export function AccessExceptionsPage() {
     },
     canManage,
   );
-  const users = useExceptionUsersQuery(canManage && canListUsers);
+  const users = // D-089: diretorio de colegas (so nomes).
+    useExceptionUsersQuery(canManage);
   const createMutation = useCreateAccessException();
   const revokeMutation = useRevokeAccessException();
 
@@ -70,7 +70,9 @@ export function AccessExceptionsPage() {
   if (!canManage) {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Liberacoes de acesso</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          Liberacoes de acesso
+        </h1>
         <Alert tone="warning" title="Acesso restrito">
           Voce nao tem permissao para gerenciar liberacoes de acesso.
         </Alert>
@@ -122,7 +124,9 @@ export function AccessExceptionsPage() {
   return (
     <div className="flex flex-col gap-4">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Liberacoes de acesso</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          Liberacoes de acesso
+        </h1>
         <p className="text-sm text-neutral-500">
           Libere, fora do horario de funcionamento, o acesso de um vendedor a Leads, Conversas ou
           ambos. A liberacao comeca na hora, exige motivo e uma data de expiracao, e pode ser
@@ -139,28 +143,19 @@ export function AccessExceptionsPage() {
           )}
           {notice && <Alert tone="success">{notice}</Alert>}
 
-          {canListUsers ? (
-            <Select
-              label="Usuario"
-              value={userId}
-              onChange={(event) => setUserId(event.target.value)}
-              required
-            >
-              <option value="">Selecione...</option>
-              {(users.data ?? []).map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </Select>
-          ) : (
-            <Input
-              label="Usuario (id)"
-              value={userId}
-              onChange={(event) => setUserId(event.target.value)}
-              required
-            />
-          )}
+          <Select
+            label="Usuario"
+            value={userId}
+            onChange={(event) => setUserId(event.target.value)}
+            required
+          >
+            <option value="">Selecione...</option>
+            {(users.data ?? []).map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
+          </Select>
 
           <Select
             label="Acesso liberado"

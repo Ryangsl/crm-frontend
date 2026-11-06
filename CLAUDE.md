@@ -47,6 +47,8 @@ agente de frontend está em
 
 **Endereço da empresa (D-088, ADR-012):** o endereço aberto no navegador identifica a empresa no login, então a API é chamada **na mesma origem** (`VITE_API_URL` vazio; o proxy do Vite encaminha `/v1` ao backend sem trocar o `Host`). Em desenvolvimento, abra `http://exemplo.localhost:5173` ou `http://trial.localhost:5173` (seed do backend), nunca `localhost:5173` nem uma API em `localhost:3000`. Nenhuma chamada envia tenant. A tela de login mostra a empresa de `GET /v1/auth/tenant` e trata `404 TENANT_DOMAIN_NOT_FOUND`.
 
+**Menu e visibilidade (D-087, D-089):** a seção Administração do `AppShell` aparece só para quem tem o papel `admin` (`user.roles`); Liberações ficam no menu principal para o Gerente. Nomes de colegas (responsáveis, seletores de atribuição e de liberação) vêm de `GET /v1/users/directory`, nunca da lista completa, que é só do Admin. O proxy do Vite repassa `/v1` e `/health`.
+
 **Usuários (D-087):** `features/users/`. Consulta, criação, edição de nome e papéis e desativação. O backend decide a concessão (`403 ROLE_ASSIGNMENT_FORBIDDEN`/`USER_MANAGEMENT_FORBIDDEN`, `409 LAST_ADMIN`); `lib/access.ts` só antecipa o motivo de uma opção indisponível e traduz os erros. Não existe reativação: não ofereça. Testes: `features/users/pages/UsersPage.test.tsx`.
 
 ## Antes de implementar qualquer coisa

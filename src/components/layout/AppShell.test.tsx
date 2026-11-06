@@ -12,12 +12,12 @@ import { AppShell } from './AppShell';
 // precisa de QueryClient e do servico mockado. As assercoes deste arquivo nao mudaram.
 vi.mock('@/features/notifications/services/notifications');
 
-function renderShell(permissions: string[]) {
+function renderShell(permissions: string[], roles: string[] = []) {
   vi.mocked(notificationsService.getUnreadCount).mockResolvedValue({ count: 0 });
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const authValue: AuthState = {
     status: 'authenticated',
-    user: { id: 'u1', name: 'Ana', email: 'ana@x.com', status: 'active', permissions },
+    user: { id: 'u1', name: 'Ana', email: 'ana@x.com', status: 'active', permissions, roles },
     login: vi.fn(),
     logout: vi.fn(),
     logoutAll: vi.fn(),
@@ -39,8 +39,8 @@ function renderShell(permissions: string[]) {
 }
 
 describe('AppShell — item de plano (D-085)', () => {
-  it('aparece na sidebar para todo usuario e nao entra na barra inferior, que ja esta cheia', () => {
-    renderShell([]);
+  it('aparece na Administracao do Admin e nao entra na barra inferior, que ja esta cheia', () => {
+    renderShell([], ['admin']);
     const sidebar = screen.getByRole('navigation', { name: 'Principal' });
     const bottom = screen.getByRole('navigation', { name: 'Atalhos' });
     expect(within(sidebar).getByRole('link', { name: /plano/i })).toHaveAttribute('href', '/plan');
@@ -48,7 +48,7 @@ describe('AppShell — item de plano (D-085)', () => {
   });
 
   it('a barra inferior so tem o que cabe; o resto fica no menu Mais', () => {
-    renderShell(['tenant_settings:read', 'conversations:read']);
+    renderShell(['tenant_settings:read', 'conversations:read'], ['admin']);
     const bottom = screen.getByRole('navigation', { name: 'Atalhos' });
     expect(within(bottom).getAllByRole('link')).toHaveLength(4);
 
@@ -74,9 +74,37 @@ describe('AppShell — item de configuracoes', () => {
   });
 
   it('com tenant_settings:read o item aparece e aponta para a central de configuracoes', () => {
-    renderShell(['tenant_settings:read']);
+    renderShell(['tenant_settings:read'], ['admin']);
     const links = screen.getAllByRole('link', { name: /configurações/i });
     expect(links.length).toBeGreaterThan(0);
     for (const link of links) expect(link).toHaveAttribute('href', '/settings');
+  });
+});
+
+describe('AppShell — Administracao so para o Admin', () => {
+  it('quem nao e Admin nao ve a secao Administracao, mesmo com permissoes de leitura', () => {
+    renderShell(['tenant_settings:read', 'users:read', 'plan:read'], ['diretor']);
+    const sidebar = screen.getByRole('navigation', { name: 'Principal' });
+    expect(within(sidebar).queryByText('Administração')).not.toBeInTheDocument();
+    expect(within(sidebar).queryByRole('link', { name: /usuários/i })).not.toBeInTheDocument();
+    expect(within(sidebar).queryByRole('link', { name: /configurações/i })).not.toBeInTheDocument();
+  });
+
+  it('o Gerente continua com Liberacoes, fora da Administracao (D-082)', () => {
+    renderShell(['access_exceptions:manage', 'leads:read'], ['gerente']);
+    const sidebar = screen.getByRole('navigation', { name: 'Principal' });
+    expect(within(sidebar).queryByText('Administração')).not.toBeInTheDocument();
+    expect(within(sidebar).getByRole('link', { name: /liberações/i })).toHaveAttribute(
+      'href',
+      '/settings/access-exceptions',
+    );
+  });
+
+  it('o Admin ve a Administracao completa', () => {
+    renderShell(['tenant_settings:read', 'users:read', 'access_exceptions:manage'], ['admin']);
+    const sidebar = screen.getByRole('navigation', { name: 'Principal' });
+    expect(within(sidebar).getByText('Administração')).toBeInTheDocument();
+    expect(within(sidebar).getByRole('link', { name: /usuários/i })).toBeInTheDocument();
+    expect(within(sidebar).getAllByRole('link', { name: /liberações/i })).toHaveLength(1);
   });
 });
