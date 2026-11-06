@@ -253,10 +253,13 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
     expect(await screen.findByText('Nenhuma liberacao encontrada')).toBeInTheDocument();
   });
 
-  it('sem users:read o destinatario e informado por id e a lista de usuarios nao e consultada', async () => {
+  it('D-089: sem users:read (ex.: Gerente) o destinatario vem do diretorio de colegas', async () => {
     vi.mocked(service.listAccessExceptions).mockResolvedValue(page([]));
+    vi.mocked(service.listExceptionUsers).mockResolvedValue({
+      data: [{ id: 'u-vend', name: 'Vendedor', status: 'active' }],
+    });
     renderPage(['access_exceptions:manage']);
-    expect(await screen.findByLabelText('Usuario (id)')).toBeInTheDocument();
-    expect(service.listExceptionUsers).not.toHaveBeenCalled();
+    expect(await screen.findByRole('option', { name: 'Vendedor' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Usuario (id)')).not.toBeInTheDocument();
   });
 });

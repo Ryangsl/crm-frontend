@@ -43,11 +43,10 @@ export function ConversationDetailPage() {
   const canRead = hasPermission('conversations:read');
   const canUpdate = hasPermission('conversations:update');
   const canAssign = hasPermission('conversations:assign');
-  const canListUsers = hasPermission('users:read');
 
   const conversationQuery = useConversationQuery(canRead ? id : undefined);
   const messagesQuery = useMessagesQuery(id, canRead);
-  const assignees = useAssigneesQuery(canRead && canAssign && canListUsers);
+  const assignees = useAssigneesQuery(canRead && canAssign);
   const assignMutation = useAssignConversation(conversationId);
   const closeMutation = useCloseConversation(conversationId);
   const reopenMutation = useReopenConversation(conversationId);
@@ -178,38 +177,35 @@ export function ConversationDetailPage() {
         <p>{assigneeName(conversation.assigned_to)}</p>
         {canAssign && isOpen && (
           <div className="mt-3 flex flex-col gap-2">
-            {canListUsers ? (
-              <Select
-                label="Atribuir a"
-                value={selectedUser}
-                onChange={(event) => setSelectedUser(event.target.value)}
-              >
-                <option value="">Selecione...</option>
-                {(assignees.data ?? []).map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
-                  </option>
-                ))}
-              </Select>
-            ) : null}
+            {/* D-089: diretorio de colegas (so nomes), aberto a quem atribui conversas. */}
+            <Select
+              label="Atribuir a"
+              value={selectedUser}
+              onChange={(event) => setSelectedUser(event.target.value)}
+            >
+              <option value="">Selecione...</option>
+              {(assignees.data ?? []).map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </Select>
             <div className="flex flex-wrap gap-2">
-              {canListUsers && (
-                <Button
-                  writes
-                  size="sm"
-                  variant="secondary"
-                  disabled={!selectedUser || assignMutation.isPending}
-                  loading={assignMutation.isPending}
-                  onClick={() =>
-                    void run(
-                      () => assignMutation.mutateAsync(selectedUser),
-                      'Nao foi possivel atribuir a conversa.',
-                    )
-                  }
-                >
-                  Atribuir
-                </Button>
-              )}
+              <Button
+                writes
+                size="sm"
+                variant="secondary"
+                disabled={!selectedUser || assignMutation.isPending}
+                loading={assignMutation.isPending}
+                onClick={() =>
+                  void run(
+                    () => assignMutation.mutateAsync(selectedUser),
+                    'Nao foi possivel atribuir a conversa.',
+                  )
+                }
+              >
+                Atribuir
+              </Button>
               {user && conversation.assigned_to !== user.id && (
                 <Button
                   writes

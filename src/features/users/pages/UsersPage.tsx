@@ -152,7 +152,8 @@ export function UsersPage() {
                               Editar
                             </Button>
                           )}
-                          {canDelete && active && (
+                          {/* Um Admin so e desativado por outro Admin (D-087): sem o botao na propria linha. */}
+                          {canDelete && active && !(isSelf && user.roles?.includes('admin')) && (
                             <Button
                               size="sm"
                               variant="ghost"

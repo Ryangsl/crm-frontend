@@ -21,12 +21,25 @@ export interface Branding {
   updated_at: string | null;
 }
 
+// Proposta estruturada da solicitacao (nome, tema e cores), validada pelo backend como na aplicacao.
+export interface BrandingProposal {
+  display_name: string | null;
+  theme: BrandingTheme;
+  colors: BrandingColors;
+}
+
 export interface BrandingRequestState {
   pending: {
     message: string;
+    proposal: BrandingProposal | null;
     requested_at: string;
     requested_by: { id: string; name: string | null };
   } | null;
+}
+
+export interface BrandingRequestInput {
+  message?: string;
+  proposal?: BrandingProposal;
 }
 
 export interface BrandingInput {

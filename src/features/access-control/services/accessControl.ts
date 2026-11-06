@@ -43,8 +43,8 @@ export function revokeAccessException(id: string): Promise<AccessException> {
   return apiDelete<AccessException>(`/v1/access-exceptions/${id}`);
 }
 
-// Usuarios do tenant para escolher o destinatario (exige `users:read`; o backend valida se o
-// usuario e sujeito a restricao na concessao).
+// Colegas para escolher o destinatario: diretorio so com nomes (D-089); o backend valida se o
+// usuario e sujeito a restricao na concessao.
 export function listExceptionUsers(): Promise<AccessExceptionUsersResponse> {
-  return apiGet<AccessExceptionUsersResponse>('/v1/users?page=1&limit=100');
+  return apiGet<AccessExceptionUsersResponse>('/v1/users/directory');
 }

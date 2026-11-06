@@ -66,6 +66,7 @@ const MAIN_ITEMS: NavItem[] = [
   },
 ];
 
+// Administracao: so para quem tem o papel Admin (apenas UX; o backend continua decidindo cada acao).
 const ADMIN_ITEMS: NavItem[] = [
   {
     to: '/settings',
@@ -95,8 +96,12 @@ function sidebarLinkClass({ isActive }: { isActive: boolean }) {
   }`;
 }
 
+// Liberacoes tambem sao do Gerente (D-082): fora da Administracao para quem nao e Admin.
+const EXCEPTIONS_ITEM = ADMIN_ITEMS.find((item) => item.to === '/settings/access-exceptions')!;
+
 function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
-  const { hasPermission } = useAuth();
+  const { user, hasPermission } = useAuth();
+  const isAdmin = user?.roles?.includes('admin') ?? false;
   const allowed = (item: NavItem) => !item.permission || hasPermission(item.permission);
   const render = (item: NavItem) => (
     <li key={item.to}>
@@ -110,14 +115,17 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     <nav aria-label="Principal" className="flex flex-col gap-4">
       <ul className="flex flex-col gap-1">
         {MAIN_ITEMS.filter(allowed).map(render)}
+        {!isAdmin && allowed(EXCEPTIONS_ITEM) && render(EXCEPTIONS_ITEM)}
         <AvailabilityNavItem />
       </ul>
-      <div>
-        <p className="text-sidebar-muted border-sidebar-border mb-2 border-t px-3 pt-4 text-xs font-medium">
-          Administração
-        </p>
-        <ul className="flex flex-col gap-1">{ADMIN_ITEMS.filter(allowed).map(render)}</ul>
-      </div>
+      {isAdmin && (
+        <div>
+          <p className="text-sidebar-muted border-sidebar-border mb-2 border-t px-3 pt-4 text-xs font-medium">
+            Administração
+          </p>
+          <ul className="flex flex-col gap-1">{ADMIN_ITEMS.filter(allowed).map(render)}</ul>
+        </div>
+      )}
     </nav>
   );
 }

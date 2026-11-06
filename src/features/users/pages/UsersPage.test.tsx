@@ -175,21 +175,29 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     );
   });
 
-  it('mostra o motivo quando o backend recusa por ser o ultimo Admin', async () => {
+  it('o Admin nao tem "Desativar" na propria linha: so outro Admin o desativa', async () => {
+    renderPage();
+    expect(await screen.findByRole('button', { name: 'Editar Ana Admin' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Desativar Ana Admin' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Desativar Bruno Vendas' })).toBeInTheDocument();
+  });
+
+  it('explica as recusas do backend ao desativar', async () => {
     vi.mocked(api.apiDelete).mockRejectedValue(
-      new ApiError(409, 'LAST_ADMIN', 'A empresa precisa manter ao menos um Admin ativo.'),
+      new ApiError(403, 'USER_MANAGEMENT_FORBIDDEN', 'x', [
+        { field: 'id', issue: 'ADMIN_SELF_DEACTIVATION' },
+      ]),
     );
     renderPage();
-    fireEvent.click(await screen.findByRole('button', { name: 'Desativar Ana Admin' }));
-
+    fireEvent.click(await screen.findByRole('button', { name: 'Desativar Bruno Vendas' }));
     const dialog = screen.getByRole('dialog', { name: 'Desativar usuário' });
-    expect(within(dialog).getByText(/seu próprio acesso/)).toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole('button', { name: 'Desativar' }));
 
     expect(
-      await within(dialog).findByText(/precisa manter ao menos um Admin ativo/),
+      await within(dialog).findByText(
+        'Um Admin não pode desativar a si mesmo. Peça a outro Admin.',
+      ),
     ).toBeInTheDocument();
-    expect(api.apiDelete).toHaveBeenCalledWith('/v1/users/u-ana');
   });
 
   it('desativa outro usuario depois de confirmar', async () => {
@@ -219,7 +227,9 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     const dialog = screen.getByRole('dialog', { name: 'Editar usuário' });
     expect(await within(dialog).findByRole('checkbox', { name: /admin/ })).toBeDisabled();
     expect(
-      within(dialog).getByText('Só um Admin concede ou retira o papel Admin.'),
+      within(dialog).getByText(
+        'O papel Admin é concedido e retirado só pela equipe do CRM Universal.',
+      ),
     ).toBeInTheDocument();
     // Diretor tem users:read e leads:read, que o editor tem: a opcao fica disponivel.
     const director = within(dialog).getByRole('checkbox', { name: /diretor/ });
