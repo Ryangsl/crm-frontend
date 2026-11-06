@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { setAccessToken, setUnauthorizedHandler } from '@/services/api';
@@ -20,7 +20,29 @@ import type { AuthUser } from './types/auth';
  * logout-all, 401 que sobreviveu ao refresh, falha ao restaurar a sessao) cancela as consultas em
  * andamento e esvazia o cache. Renovar o access token com sucesso NAO e fim de sessao e nunca
  * limpa nada.
+ *
+ * Varias abas (D-091): a sessao (cookie do refresh) e a mesma em todas as abas do navegador. Um
+ * BroadcastChannel avisa as outras abas quando esta sai (elas encerram a sessao local, sem chamar a
+ * API) ou entra (elas descartam o cache e retomam a sessao atual, que pode ser de outro usuario).
+ * Nenhum token passa pelo canal.
  */
+export const AUTH_CHANNEL_NAME = 'crm-universal:auth';
+type AuthBroadcast = { type: 'signed-in' } | { type: 'signed-out' };
+
+// Retoma a sessao pelo cookie: renova (coordenado entre abas) e busca o usuario. null = sem sessao.
+async function resumeSession(): Promise<AuthUser | null> {
+  if (!(await authService.refreshSession())) return null;
+  try {
+    return await authService.fetchCurrentUser();
+  } catch {
+    return null;
+  }
+}
+
+function openAuthChannel(): BroadcastChannel | null {
+  return typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel(AUTH_CHANNEL_NAME);
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -45,31 +67,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => setUnauthorizedHandler(null);
   }, [clearSession]);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function restoreSession() {
-      const restored = await authService.refreshSession();
-      if (!restored) {
-        if (!cancelled) clearSession();
+  // Aplica o resultado de resumeSession(); `isCurrent` descarta uma tentativa ja superada.
+  const applyResumed = useCallback(
+    (me: AuthUser | null, isCurrent: () => boolean) => {
+      if (!isCurrent()) return;
+      if (!me) {
+        clearSession();
         return;
       }
-      try {
-        const me = await authService.fetchCurrentUser();
-        if (!cancelled) {
-          setUser(me);
-          setStatus('authenticated');
-        }
-      } catch {
-        if (!cancelled) clearSession();
-      }
-    }
+      setUser(me);
+      setStatus('authenticated');
+    },
+    [clearSession],
+  );
 
-    void restoreSession();
+  useEffect(() => {
+    let cancelled = false;
+    void resumeSession().then((me) => applyResumed(me, () => !cancelled));
     return () => {
       cancelled = true;
     };
-  }, [clearSession]);
+  }, [applyResumed]);
+
+  const channelRef = useRef<BroadcastChannel | null>(null);
+  useEffect(() => {
+    const channel = openAuthChannel();
+    channelRef.current = channel;
+    if (!channel) return;
+    let generation = 0;
+    channel.onmessage = (event: MessageEvent<AuthBroadcast>) => {
+      if (event.data?.type === 'signed-out') {
+        generation += 1;
+        clearSession();
+      } else if (event.data?.type === 'signed-in') {
+        // Outra aba entrou (talvez com outro usuario): nada do cache atual pode sobrar.
+        const mine = ++generation;
+        setAccessToken(null);
+        resetServerCache();
+        setUser(null);
+        setStatus('loading');
+        void resumeSession().then((me) => applyResumed(me, () => mine === generation));
+      }
+    };
+    return () => {
+      channel.close();
+      channelRef.current = null;
+    };
+  }, [clearSession, resetServerCache, applyResumed]);
+
+  const broadcast = useCallback((message: AuthBroadcast) => {
+    channelRef.current?.postMessage(message);
+  }, []);
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -79,8 +127,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const me = await authService.fetchCurrentUser();
       setUser(me);
       setStatus('authenticated');
+      broadcast({ type: 'signed-in' });
     },
-    [resetServerCache],
+    [resetServerCache, broadcast],
   );
 
   const logout = useCallback(async () => {
@@ -88,16 +137,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await authService.logout();
     } finally {
       clearSession();
+      broadcast({ type: 'signed-out' });
     }
-  }, [clearSession]);
+  }, [clearSession, broadcast]);
 
   const logoutAll = useCallback(async () => {
     try {
       await authService.logoutAll();
     } finally {
       clearSession();
+      broadcast({ type: 'signed-out' });
     }
-  }, [clearSession]);
+  }, [clearSession, broadcast]);
 
   const hasPermission = useCallback(
     (permission: string) => user?.permissions.includes(permission) ?? false,

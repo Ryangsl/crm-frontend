@@ -9,6 +9,13 @@
  * compartilham a mesma promise de refresh (nunca disparam mais de um
  * POST /v1/auth/refresh simultaneo). Se o refresh falhar, o handler registrado via
  * setUnauthorizedHandler() e chamado para encerrar a sessao no AuthProvider.
+ *
+ * Varias abas (D-091): o cookie do refresh e um so para todas as abas, e cada renovacao o troca por
+ * outro (rotacao, D-056). Duas abas renovando ao mesmo tempo apresentariam o mesmo token, e a
+ * segunda seria tratada como reuso (todas as sessoes revogadas). Por isso toda renovacao passa por
+ * um Web Lock do navegador, compartilhado entre as abas da mesma origem: uma aba so renova depois de
+ * a anterior terminar, e ai o navegador ja manda o cookie novo. Nada vai para localStorage: cada
+ * aba continua com o proprio access token em memoria.
  */
 //
 // D-088: a API e chamada no MESMO endereco da empresa (ex.: empresa-a.crm-universal.com.br/v1/...),
@@ -99,24 +106,49 @@ async function parseErrorBody(
   };
 }
 
-async function refreshAccessToken(): Promise<string | null> {
-  refreshPromise ??= (async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/v1/auth/refresh`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { Accept: 'application/json' },
-      });
-      if (!response.ok) return null;
-      const body = (await response.json()) as { access_token: string; expires_in: number };
-      setAccessToken(body.access_token);
-      return body.access_token;
-    } catch {
-      return null;
-    }
-  })().finally(() => {
-    refreshPromise = null;
-  });
+export const REFRESH_LOCK_NAME = 'crm-universal:auth-refresh';
+// Limite de uma renovacao: o lock nunca fica preso por uma requisicao sem resposta.
+const REFRESH_TIMEOUT_MS = 15_000;
+
+function withRefreshLock<T>(task: () => Promise<T>): Promise<T> {
+  const locks = typeof navigator === 'undefined' ? undefined : navigator.locks;
+  // Sem Web Locks (navegador antigo ou contexto inseguro): renova sem coordenar entre abas.
+  if (!locks?.request) return task();
+  return locks.request(REFRESH_LOCK_NAME, { mode: 'exclusive' }, task) as Promise<T>;
+}
+
+async function postRefresh(): Promise<string | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REFRESH_TIMEOUT_MS);
+  try {
+    const response = await fetch(`${BASE_URL}/v1/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    });
+    if (!response.ok) return null;
+    const body = (await response.json()) as { access_token: string; expires_in: number };
+    return body.access_token;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Renova o access token pelo cookie do refresh. Uma so renovacao por aba de cada vez (pedidos
+// simultaneos da mesma aba esperam a mesma promise) e uma so entre abas (Web Lock). Devolve o novo
+// access token ou null; nunca lanca.
+export function refreshAccessToken(): Promise<string | null> {
+  refreshPromise ??= withRefreshLock(postRefresh)
+    .then((token) => {
+      if (token) setAccessToken(token);
+      return token;
+    })
+    .finally(() => {
+      refreshPromise = null;
+    });
 
   return refreshPromise;
 }

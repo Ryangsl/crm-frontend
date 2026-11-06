@@ -48,6 +48,14 @@ export function userErrorMessage(error: unknown, fallback: string): string {
       return 'Já existe um usuário com este e-mail nesta empresa.';
     case 'FORBIDDEN':
       return 'Você não tem permissão para realizar esta ação.';
+    case 'USER_ALREADY_ACTIVE':
+      return 'Este usuário já está ativo.';
+    case 'USER_NOT_ACTIVE':
+      return 'Usuário desativado. Para devolver o acesso, use Reativar.';
+    case 'PLAN_LIMIT_REACHED':
+      return 'O plano atingiu o limite de usuários ativos. Desative outro usuário ou fale com o comercial.';
+    case 'RATE_LIMITED':
+      return 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente de novo.';
     default:
       return error.message || fallback;
   }

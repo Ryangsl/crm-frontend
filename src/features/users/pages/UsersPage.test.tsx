@@ -114,10 +114,11 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     expect(screen.getByText('(você)')).toBeInTheDocument();
     const inactive = screen.getByRole('button', { name: 'Carla Antiga' }).closest('tr')!;
     expect(within(inactive).getAllByText('Inativo')).toHaveLength(2);
-    // Inativo nao tem "Desativar" (nao existe reativacao).
+    // Inativo nao tem "Desativar": tem "Reativar" (D-093).
     expect(
       screen.queryByRole('button', { name: 'Desativar Carla Antiga' }),
     ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reativar Carla Antiga' })).toBeInTheDocument();
   });
 
   it('consulta os detalhes de um usuario', async () => {
@@ -127,7 +128,7 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     const dialog = screen.getByRole('dialog', { name: 'Carla Antiga' });
     expect(within(dialog).getByText('carla@empresa.com')).toBeInTheDocument();
     expect(within(dialog).getByText('Sem papel')).toBeInTheDocument();
-    expect(within(dialog).getByText(/reativação ainda não está disponível/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/Use Reativar para devolver o acesso/)).toBeInTheDocument();
   });
 
   it('cria usuario com papeis', async () => {
@@ -250,6 +251,62 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     expect(screen.queryByRole('button', { name: /^Editar/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^Desativar/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('columnheader', { name: 'Ações' })).not.toBeInTheDocument();
+  });
+
+  it('reativa um usuario e mostra o link de senha uma vez (D-093)', async () => {
+    vi.mocked(api.apiPost).mockResolvedValue({
+      ...CARLA,
+      status: 'active',
+      password_reset: { token: 'id-1.segredo', expires_at: '2026-11-07T12:00:00.000Z' },
+    });
+    renderPage();
+    fireEvent.click(await screen.findByRole('button', { name: 'Reativar Carla Antiga' }));
+    const confirm = screen.getByRole('dialog', { name: 'Reativar usuário' });
+    expect(within(confirm).getByText(/papéis anteriores/)).toBeInTheDocument();
+    fireEvent.click(within(confirm).getByRole('button', { name: 'Reativar' }));
+
+    const result = await screen.findByRole('dialog', { name: 'Usuário reativado' });
+    expect(api.apiPost).toHaveBeenCalledWith('/v1/users/u-carla/reactivate');
+    const link = within(result).getByLabelText(/Link de redefinição de senha para Carla Antiga/);
+    expect((link as HTMLTextAreaElement).value).toBe(
+      `${window.location.origin}/redefinir-senha#token=id-1.segredo`,
+    );
+    expect(within(result).getByText(/Vale uma única vez/)).toBeInTheDocument();
+    // O modal tem o X e o botao do rodape, os dois "Fechar".
+    fireEvent.click(within(result).getAllByRole('button', { name: 'Fechar' }).at(-1)!);
+    expect(await screen.findByText('Usuário reativado.')).toBeInTheDocument();
+  });
+
+  it('gera link de senha para outra pessoa ativa, nunca para si (D-064)', async () => {
+    vi.mocked(api.apiPost).mockResolvedValue({
+      token: 'id-2.outro',
+      expires_at: '2026-11-07T12:00:00.000Z',
+    });
+    renderPage();
+    expect(
+      await screen.findByRole('button', { name: 'Gerar link de senha para Bruno Vendas' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Gerar link de senha para Ana Admin' }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Gerar link de senha para Bruno Vendas' }));
+    fireEvent.click(
+      within(screen.getByRole('dialog', { name: 'Gerar link de senha' })).getByRole('button', {
+        name: 'Gerar link',
+      }),
+    );
+    await screen.findByRole('dialog', { name: 'Link de redefinição de senha' });
+    expect(api.apiPost).toHaveBeenCalledWith('/v1/users/u-bruno/password-reset');
+  });
+
+  it('explica a recusa por limite do plano ao reativar', async () => {
+    vi.mocked(api.apiPost).mockRejectedValue(new ApiError(403, 'PLAN_LIMIT_REACHED', 'x'));
+    renderPage();
+    fireEvent.click(await screen.findByRole('button', { name: 'Reativar Carla Antiga' }));
+    const dialog = screen.getByRole('dialog', { name: 'Reativar usuário' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Reativar' }));
+    expect(await within(dialog).findByText(/limite de usuários ativos/)).toBeInTheDocument();
   });
 
   it('sem users:read nao consulta', () => {

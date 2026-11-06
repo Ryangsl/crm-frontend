@@ -49,7 +49,11 @@ agente de frontend está em
 
 **Menu e visibilidade (D-087, D-089):** a seção Administração do `AppShell` aparece só para quem tem o papel `admin` (`user.roles`); Liberações ficam no menu principal para o Gerente. Nomes de colegas (responsáveis, seletores de atribuição e de liberação) vêm de `GET /v1/users/directory`, nunca da lista completa, que é só do Admin. O proxy do Vite repassa `/v1` e `/health`.
 
-**Usuários (D-087):** `features/users/`. Consulta, criação, edição de nome e papéis e desativação. O backend decide a concessão (`403 ROLE_ASSIGNMENT_FORBIDDEN`/`USER_MANAGEMENT_FORBIDDEN`, `409 LAST_ADMIN`); `lib/access.ts` só antecipa o motivo de uma opção indisponível e traduz os erros. Não existe reativação: não ofereça. Testes: `features/users/pages/UsersPage.test.tsx`.
+**Usuários (D-087, D-093, D-064):** `features/users/`. Consulta, criação, edição de nome e papéis, desativação, **reativação** (inativos, `users:delete`) e **link de senha** (ativos, outra pessoa, `users:update`). O backend decide a concessão (`403 ROLE_ASSIGNMENT_FORBIDDEN`/`USER_MANAGEMENT_FORBIDDEN`, `409 LAST_ADMIN`, `PLAN_LIMIT_REACHED`); `lib/access.ts` só antecipa o motivo de uma opção indisponível e traduz os erros. O link de senha (`/redefinir-senha#token=...`, montado em `lib/reset-link.ts`) é mostrado **uma vez** (`PasswordLinkModal`) e nunca guardado. Testes: `features/users/pages/UsersPage.test.tsx`.
+
+**Conta e senha (D-064):** `/account` (Minha conta, no menu da empresa) troca a própria senha e guarda o access token novo da resposta. `/redefinir-senha` é **pública**: lê o token do fragmento (`#token=`), apaga-o da barra de endereço e chama `/v1/auth/password-reset[/check]`. Sem "esqueci minha senha" por e-mail (não há provedor): o login orienta a pedir o link ao Admin.
+
+**Várias abas (D-091):** toda renovação de sessão passa por `refreshAccessToken()` em `services/api.ts`, que serializa as renovações **entre abas** com Web Lock (`navigator.locks`) e dentro da aba com uma promise única. Não crie outro caminho de `POST /v1/auth/refresh`. Entrar/sair é avisado às outras abas por BroadcastChannel no `AuthProvider` (sem token na mensagem). Nada de token em `localStorage`/`sessionStorage`. Testes: `services/api.multi-tab.test.ts`, `AuthProvider.multi-tab.test.tsx`.
 
 ## Antes de implementar qualquer coisa
 

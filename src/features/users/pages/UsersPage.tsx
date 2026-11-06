@@ -13,6 +13,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@/components/ui/Table';
 import { Toast } from '@/components/ui/Toast';
 import { useAuth } from '@/features/auth/useAuth';
 import { DeactivateUserModal } from '../components/DeactivateUserModal';
+import { UserAccessActionModal } from '../components/UserAccessActionModal';
 import { UserFormModal } from '../components/UserFormModal';
 import { useRolesQuery, useUsersQuery } from '../hooks/useUsers';
 import type { TenantUser } from '../hooks/useUsers';
@@ -21,7 +22,9 @@ type Dialog =
   | { kind: 'create' }
   | { kind: 'edit'; user: TenantUser }
   | { kind: 'details'; user: TenantUser }
-  | { kind: 'deactivate'; user: TenantUser };
+  | { kind: 'deactivate'; user: TenantUser }
+  | { kind: 'reset-link'; user: TenantUser }
+  | { kind: 'reactivate'; user: TenantUser };
 
 function rolesText(user: TenantUser): string {
   return user.roles?.length ? user.roles.join(', ') : 'Sem papel';
@@ -39,6 +42,7 @@ function formatDate(value?: string): string {
 // Gestao de usuarios da empresa (D-087). As acoes aparecem conforme as permissoes de quem esta
 // logado, mas quem decide e o backend: conceder papel acima do proprio acesso, mexer em um Admin sem
 // ser Admin ou deixar a empresa sem Admin ativo sao recusados la, com a mensagem mostrada aqui.
+// Reativacao (D-093) e link de senha (D-064) mostram o link gerado uma unica vez.
 export function UsersPage() {
   const { user: me, hasPermission } = useAuth();
   const canRead = hasPermission('users:read');
@@ -152,6 +156,29 @@ export function UsersPage() {
                               Editar
                             </Button>
                           )}
+                          {/* Link de senha (D-064): para outra pessoa; a propria senha e trocada em Minha conta. */}
+                          {canUpdate && active && !isSelf && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              aria-label={`Gerar link de senha para ${user.name}`}
+                              onClick={() => setDialog({ kind: 'reset-link', user })}
+                              writes
+                            >
+                              Link de senha
+                            </Button>
+                          )}
+                          {canDelete && !active && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              aria-label={`Reativar ${user.name}`}
+                              onClick={() => setDialog({ kind: 'reactivate', user })}
+                              writes
+                            >
+                              Reativar
+                            </Button>
+                          )}
                           {/* Um Admin so e desativado por outro Admin (D-087): sem o botao na propria linha. */}
                           {canDelete && active && !(isSelf && user.roles?.includes('admin')) && (
                             <Button
@@ -199,7 +226,7 @@ export function UsersPage() {
           </dl>
           {dialog.user.status !== 'active' && (
             <p className="mt-3 text-neutral-500">
-              Usuário desativado. A reativação ainda não está disponível no CRM.
+              Usuário desativado. {canDelete ? 'Use Reativar para devolver o acesso.' : ''}
             </p>
           )}
         </Modal>
@@ -219,6 +246,14 @@ export function UsersPage() {
         <DeactivateUserModal
           user={dialog.user}
           isSelf={dialog.user.id === me?.id}
+          onClose={() => setDialog(null)}
+          onDone={finish}
+        />
+      )}
+      {(dialog?.kind === 'reset-link' || dialog?.kind === 'reactivate') && (
+        <UserAccessActionModal
+          kind={dialog.kind}
+          user={dialog.user}
           onClose={() => setDialog(null)}
           onDone={finish}
         />
