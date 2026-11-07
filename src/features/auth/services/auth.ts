@@ -1,4 +1,4 @@
-import { ApiError, apiGet, apiPost, setAccessToken } from '@/services/api';
+import { ApiError, apiGet, apiPost, refreshAccessToken, setAccessToken } from '@/services/api';
 import type { AuthUser, LoginCredentials } from '../types/auth';
 
 interface AccessTokenResponse {
@@ -41,15 +41,10 @@ export async function login(credentials: LoginCredentials): Promise<void> {
 
 // Usa o refresh token do cookie httpOnly (nunca lido/escrito aqui) para obter um novo
 // access token. Retorna false em qualquer falha, sem lancar — quem chama decide o que
-// fazer (restaurar sessao vs. permanecer deslogado).
+// fazer (restaurar sessao vs. permanecer deslogado). Passa pela mesma renovacao coordenada do
+// cliente HTTP (uma por vez, inclusive entre abas — D-091).
 export async function refreshSession(): Promise<boolean> {
-  try {
-    const tokens = await apiPost<AccessTokenResponse>('/v1/auth/refresh');
-    setAccessToken(tokens.access_token);
-    return true;
-  } catch {
-    return false;
-  }
+  return (await refreshAccessToken()) !== null;
 }
 
 export async function fetchCurrentUser(): Promise<AuthUser> {

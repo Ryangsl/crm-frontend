@@ -1,11 +1,11 @@
-# CI da Fase 1: install -> lint -> test -> build.
+# CI do frontend: install -> lint -> testes (Vitest) -> build; e auditoria das dependencias de producao.
 #
-# D-021 (`PROPOSTO`): GitHub Actions e a direcao, nao uma decisao fechada. Se a hospedagem
-# mudar (GitLab/Bitbucket), troca-se este arquivo sem alterar a estrategia de testes de
+# D-021/D-052 (`PROPOSTO`): GitHub Actions, um workflow por repositorio. Se a hospedagem mudar,
+# troca-se este arquivo sem alterar a estrategia de testes de
 # crm-spec/docs/09-testing/testing-strategy.md.
 #
-# Escopo desta fase: teste unitario e build. Integracao/e2e (que exigem Postgres e Redis)
-# entram na Fase 2 junto do primeiro fluxo real.
+# Os testes do frontend nao usam banco nem API reais (a API e simulada). Os e2e da API rodam no CI do
+# crm-backend; e2e de navegador (Playwright, D-020) ainda nao existem.
 name: CI
 
 on:
@@ -14,14 +14,19 @@ on:
   pull_request:
     branches: [main]
 
+# Uma execucao por ref. Em PR, um push novo cancela a anterior; no main, nenhuma e cancelada.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
   frontend:
     name: build e testes
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -41,3 +46,7 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # Falha com vulnerabilidade alta ou critica em dependencia de producao (D-090).
+      - name: npm audit (producao)
+        run: npm audit --omit=dev --audit-level=high

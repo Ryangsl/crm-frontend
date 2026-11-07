@@ -80,11 +80,33 @@ export function useUpdateUser() {
   });
 }
 
-// "Excluir" usuario e desativacao logica; nao existe reativacao na API.
+// "Excluir" usuario e desativacao logica; a volta e pela reativacao (D-093).
 export function useDeactivateUser() {
   const invalidate = useInvalidateUsers();
   return useMutation({
     mutationFn: (id: string) => apiDelete<void>(`/v1/users/${id}`),
+    onSuccess: invalidate,
+  });
+}
+
+// Link de redefinicao de senha de uso unico (D-064). O token so aparece nesta resposta.
+export interface PasswordResetLink {
+  token: string;
+  expires_at: string;
+}
+
+export function useCreatePasswordResetLink() {
+  return useMutation({
+    mutationFn: (id: string) => apiPost<PasswordResetLink>(`/v1/users/${id}/password-reset`),
+  });
+}
+
+// D-093: reativa com os papeis anteriores; a senha antiga deixa de valer e vem um link para a nova.
+export function useReactivateUser() {
+  const invalidate = useInvalidateUsers();
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiPost<TenantUser & { password_reset: PasswordResetLink }>(`/v1/users/${id}/reactivate`),
     onSuccess: invalidate,
   });
 }

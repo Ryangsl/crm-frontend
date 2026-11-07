@@ -5,6 +5,7 @@ import {
   Clock,
   Contact,
   Gauge,
+  KeyRound,
   Handshake,
   House,
   KanbanSquare,
@@ -236,6 +237,9 @@ function TenantMenu() {
         </>
       }
     >
+      <Link role="menuitem" to="/account" className={dropdownItemClass}>
+        <KeyRound aria-hidden="true" className="size-4" /> Minha conta
+      </Link>
       <Link role="menuitem" to="/plan" className={dropdownItemClass}>
         <Gauge aria-hidden="true" className="size-4" /> Plano
       </Link>

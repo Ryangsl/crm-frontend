@@ -59,6 +59,9 @@ export function LoginPage() {
     } catch (err) {
       if (err instanceof ApiError && err.code === 'TENANT_DOMAIN_NOT_FOUND') {
         setError(UNKNOWN_ADDRESS);
+      } else if (err instanceof ApiError && err.code === 'RATE_LIMITED') {
+        // D-090: limite de tentativas (por endereco ou por conta). Passa sozinho no fim da janela.
+        setError('Muitas tentativas de entrar. Aguarde alguns minutos e tente de novo.');
       } else {
         setError(
           err instanceof ApiError ? err.message : 'Nao foi possivel entrar. Tente novamente.',
@@ -125,6 +128,10 @@ export function LoginPage() {
               <Button type="submit" loading={submitting} disabled={submitting}>
                 Entrar
               </Button>
+              {/* D-064: sem e-mail configurado, a redefinicao e pelo link que o Admin gera. */}
+              <p className="text-sm text-neutral-500">
+                Esqueceu a senha? Peça ao Admin da sua empresa um link para definir uma nova.
+              </p>
             </form>
           )}
         </Card>

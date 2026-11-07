@@ -61,8 +61,8 @@ export function DeactivateUserModal({ user, isSelf, onClose, onDone }: Deactivat
         </p>
         {isSelf && <p className="text-warning">Você está desativando o seu próprio acesso.</p>}
         <p className="text-neutral-500">
-          A reativação ainda não está disponível no CRM. Para voltar a dar acesso, fale com o
-          suporte.
+          Para devolver o acesso depois, use Reativar: os papéis voltam e a pessoa define uma senha
+          nova por um link.
         </p>
       </div>
     </Modal>

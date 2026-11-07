@@ -3,6 +3,8 @@ import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '../components/routing/ProtectedRoute';
 import { AppShell } from '../components/layout/AppShell';
 import { LoginPage } from '../features/auth/pages/LoginPage';
+import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage';
+import { AccountPage } from '../features/account/pages/AccountPage';
 import { HomePage } from '../app/pages/HomePage';
 import { NotFoundPage } from '../app/pages/NotFoundPage';
 import { StatusPage } from '../features/status/pages/StatusPage';
@@ -33,6 +35,8 @@ import { UsersPage } from '../features/users/pages/UsersPage';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  // D-064: link de redefinicao de senha (publico, no endereco da empresa).
+  { path: '/redefinir-senha', element: <ResetPasswordPage /> },
   {
     element: <ProtectedRoute />,
     children: [
@@ -63,6 +67,7 @@ export const router = createBrowserRouter([
           { path: 'plan', element: <PlanPage /> },
           { path: 'search', element: <SearchPage /> },
           { path: 'follow-ups', element: <FollowUpsPage /> },
+          { path: 'account', element: <AccountPage /> },
           { path: 'settings', element: <SettingsHomePage /> },
           { path: 'settings/users', element: <UsersPage /> },
           { path: 'settings/roles', element: <RolesPage /> },
