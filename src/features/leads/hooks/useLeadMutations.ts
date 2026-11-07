@@ -3,9 +3,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   convertLead,
   createLead,
+  createLeadSource,
   deleteLead,
+  deleteLeadSource,
   disqualifyLead,
   qualifyLead,
+  renameLeadSource,
   reopenLead,
   updateLead,
 } from '../services/leads';
@@ -65,4 +68,31 @@ export function useConvertLead(id: string) {
     mutationFn: (input: ConvertLeadInput) => convertLead(id, input),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['leads'] }),
   });
+}
+
+// D-094: origens de Lead. Toda escrita atualiza o seletor do formulario de Lead.
+function useInvalidateLeadSources() {
+  const queryClient = useQueryClient();
+  return () => queryClient.invalidateQueries({ queryKey: ['lead-sources'] });
+}
+
+export function useCreateLeadSource() {
+  const invalidate = useInvalidateLeadSources();
+  return useMutation({
+    mutationFn: (name: string) => createLeadSource(name),
+    onSuccess: invalidate,
+  });
+}
+
+export function useRenameLeadSource() {
+  const invalidate = useInvalidateLeadSources();
+  return useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => renameLeadSource(id, name),
+    onSuccess: invalidate,
+  });
+}
+
+export function useDeleteLeadSource() {
+  const invalidate = useInvalidateLeadSources();
+  return useMutation({ mutationFn: (id: string) => deleteLeadSource(id), onSuccess: invalidate });
 }

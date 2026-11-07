@@ -109,7 +109,9 @@ export function LeadDetailPage() {
           <header className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Lead</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+                  {lead.name || 'Lead'}
+                </h1>
                 <LeadStatusBadge status={lead.status} />
               </div>
               <p className="text-sm text-neutral-500">Origem: {sourceName ?? '—'}</p>
@@ -131,6 +133,25 @@ export function LeadDetailPage() {
               </Button>
             )}
           </header>
+
+          {/* D-094: dados de contato do lead (os mesmos que viram o Cliente na conversao). */}
+          <Card title="Dados do lead">
+            <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+              {(
+                [
+                  ['Nome', lead.name],
+                  ['Telefone', lead.phone],
+                  ['E-mail', lead.email],
+                  ['CPF ou CNPJ', lead.document],
+                ] as const
+              ).map(([label, value]) => (
+                <div key={label} className="min-w-0">
+                  <dt className="text-neutral-500">{label}</dt>
+                  <dd className="break-all text-neutral-900">{value || '—'}</dd>
+                </div>
+              ))}
+            </dl>
+          </Card>
 
           {actionError && (
             <Alert tone="danger" title="Nao foi possivel completar a acao">

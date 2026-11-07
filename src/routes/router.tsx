@@ -32,6 +32,7 @@ import { FollowUpsPage } from '../features/follow-up/pages/FollowUpsPage';
 import { SearchPage } from '../features/search/pages/SearchPage';
 import { RolesPage, SettingsHomePage } from '../features/settings/pages/SettingsPages';
 import { UsersPage } from '../features/users/pages/UsersPage';
+import { LeadSourcesPage } from '../features/leads/pages/LeadSourcesPage';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -70,6 +71,7 @@ export const router = createBrowserRouter([
           { path: 'account', element: <AccountPage /> },
           { path: 'settings', element: <SettingsHomePage /> },
           { path: 'settings/users', element: <UsersPage /> },
+          { path: 'settings/lead-sources', element: <LeadSourcesPage /> },
           { path: 'settings/roles', element: <RolesPage /> },
           { path: 'settings/brand-identity', element: <BrandIdentityPage /> },
           { path: '*', element: <NotFoundPage /> },

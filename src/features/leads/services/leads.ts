@@ -3,6 +3,7 @@ import type {
   ConvertLeadInput,
   Lead,
   LeadInput,
+  LeadSource,
   LeadListResponse,
   LeadSourceListResponse,
 } from '../types/lead';
@@ -68,4 +69,18 @@ export function listLeadSources(
   if (params.limit) query.set('limit', String(params.limit));
   const qs = query.toString();
   return apiGet<LeadSourceListResponse>(`/v1/lead-sources${qs ? `?${qs}` : ''}`);
+}
+
+// D-094: cadastro de origens pelo Admin (Configuracoes > Origens de Lead).
+export function createLeadSource(name: string): Promise<LeadSource> {
+  return apiPost<LeadSource>('/v1/lead-sources', { name });
+}
+
+export function renameLeadSource(id: string, name: string): Promise<LeadSource> {
+  return apiPatch<LeadSource>(`/v1/lead-sources/${id}`, { name });
+}
+
+// Desativacao (soft delete): leads que ja usam a origem continuam com ela.
+export function deleteLeadSource(id: string): Promise<void> {
+  return apiDelete<void>(`/v1/lead-sources/${id}`);
 }

@@ -7,6 +7,7 @@ export interface Lead {
   customer_id: string | null;
   owner_id: string | null;
   name?: string | null;
+  document?: string | null;
   phone?: string | null;
   email?: string | null;
   disqualify_reason: string | null;
@@ -26,6 +27,11 @@ export interface LeadListResponse {
 export interface LeadInput {
   source_id: string;
   owner_id?: string | null;
+  // D-094: dados do lead. null na edicao = limpar o campo.
+  name?: string;
+  document?: string | null;
+  phone?: string | null;
+  email?: string | null;
 }
 
 export interface LeadSource {
