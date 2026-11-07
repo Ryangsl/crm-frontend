@@ -5,6 +5,7 @@ import {
   Gauge,
   Palette,
   ShieldCheck,
+  Signpost,
   UsersRound,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -51,6 +52,13 @@ const LINKS: SettingsLink[] = [
     description: 'Acessos excepcionais fora do horário.',
     Icon: ShieldCheck,
     permission: 'access_exceptions:manage',
+  },
+  {
+    to: '/settings/lead-sources',
+    title: 'Origens de Lead',
+    description: 'De onde vêm os leads da empresa.',
+    Icon: Signpost,
+    permission: ['lead_sources:create', 'lead_sources:update', 'lead_sources:delete'],
   },
   {
     to: '/settings/users',
