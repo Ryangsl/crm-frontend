@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthContext } from '@/features/auth/auth-context';
@@ -40,7 +41,9 @@ function renderPage(permissions: string[]) {
   return render(
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={authValue}>
-        <TeamAvailabilityPage />
+        <MemoryRouter>
+          <TeamAvailabilityPage />
+        </MemoryRouter>
       </AuthContext.Provider>
     </QueryClientProvider>,
   );
@@ -64,9 +67,19 @@ describe('TeamAvailabilityPage', () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue({ ...ME_ON, enabled: false });
     renderPage(MANAGER);
 
-    expect(await screen.findByText(/nao esta habilitada/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Peça ao Admin para ligá-la/i)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Disponibilidade/ })).not.toBeInTheDocument();
     expect(service.listAvailability).not.toHaveBeenCalled();
     expect(screen.queryByLabelText('Filtrar por estado')).not.toBeInTheDocument();
+  });
+
+  it('mecanismo desabilitado, visto pelo Admin: aponta para onde ligar', async () => {
+    vi.mocked(service.getMyAvailability).mockResolvedValue({ ...ME_ON, enabled: false });
+    renderPage([...MANAGER, 'tenant_settings:update']);
+
+    const link = await screen.findByRole('link', { name: 'Configurações > Disponibilidade' });
+    expect(link).toHaveAttribute('href', '/settings/availability');
+    expect(service.listAvailability).not.toHaveBeenCalled();
   });
 
   it('lista usuarios com estado e desde quando; sem registro aparece como Indisponivel', async () => {

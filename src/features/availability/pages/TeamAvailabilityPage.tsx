@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
@@ -54,7 +55,9 @@ export function TeamAvailabilityPage() {
   if (!canRead) {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Disponibilidade da equipe</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          Disponibilidade da equipe
+        </h1>
         <Alert tone="warning" title="Acesso restrito">
           Voce nao tem permissao para acessar a disponibilidade da equipe.
         </Alert>
@@ -79,7 +82,9 @@ export function TeamAvailabilityPage() {
   return (
     <div className="flex flex-col gap-4">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Disponibilidade da equipe</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          Disponibilidade da equipe
+        </h1>
         <p className="text-sm text-neutral-500">
           Estado atual de cada usuario ativo. Com a disponibilidade habilitada, so quem esta
           Disponivel recebe novos Leads pela distribuicao automatica. Quem nunca alterou o estado
@@ -104,8 +109,20 @@ export function TeamAvailabilityPage() {
 
       {me.data && !enabled && (
         <Alert tone="info">
-          A disponibilidade nao esta habilitada para esta empresa. Peca a um administrador para
-          habilita-la; os estados ja registrados sao preservados.
+          {hasPermission('tenant_settings:update') ? (
+            <>
+              A disponibilidade não está ligada para esta empresa. Ligue em{' '}
+              <Link to="/settings/availability" className="font-medium underline">
+                Configurações &gt; Disponibilidade
+              </Link>
+              ; os estados já registrados são preservados.
+            </>
+          ) : (
+            <>
+              A disponibilidade não está ligada para esta empresa. Peça ao Admin para ligá-la; os
+              estados já registrados são preservados.
+            </>
+          )}
         </Alert>
       )}
 

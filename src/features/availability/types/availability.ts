@@ -29,3 +29,8 @@ export interface ListAvailabilityParams {
   limit?: number;
   status?: AvailabilityStatus;
 }
+
+// Espelha GET/PUT /v1/tenant-settings/availability.
+export interface AvailabilitySetting {
+  enabled: boolean;
+}

@@ -1,11 +1,13 @@
 import {
   Activity,
   ChevronRight,
+  Columns3,
   Clock,
   Gauge,
   Palette,
   ShieldCheck,
   Signpost,
+  UserRoundCheck,
   UsersRound,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -59,6 +61,20 @@ const LINKS: SettingsLink[] = [
     description: 'De onde vêm os leads da empresa.',
     Icon: Signpost,
     permission: ['lead_sources:create', 'lead_sources:update', 'lead_sources:delete'],
+  },
+  {
+    to: '/settings/pipelines',
+    title: 'Pipelines e etapas',
+    description: 'Funis de venda e as etapas de cada um.',
+    Icon: Columns3,
+    permission: ['pipelines:create', 'pipelines:update', 'pipelines:delete'],
+  },
+  {
+    to: '/settings/availability',
+    title: 'Disponibilidade',
+    description: 'Ligar ou desligar a disponibilidade da equipe.',
+    Icon: UserRoundCheck,
+    permission: 'tenant_settings:read',
   },
   {
     to: '/settings/users',

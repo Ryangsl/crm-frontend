@@ -1,8 +1,10 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
+  getAvailabilitySetting,
   getMyAvailability,
   listAvailability,
+  setAvailabilitySetting,
   setMyAvailability,
   setUserAvailability,
 } from '../services/availability';
@@ -59,6 +61,24 @@ export function useSetUserAvailability() {
     }) => setUserAvailability(userId, status),
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: ['availability', 'list'] });
+    },
+  });
+}
+
+const SETTING_KEY = ['tenant-settings', 'availability'];
+
+export function useAvailabilitySettingQuery(enabled: boolean) {
+  return useQuery({ queryKey: SETTING_KEY, queryFn: getAvailabilitySetting, enabled });
+}
+
+// Ligar/desligar muda o seletor, o menu e a tela da equipe (todos leem `availability/me`).
+export function useSetAvailabilitySetting() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (enabled: boolean) => setAvailabilitySetting(enabled),
+    onSuccess: (response) => {
+      queryClient.setQueryData(SETTING_KEY, response);
+      void queryClient.invalidateQueries({ queryKey: ['availability'] });
     },
   });
 }
