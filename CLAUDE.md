@@ -57,6 +57,8 @@ agente de frontend está em
 
 **Histórico de etapas (E2, RF-10):** o detalhe da Oportunidade mostra `StageHistorySection` (`GET /v1/opportunities/{id}/stage-history`, cursor opaco, "Carregar mais"): de/para, quem, quando e a justificativa do salto. Chave `['opportunities', 'stage-history', id]`, então mover/ganhar/perder já atualizam a lista.
 
+**Timeline do Cliente consolidada (D-095):** no Cliente, `TimelineSection` mostra também as interações das Oportunidades dele (o backend decide e só envia com `opportunities:read`), marcadas com "· na oportunidade" e link; cada item traz `entity_type`/`entity_id`. Criar ou excluir interação invalida **todas** as timelines em cache (`['interactions', 'timeline']`). O Lead de origem continua fora (D-079).
+
 **Conta e senha (D-064):** `/account` (Minha conta, no menu da empresa) troca a própria senha e guarda o access token novo da resposta. `/redefinir-senha` é **pública**: lê o token do fragmento (`#token=`), apaga-o da barra de endereço e chama `/v1/auth/password-reset[/check]`. Sem "esqueci minha senha" por e-mail (não há provedor): o login orienta a pedir o link ao Admin.
 
 **Várias abas (D-091):** toda renovação de sessão passa por `refreshAccessToken()` em `services/api.ts`, que serializa as renovações **entre abas** com Web Lock (`navigator.locks`) e dentro da aba com uma promise única. Não crie outro caminho de `POST /v1/auth/refresh`. Entrar/sair é avisado às outras abas por BroadcastChannel no `AuthProvider` (sem token na mensagem). Nada de token em `localStorage`/`sessionStorage`. Testes: `services/api.multi-tab.test.ts`, `AuthProvider.multi-tab.test.tsx`.

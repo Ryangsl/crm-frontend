@@ -36,7 +36,7 @@ export function InteractionForm({
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const mutation = useCreateInteraction(entityType, entityId);
+  const mutation = useCreateInteraction();
   const submitting = mutation.isPending;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
