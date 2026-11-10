@@ -75,3 +75,24 @@ export interface MoveInput {
   stage_id: string;
   justification?: string;
 }
+
+// Espelha GET /v1/opportunities/{id}/stage-history (RF-10, BR-10).
+export interface StageRef {
+  id: string;
+  name: string;
+}
+
+export interface StageHistoryItem {
+  id: string;
+  // Nulo na criacao da oportunidade.
+  from_stage: StageRef | null;
+  to_stage: StageRef;
+  changed_by: StageRef;
+  changed_at: string;
+  justification: string | null;
+}
+
+export interface StageHistoryPage {
+  data: StageHistoryItem[];
+  next_cursor: string | null;
+}

@@ -7,6 +7,7 @@ import type {
   OpportunityUpdateInput,
   Pipeline,
   PipelineListResponse,
+  StageHistoryPage,
 } from '../types/opportunity';
 
 export interface ListOpportunitiesParams {
@@ -76,4 +77,11 @@ export function listPipelines(): Promise<PipelineListResponse> {
 
 export function getPipeline(id: string): Promise<Pipeline> {
   return apiGet<Pipeline>(`/v1/pipelines/${id}`);
+}
+
+// Cursor opaco (`next_cursor`): repassado como veio, nunca montado aqui.
+export function listStageHistory(id: string, cursor?: string): Promise<StageHistoryPage> {
+  const query = new URLSearchParams({ limit: '20' });
+  if (cursor) query.set('cursor', cursor);
+  return apiGet<StageHistoryPage>(`/v1/opportunities/${id}/stage-history?${query.toString()}`);
 }
