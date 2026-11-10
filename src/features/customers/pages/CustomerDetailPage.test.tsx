@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthContext } from '@/features/auth/auth-context';
 import type { AuthState } from '@/features/auth/auth-context';
+import { ApiError } from '@/services/api';
 import { CustomerDetailPage } from './CustomerDetailPage';
 import * as customersService from '../services/customers';
 import type { Customer } from '../types/customer';
@@ -87,5 +88,25 @@ describe('CustomerDetailPage', () => {
     await user.click(screen.getByRole('button', { name: /confirmar exclusao/i }));
     await waitFor(() => expect(customersService.deleteCustomer).toHaveBeenCalledWith('c1'));
     expect(await screen.findByText('Lista de clientes')).toBeInTheDocument();
+  });
+
+  it('D-098: com oportunidade em andamento, mostra a recusa do backend e continua no cliente', async () => {
+    const user = userEvent.setup();
+    vi.mocked(customersService.getCustomer).mockResolvedValue(CUSTOMER);
+    vi.mocked(customersService.listContacts).mockResolvedValue([]);
+    vi.mocked(customersService.deleteCustomer).mockRejectedValue(
+      new ApiError(
+        409,
+        'CUSTOMER_HAS_OPEN_OPPORTUNITIES',
+        'Este cliente tem 1 oportunidade em andamento. Ganhe, perca ou exclua a oportunidade antes de excluir o cliente.',
+      ),
+    );
+    renderPage(['customers:read', 'customers:delete']);
+
+    await user.click(await screen.findByRole('button', { name: /^excluir$/i }));
+    await user.click(screen.getByRole('button', { name: /confirmar exclusao/i }));
+
+    expect(await screen.findByText(/1 oportunidade em andamento/)).toBeInTheDocument();
+    expect(screen.queryByText('Lista de clientes')).not.toBeInTheDocument();
   });
 });
