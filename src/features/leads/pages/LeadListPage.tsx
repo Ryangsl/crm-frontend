@@ -61,7 +61,16 @@ export function LeadListPage() {
           <p className="text-sm text-neutral-500">Captação e qualificação de leads do tenant.</p>
         </div>
         {hasPermission('leads:create') && (
-          <Button writes onClick={() => navigate('/leads/new')}>Novo lead</Button>
+          <div className="flex flex-wrap gap-2">
+            {hasPermission('leads:read') && (
+              <Button variant="secondary" onClick={() => navigate('/leads/imports')}>
+                Importar
+              </Button>
+            )}
+            <Button writes onClick={() => navigate('/leads/new')}>
+              Novo lead
+            </Button>
+          </div>
         )}
       </header>
 

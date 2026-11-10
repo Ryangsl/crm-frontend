@@ -16,6 +16,8 @@ import { LeadListPage } from '../features/leads/pages/LeadListPage';
 import { LeadNewPage } from '../features/leads/pages/LeadNewPage';
 import { LeadDetailPage } from '../features/leads/pages/LeadDetailPage';
 import { LeadEditPage } from '../features/leads/pages/LeadEditPage';
+import { LeadImportsPage } from '../features/leads/pages/LeadImportsPage';
+import { LeadImportDetailPage } from '../features/leads/pages/LeadImportDetailPage';
 import { OpportunityListPage } from '../features/opportunities/pages/OpportunityListPage';
 import { OpportunityNewPage } from '../features/opportunities/pages/OpportunityNewPage';
 import { OpportunityDetailPage } from '../features/opportunities/pages/OpportunityDetailPage';
@@ -55,6 +57,8 @@ export const router = createBrowserRouter([
           { path: 'customers/:id/edit', element: <CustomerEditPage /> },
           { path: 'leads', element: <LeadListPage /> },
           { path: 'leads/new', element: <LeadNewPage /> },
+          { path: 'leads/imports', element: <LeadImportsPage /> },
+          { path: 'leads/imports/:id', element: <LeadImportDetailPage /> },
           { path: 'leads/:id', element: <LeadDetailPage /> },
           { path: 'leads/:id/edit', element: <LeadEditPage /> },
           { path: 'opportunities', element: <OpportunityListPage /> },
