@@ -16,6 +16,7 @@ import { TasksSection } from '@/features/follow-up/components/TasksSection';
 import { OpportunityActionPanel } from '../components/OpportunityActionPanel';
 import type { ActionMode } from '../components/OpportunityActionPanel';
 import { OpportunityStatusBadge } from '../components/OpportunityStatusBadge';
+import { StageHistorySection } from '../components/StageHistorySection';
 import { useDeleteOpportunity } from '../hooks/useOpportunityMutations';
 import { useOpportunityQuery, usePipelineQuery } from '../hooks/useOpportunities';
 import { formatMoney } from '../lib/money';
@@ -195,6 +196,10 @@ export function OpportunityDetailPage() {
                 </Alert>
               </div>
             )}
+          </Card>
+
+          <Card>
+            <StageHistorySection opportunityId={opportunityId} />
           </Card>
 
           <Card>

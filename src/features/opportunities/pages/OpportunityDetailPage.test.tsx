@@ -13,6 +13,27 @@ vi.mock('../services/opportunities');
 function renderPage(opportunity: Opportunity, permissions: string[]) {
   vi.mocked(service.getOpportunity).mockResolvedValue(opportunity);
   vi.mocked(service.getPipeline).mockResolvedValue(PIPELINE);
+  vi.mocked(service.listStageHistory).mockResolvedValue({
+    data: [
+      {
+        id: 'h2',
+        from_stage: { id: 'st1', name: 'Novo' },
+        to_stage: { id: 'st3', name: 'Proposta' },
+        changed_by: { id: 'u1', name: 'Ana' },
+        changed_at: '2026-11-10T13:00:00Z',
+        justification: 'Cliente já tinha o orçamento',
+      },
+      {
+        id: 'h1',
+        from_stage: null,
+        to_stage: { id: 'st1', name: 'Novo' },
+        changed_by: { id: 'u1', name: 'Ana' },
+        changed_at: '2026-11-09T13:00:00Z',
+        justification: null,
+      },
+    ],
+    next_cursor: null,
+  });
   return renderWithProviders(
     <Routes>
       <Route path="/opportunities/:id" element={<OpportunityDetailPage />} />
@@ -27,6 +48,16 @@ const FULL = ['opportunities:read', 'opportunities:update', 'opportunities:delet
 describe('OpportunityDetailPage', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  it('mostra o histórico de etapas com a justificativa do salto (RF-10)', async () => {
+    renderPage(makeOpportunity({ stage_id: 'st3' }), ['opportunities:read']);
+
+    const list = await screen.findByRole('list', { name: 'Histórico de etapas' });
+    expect(list).toHaveTextContent('Novo → Proposta');
+    expect(list).toHaveTextContent('Justificativa: Cliente já tinha o orçamento');
+    expect(list).toHaveTextContent('Criada em Novo');
+    expect(service.listStageHistory).toHaveBeenCalledWith('o1', undefined);
   });
 
   it('mostra cliente, etapa (pelo pipeline), valor e responsável', async () => {

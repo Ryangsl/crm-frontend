@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 import {
   getOpportunity,
@@ -6,6 +6,7 @@ import {
   listOpportunities,
   listPipelineOpportunities,
   listPipelines,
+  listStageHistory,
 } from '../services/opportunities';
 import type { ListOpportunitiesParams } from '../services/opportunities';
 
@@ -44,6 +45,18 @@ export function usePipelineQuery(id: string | undefined) {
   return useQuery({
     queryKey: ['pipelines', id],
     queryFn: () => getPipeline(id as string),
+    enabled: Boolean(id),
+  });
+}
+
+// Sob ['opportunities', ...]: mover, ganhar e perder ja invalidam esse prefixo e o historico volta
+// atualizado.
+export function useStageHistoryQuery(id: string | undefined) {
+  return useInfiniteQuery({
+    queryKey: ['opportunities', 'stage-history', id],
+    queryFn: ({ pageParam }) => listStageHistory(id as string, pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.next_cursor ?? undefined,
     enabled: Boolean(id),
   });
 }
