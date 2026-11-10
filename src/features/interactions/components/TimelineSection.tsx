@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
@@ -20,8 +21,9 @@ const DIRECTION_LABEL: Record<InteractionDirection, string> = {
   outbound: 'Saida',
 };
 
-// F4.4: historico (interacoes + notas) do registro. Mostra SO o que foi registrado nesta
-// entidade — o historico de um Lead nao aparece no Cliente. Notas sao somente leitura aqui
+// F4.4: historico (interacoes + notas) do registro. O historico de um Lead nao aparece no
+// Cliente (D-079); no Cliente, as interacoes das Oportunidades dele aparecem marcadas com um link
+// para a Oportunidade (D-095). Notas sao somente leitura aqui
 // (editadas/excluidas na secao de Notas); interacoes nao tem edicao, so exclusao.
 export function TimelineSection({ entityType, entityId }: TimelineSectionProps) {
   const { hasPermission } = useAuth();
@@ -39,7 +41,7 @@ export function TimelineSection({ entityType, entityId }: TimelineSectionProps) 
     fetchNextPage,
     isFetchingNextPage,
   } = useTimelineQuery(entityType, entityId, canRead);
-  const deleteMutation = useDeleteInteraction(entityType, entityId);
+  const deleteMutation = useDeleteInteraction();
 
   const [creating, setCreating] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -106,7 +108,11 @@ export function TimelineSection({ entityType, entityId }: TimelineSectionProps) 
       {!isPending && !isError && items.length === 0 && !creating && (
         <EmptyState
           title="Nenhum registro no historico"
-          description="Interacoes e notas deste registro aparecem aqui."
+          description={
+            entityType === 'customer'
+              ? 'Interações e notas deste cliente e interações das oportunidades dele aparecem aqui.'
+              : 'Interacoes e notas deste registro aparecem aqui.'
+          }
         />
       )}
 
@@ -124,6 +130,14 @@ export function TimelineSection({ entityType, entityId }: TimelineSectionProps) 
                     {item.channel && <span className="text-neutral-500">· {item.channel}</span>}
                     {item.direction && (
                       <span className="text-neutral-500">· {DIRECTION_LABEL[item.direction]}</span>
+                    )}
+                    {item.entity_type === 'opportunity' && entityType !== 'opportunity' && (
+                      <Link
+                        to={`/opportunities/${item.entity_id}`}
+                        className="text-brand-700 font-normal hover:underline"
+                      >
+                        · na oportunidade
+                      </Link>
                     )}
                   </p>
                   <p className="whitespace-pre-wrap text-neutral-800">{item.summary}</p>

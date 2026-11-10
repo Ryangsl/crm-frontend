@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthContext } from '@/features/auth/auth-context';
@@ -14,6 +15,8 @@ vi.mock('../services/interactions');
 const INTERACTION: TimelineItem = {
   type: 'interaction',
   id: 'i1',
+  entity_type: 'customer',
+  entity_id: 'c1',
   occurred_at: '2026-10-05T14:30:00Z',
   author_id: 'u1',
   summary: 'Cliente ligou pedindo proposta',
@@ -24,6 +27,8 @@ const INTERACTION: TimelineItem = {
 const NOTE: TimelineItem = {
   type: 'note',
   id: 'n1',
+  entity_type: 'customer',
+  entity_id: 'c1',
   occurred_at: '2026-10-04T10:00:00Z',
   author_id: 'u1',
   summary: 'Lembrar do desconto',
@@ -51,7 +56,9 @@ function renderSection(permissions: string[] = []) {
   return render(
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={authValue}>
-        <TimelineSection entityType="customer" entityId="c1" />
+        <MemoryRouter>
+          <TimelineSection entityType="customer" entityId="c1" />
+        </MemoryRouter>
       </AuthContext.Provider>
     </QueryClientProvider>,
   );
@@ -60,6 +67,20 @@ function renderSection(permissions: string[] = []) {
 describe('TimelineSection', () => {
   afterEach(() => {
     vi.resetAllMocks();
+  });
+
+  it('D-095: interacao de uma Oportunidade do Cliente aparece marcada, com link para ela', async () => {
+    vi.mocked(service.listTimeline).mockResolvedValue(
+      page([
+        { ...INTERACTION, id: 'i9', entity_type: 'opportunity', entity_id: 'o7' },
+        INTERACTION,
+      ]),
+    );
+    renderSection(['interactions:read']);
+
+    const link = await screen.findByRole('link', { name: '· na oportunidade' });
+    expect(link).toHaveAttribute('href', '/opportunities/o7');
+    expect(screen.getAllByRole('link', { name: '· na oportunidade' })).toHaveLength(1);
   });
 
   it('sem interactions:read nao renderiza nada nem consulta a API', () => {

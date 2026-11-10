@@ -34,6 +34,10 @@ export interface InteractionCreateInput {
 export interface TimelineItem {
   type: 'interaction' | 'note';
   id: string;
+  // Entidade em que o registro foi feito. Na timeline do Cliente pode ser uma Oportunidade dele
+  // (D-095); nada e copiado entre entidades.
+  entity_type: CrmEntityType;
+  entity_id: string;
   occurred_at: string;
   author_id: string;
   summary: string;

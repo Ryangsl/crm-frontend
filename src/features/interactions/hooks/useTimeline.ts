@@ -9,6 +9,8 @@ export function timelineQueryKey(entityType: CrmEntityType, entityId: string) {
   return ['interactions', 'timeline', entityType, entityId];
 }
 
+const TIMELINES_KEY = ['interactions', 'timeline'];
+
 export function useTimelineQuery(
   entityType: CrmEntityType,
   entityId: string | undefined,
@@ -23,22 +25,24 @@ export function useTimelineQuery(
   });
 }
 
-export function useCreateInteraction(entityType: CrmEntityType, entityId: string) {
+export function useCreateInteraction() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: InteractionCreateInput) => createInteraction(input),
+    // D-095: uma interacao da Oportunidade tambem aparece na timeline do Cliente dela; recarrega
+    // todas as timelines em cache em vez de so a desta entidade.
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: timelineQueryKey(entityType, entityId) });
+      void queryClient.invalidateQueries({ queryKey: TIMELINES_KEY });
     },
   });
 }
 
-export function useDeleteInteraction(entityType: CrmEntityType, entityId: string) {
+export function useDeleteInteraction() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteInteraction(id),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: timelineQueryKey(entityType, entityId) });
+      void queryClient.invalidateQueries({ queryKey: TIMELINES_KEY });
     },
   });
 }
