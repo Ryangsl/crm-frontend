@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { isPermissionDenied } from '@/features/plan/lib/labels';
+import { countStagesBetween } from '@/features/pipelines/lib/stages';
 import { ApiError } from '@/services/api';
 import {
   useLoseOpportunity,
@@ -66,9 +67,10 @@ export function OpportunityActionPanel({
       ? ordered.find((stage) => stage.id === destinationId)
       : ordered.find((stage) => (mode === 'win' ? stage.is_won : stage.is_lost));
 
+  // D-032: pular etapa = ha etapa no meio (nao a diferenca de `order`); o backend decide.
   const skipsStages =
     mode === 'move' && current && destination
-      ? Math.abs(destination.order - current.order) > 1
+      ? countStagesBetween(ordered, current, destination) > 0
       : false;
   const showJustification = mode === 'move' && (skipsStages || serverWantsJustification);
   const showValue =

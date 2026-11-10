@@ -36,8 +36,8 @@ export function usePipelineOpportunitiesQuery(pipelineId: string | undefined) {
   });
 }
 
-export function usePipelinesQuery() {
-  return useQuery({ queryKey: ['pipelines'], queryFn: listPipelines });
+export function usePipelinesQuery(enabled = true) {
+  return useQuery({ queryKey: ['pipelines'], queryFn: listPipelines, enabled });
 }
 
 export function usePipelineQuery(id: string | undefined) {

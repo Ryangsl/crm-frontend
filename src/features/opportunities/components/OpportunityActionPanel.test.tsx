@@ -7,17 +7,21 @@ import { OpportunityActionPanel } from './OpportunityActionPanel';
 import type { ActionMode } from './OpportunityActionPanel';
 import * as service from '../services/opportunities';
 import { makeOpportunity, renderWithProviders, STAGES } from '../test-utils';
-import type { Opportunity } from '../types/opportunity';
+import type { Opportunity, Stage } from '../types/opportunity';
 
 vi.mock('../services/opportunities');
 
-function renderPanel(mode: ActionMode, opportunity: Opportunity = makeOpportunity()) {
+function renderPanel(
+  mode: ActionMode,
+  opportunity: Opportunity = makeOpportunity(),
+  stages: Stage[] = STAGES,
+) {
   const onDone = vi.fn();
   const onCancel = vi.fn();
   renderWithProviders(
     <OpportunityActionPanel
       opportunity={opportunity}
-      stages={STAGES}
+      stages={stages}
       mode={mode}
       onDone={onDone}
       onCancel={onCancel}
@@ -51,6 +55,24 @@ describe('OpportunityActionPanel', () => {
     await waitFor(() => expect(onDone).toHaveBeenCalled());
     expect(service.moveOpportunity).toHaveBeenCalledWith('o1', {
       stage_id: 'st2',
+      justification: undefined,
+    });
+  });
+
+  it('D-032: etapa excluída no meio (order 1 -> 3) não conta como salto', async () => {
+    const user = userEvent.setup();
+    vi.mocked(service.moveOpportunity).mockResolvedValue(makeOpportunity({ stage_id: 'st3' }));
+    // Sem a etapa 2 (excluída): Novo e Proposta são vizinhas, embora o `order` pule de 1 para 3.
+    const withGap = STAGES.filter((stage) => stage.id !== 'st2');
+    const { onDone } = renderPanel('move', makeOpportunity(), withGap);
+
+    await user.selectOptions(screen.getByLabelText('Mover para'), 'st3');
+    expect(screen.queryByLabelText(/justificativa/i)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Mover' }));
+
+    await waitFor(() => expect(onDone).toHaveBeenCalled());
+    expect(service.moveOpportunity).toHaveBeenCalledWith('o1', {
+      stage_id: 'st3',
       justification: undefined,
     });
   });

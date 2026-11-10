@@ -3,6 +3,7 @@ import type {
   AvailabilityListResponse,
   AvailabilityStatus,
   ListAvailabilityParams,
+  AvailabilitySetting,
   MyAvailability,
 } from '../types/availability';
 
@@ -31,4 +32,14 @@ export function setUserAvailability(
   status: Extract<AvailabilityStatus, 'training' | 'unavailable'>,
 ): Promise<MyAvailability> {
   return apiPut<MyAvailability>(`/v1/users/${userId}/availability`, { status });
+}
+
+// Mecanismo de disponibilidade da empresa (`crm.availability.enabled`, F4.1/F4.2, D-071/D-077).
+// Leitura com `tenant_settings:read`; so o Admin (`tenant_settings:update`) liga ou desliga.
+export function getAvailabilitySetting(): Promise<AvailabilitySetting> {
+  return apiGet<AvailabilitySetting>('/v1/tenant-settings/availability');
+}
+
+export function setAvailabilitySetting(enabled: boolean): Promise<AvailabilitySetting> {
+  return apiPut<AvailabilitySetting>('/v1/tenant-settings/availability', { enabled });
 }
