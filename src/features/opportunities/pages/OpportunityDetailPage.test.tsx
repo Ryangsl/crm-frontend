@@ -4,11 +4,14 @@ import { Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { OpportunityDetailPage } from './OpportunityDetailPage';
+import * as reasonsService from '@/features/closing-reasons/services';
+import { reasonsOf } from '@/features/closing-reasons/testing';
 import * as service from '../services/opportunities';
 import { makeOpportunity, PIPELINE, renderWithProviders } from '../test-utils';
 import type { Opportunity } from '../types/opportunity';
 
 vi.mock('../services/opportunities');
+vi.mock('@/features/closing-reasons/services');
 
 function renderPage(opportunity: Opportunity, permissions: string[]) {
   vi.mocked(service.getOpportunity).mockResolvedValue(opportunity);
@@ -115,13 +118,16 @@ describe('OpportunityDetailPage', () => {
     vi.mocked(service.loseOpportunity).mockResolvedValue(
       makeOpportunity({ status: 'lost', stage_id: 'st5' }),
     );
+    vi.mocked(reasonsService.listClosingReasons).mockResolvedValue(reasonsOf('opportunity_lost'));
     renderPage(makeOpportunity(), FULL);
 
     await user.click(await screen.findByRole('button', { name: 'Perder' }));
-    await user.type(screen.getByLabelText(/motivo da perda/i), 'Sem orçamento');
+    await user.selectOptions(await screen.findByLabelText('Motivo da perda'), 'opportunity_lost-1');
     await user.click(screen.getByRole('button', { name: 'Confirmar perda' }));
     await waitFor(() =>
-      expect(service.loseOpportunity).toHaveBeenCalledWith('o1', 'Sem orçamento'),
+      expect(service.loseOpportunity).toHaveBeenCalledWith('o1', {
+        reason_id: 'opportunity_lost-1',
+      }),
     );
   });
 

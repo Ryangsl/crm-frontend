@@ -55,7 +55,9 @@ export function PipelineBoardPage() {
             Ver lista
           </Button>
           {hasPermission('opportunities:create') && (
-            <Button writes onClick={() => navigate('/opportunities/new')}>Nova oportunidade</Button>
+            <Button writes onClick={() => navigate('/opportunities/new')}>
+              Nova oportunidade
+            </Button>
           )}
         </div>
       </header>

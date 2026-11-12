@@ -32,9 +32,7 @@ export function AppointmentForm({
 }: AppointmentFormProps) {
   const { user } = useAuth();
   const now = new Date().toISOString();
-  const [startsAt, setStartsAt] = useState(
-    toDatetimeLocalValue(appointment?.starts_at ?? now),
-  );
+  const [startsAt, setStartsAt] = useState(toDatetimeLocalValue(appointment?.starts_at ?? now));
   const [endsAt, setEndsAt] = useState(
     toDatetimeLocalValue(appointment?.ends_at ?? defaultEnd(now)),
   );
@@ -109,7 +107,13 @@ export function AppointmentForm({
         <Button writes type="submit" size="sm" loading={submitting} disabled={submitting}>
           {appointment ? 'Salvar' : 'Adicionar'}
         </Button>
-        <Button type="button" size="sm" variant="secondary" onClick={onCancel} disabled={submitting}>
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          onClick={onCancel}
+          disabled={submitting}
+        >
           Cancelar
         </Button>
       </div>

@@ -18,7 +18,10 @@ export interface Opportunity {
   owner: Ref;
   value: string | null;
   status: OpportunityStatus;
+  // D-099: nome do motivo escolhido (ou o texto livre de registros antigos), id e observacao.
   lost_reason: string | null;
+  lost_reason_id?: string | null;
+  lost_note?: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { createAppointment, deleteAppointment, listAppointments, updateAppointment } from '../services/followUp';
+import {
+  createAppointment,
+  deleteAppointment,
+  listAppointments,
+  updateAppointment,
+} from '../services/followUp';
 import type {
   AppointmentCreateInput,
   AppointmentUpdateInput,

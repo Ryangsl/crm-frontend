@@ -1,3 +1,4 @@
+import type { ClosingReasonChoice } from '@/features/closing-reasons/types';
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/services/api';
 import type {
   MoveInput,
@@ -67,8 +68,9 @@ export function winOpportunity(id: string): Promise<Opportunity> {
   return apiPost<Opportunity>(`/v1/opportunities/${id}/win`);
 }
 
-export function loseOpportunity(id: string, reason: string): Promise<Opportunity> {
-  return apiPost<Opportunity>(`/v1/opportunities/${id}/lose`, { reason });
+// D-099: motivo da lista da empresa + observacao (obrigatoria com "Outro").
+export function loseOpportunity(id: string, choice: ClosingReasonChoice): Promise<Opportunity> {
+  return apiPost<Opportunity>(`/v1/opportunities/${id}/lose`, choice);
 }
 
 export function listPipelines(): Promise<PipelineListResponse> {

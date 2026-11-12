@@ -1,5 +1,11 @@
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/services/api';
-import type { Contact, ContactInput, Customer, CustomerInput, CustomerListResponse } from '../types/customer';
+import type {
+  Contact,
+  ContactInput,
+  Customer,
+  CustomerInput,
+  CustomerListResponse,
+} from '../types/customer';
 
 export interface ListCustomersParams {
   page?: number;

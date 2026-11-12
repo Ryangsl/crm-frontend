@@ -82,7 +82,10 @@ export function NotesSection({ entityType, entityId }: NotesSectionProps) {
       )}
 
       {notes && notes.length === 0 && mode === null && (
-        <EmptyState title="Nenhuma nota registrada" description="Adicione a primeira nota deste registro." />
+        <EmptyState
+          title="Nenhuma nota registrada"
+          description="Adicione a primeira nota deste registro."
+        />
       )}
 
       {notes && notes.length > 0 && (
@@ -107,7 +110,12 @@ export function NotesSection({ entityType, entityId }: NotesSectionProps) {
                   </div>
                   <div className="flex shrink-0 gap-1">
                     {canEdit && (
-                      <Button writes size="sm" variant="ghost" onClick={() => setMode({ kind: 'edit', note })}>
+                      <Button
+                        writes
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setMode({ kind: 'edit', note })}
+                      >
                         Editar
                       </Button>
                     )}

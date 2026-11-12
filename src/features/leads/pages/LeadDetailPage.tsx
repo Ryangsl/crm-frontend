@@ -2,13 +2,21 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
+import { ClosingReasonFields } from '@/features/closing-reasons/components/ClosingReasonFields';
+import {
+  choiceErrorMessage,
+  EMPTY_CHOICE,
+  isChoiceComplete,
+  toChoice,
+} from '@/features/closing-reasons/choice';
+import type { ChoiceDraft } from '@/features/closing-reasons/choice';
+import { useClosingReasonsQuery } from '@/features/closing-reasons/hooks';
 import { Alert } from '@/components/ui/Alert';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { OutsideBusinessHoursAlert } from '@/features/access-control/components/OutsideBusinessHoursAlert';
 import { isOutsideBusinessHours } from '@/features/access-control/lib/labels';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
 import { ApiError } from '@/services/api';
@@ -43,7 +51,8 @@ export function LeadDetailPage() {
   const { data: sources } = useLeadSourcesQuery();
 
   const [panel, setPanel] = useState<'none' | 'disqualify' | 'convert' | 'delete'>('none');
-  const [reason, setReason] = useState('');
+  const [choice, setChoice] = useState<ChoiceDraft>(EMPTY_CHOICE);
+  const disqualifyReasons = useClosingReasonsQuery('lead_disqualified', panel === 'disqualify');
   const [actionError, setActionError] = useState<string | null>(null);
 
   const qualifyMutation = useQualifyLead(id ?? '');
@@ -66,15 +75,18 @@ export function LeadDetailPage() {
       await action();
       setPanel('none');
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'Nao foi possivel completar a acao.');
+      setActionError(
+        choiceErrorMessage(err) ??
+          (err instanceof ApiError ? err.message : 'Não foi possível completar a ação.'),
+      );
     }
   }
 
   async function handleDisqualify(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!reason.trim()) return;
-    await runAction(() => disqualifyMutation.mutateAsync(reason.trim()));
-    setReason('');
+    if (!isChoiceComplete(disqualifyReasons.data?.data, choice)) return;
+    await runAction(() => disqualifyMutation.mutateAsync(toChoice(choice)));
+    setChoice(EMPTY_CHOICE);
   }
 
   async function handleDelete() {
@@ -119,7 +131,10 @@ export function LeadDetailPage() {
                 Responsável: {lead.owner_id ? 'Atribuído' : 'Sem responsável'}
               </p>
               {lead.status === 'disqualified' && lead.disqualify_reason && (
-                <p className="text-sm text-neutral-500">Motivo: {lead.disqualify_reason}</p>
+                <p className="text-sm text-neutral-500">
+                  Motivo: {lead.disqualify_reason}
+                  {lead.disqualify_note ? ` — ${lead.disqualify_note}` : ''}
+                </p>
               )}
             </div>
             {canUpdate && (
@@ -218,14 +233,23 @@ export function LeadDetailPage() {
                 onSubmit={(event) => void handleDisqualify(event)}
                 className="mt-4 flex flex-col gap-3"
               >
-                <Input
+                <ClosingReasonFields
+                  kind="lead_disqualified"
                   label="Motivo da desqualificação"
-                  required
-                  value={reason}
-                  onChange={(event) => setReason(event.target.value)}
+                  value={choice}
+                  onChange={setChoice}
                 />
                 <div className="flex gap-2">
-                  <Button writes type="submit" size="sm" loading={disqualifyMutation.isPending}>
+                  <Button
+                    writes
+                    type="submit"
+                    size="sm"
+                    loading={disqualifyMutation.isPending}
+                    disabled={
+                      disqualifyMutation.isPending ||
+                      !isChoiceComplete(disqualifyReasons.data?.data, choice)
+                    }
+                  >
                     Confirmar
                   </Button>
                   <Button

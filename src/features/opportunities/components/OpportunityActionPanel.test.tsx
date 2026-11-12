@@ -5,11 +5,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '@/services/api';
 import { OpportunityActionPanel } from './OpportunityActionPanel';
 import type { ActionMode } from './OpportunityActionPanel';
+import * as reasonsService from '@/features/closing-reasons/services';
+import { reasonsOf } from '@/features/closing-reasons/testing';
 import * as service from '../services/opportunities';
 import { makeOpportunity, renderWithProviders, STAGES } from '../test-utils';
 import type { Opportunity, Stage } from '../types/opportunity';
 
 vi.mock('../services/opportunities');
+vi.mock('@/features/closing-reasons/services');
 
 function renderPanel(
   mode: ActionMode,
@@ -190,23 +193,52 @@ describe('OpportunityActionPanel', () => {
     expect(service.winOpportunity).toHaveBeenCalledWith('o1');
   });
 
-  it('perder: motivo obrigatório (mínimo 3 caracteres) e chama lose', async () => {
+  it('perder: motivo da lista obrigatório; "Outro" exige justificativa; chama lose', async () => {
     const user = userEvent.setup();
     vi.mocked(service.loseOpportunity).mockResolvedValue(
       makeOpportunity({ status: 'lost', stage_id: 'st5' }),
     );
+    vi.mocked(reasonsService.listClosingReasons).mockResolvedValue(reasonsOf('opportunity_lost'));
     const { onDone } = renderPanel('lose');
 
     const confirm = screen.getByRole('button', { name: 'Confirmar perda' });
     expect(confirm).toBeDisabled();
-    await user.type(screen.getByLabelText(/motivo da perda/i), 'ab');
+    const select = await screen.findByLabelText('Motivo da perda');
+    expect(reasonsService.listClosingReasons).toHaveBeenCalledWith('opportunity_lost');
+    await user.selectOptions(select, 'opportunity_lost-other');
     expect(confirm).toBeDisabled();
-    await user.type(screen.getByLabelText(/motivo da perda/i), 'c');
+    await user.type(screen.getByLabelText('Justificativa'), 'Projeto cancelado');
+    expect(confirm).toBeEnabled();
+    // Motivo comum: a observacao deixa de ser obrigatoria.
+    await user.selectOptions(select, 'opportunity_lost-1');
+    await user.clear(screen.getByLabelText('Observação (opcional)'));
     expect(confirm).toBeEnabled();
     await user.click(confirm);
 
     await waitFor(() => expect(onDone).toHaveBeenCalled());
-    expect(service.loseOpportunity).toHaveBeenCalledWith('o1', 'abc');
+    expect(service.loseOpportunity).toHaveBeenCalledWith('o1', { reason_id: 'opportunity_lost-1' });
+  });
+
+  it('perder: motivo que saiu da lista mostra a orientação e mantém o painel aberto', async () => {
+    const user = userEvent.setup();
+    vi.mocked(reasonsService.listClosingReasons).mockResolvedValue(reasonsOf('opportunity_lost'));
+    vi.mocked(service.loseOpportunity).mockRejectedValue(
+      new ApiError(422, 'CLOSING_REASON_INVALID', 'Escolha um motivo da lista da empresa.'),
+    );
+    const { onDone } = renderPanel('lose');
+
+    await user.selectOptions(await screen.findByLabelText('Motivo da perda'), 'opportunity_lost-1');
+    await user.click(screen.getByRole('button', { name: 'Confirmar perda' }));
+
+    expect(await screen.findByText(/Este motivo não está mais na lista/)).toBeInTheDocument();
+    expect(onDone).not.toHaveBeenCalled();
+  });
+
+  it('perder: sem motivos cadastrados orienta a procurar o administrador', async () => {
+    vi.mocked(reasonsService.listClosingReasons).mockResolvedValue({ data: [] });
+    renderPanel('lose');
+    expect(await screen.findByText('Nenhum motivo cadastrado')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Confirmar perda' })).toBeDisabled();
   });
 
   it('mostra erro do backend (ex.: oportunidade já encerrada) e não fecha o painel', async () => {

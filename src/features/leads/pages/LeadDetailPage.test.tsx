@@ -7,10 +7,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { AuthContext } from '@/features/auth/auth-context';
 import type { AuthState } from '@/features/auth/auth-context';
 import { LeadDetailPage } from './LeadDetailPage';
+import * as reasonsService from '@/features/closing-reasons/services';
+import { reasonsOf } from '@/features/closing-reasons/testing';
 import * as leadsService from '../services/leads';
 import type { Lead, LeadSourceListResponse } from '../types/lead';
 
 vi.mock('../services/leads');
+vi.mock('@/features/closing-reasons/services');
 
 function sourcesPage(): LeadSourceListResponse {
   return {
@@ -115,14 +118,53 @@ describe('LeadDetailPage', () => {
     vi.mocked(leadsService.disqualifyLead).mockResolvedValue(
       newLead({ status: 'disqualified', disqualify_reason: 'Sem interesse' }),
     );
+    vi.mocked(reasonsService.listClosingReasons).mockResolvedValue(reasonsOf('lead_disqualified'));
     renderPage(newLead(), ['leads:read', 'leads:update']);
 
     await user.click(await screen.findByRole('button', { name: /desqualificar/i }));
-    await user.type(screen.getByLabelText(/motivo/i), 'Sem interesse');
-    await user.click(screen.getByRole('button', { name: /confirmar/i }));
+    const confirm = screen.getByRole('button', { name: /confirmar/i });
+    // D-099: sem motivo da lista nao confirma.
+    await user.selectOptions(
+      await screen.findByLabelText('Motivo da desqualificação'),
+      'lead_disqualified-1',
+    );
+    expect(reasonsService.listClosingReasons).toHaveBeenCalledWith('lead_disqualified');
+    await user.type(screen.getByLabelText('Observação (opcional)'), ' Pediu para não ligar ');
+    await user.click(confirm);
 
     await waitFor(() =>
-      expect(leadsService.disqualifyLead).toHaveBeenCalledWith('l1', 'Sem interesse'),
+      expect(leadsService.disqualifyLead).toHaveBeenCalledWith('l1', {
+        reason_id: 'lead_disqualified-1',
+        note: 'Pediu para não ligar',
+      }),
+    );
+  });
+
+  it('desqualificar com "Outro" exige justificativa', async () => {
+    const user = userEvent.setup();
+    vi.mocked(leadsService.disqualifyLead).mockResolvedValue(newLead({ status: 'disqualified' }));
+    vi.mocked(reasonsService.listClosingReasons).mockResolvedValue(reasonsOf('lead_disqualified'));
+    renderPage(newLead(), ['leads:read', 'leads:update']);
+
+    await user.click(await screen.findByRole('button', { name: /desqualificar/i }));
+    const confirm = screen.getByRole('button', { name: /confirmar/i });
+    expect(confirm).toBeDisabled();
+    await user.selectOptions(
+      await screen.findByLabelText('Motivo da desqualificação'),
+      'lead_disqualified-other',
+    );
+    expect(confirm).toBeDisabled();
+    await user.type(screen.getByLabelText('Justificativa'), 'ab');
+    expect(confirm).toBeDisabled();
+    await user.type(screen.getByLabelText('Justificativa'), 'c');
+    expect(confirm).toBeEnabled();
+    await user.click(confirm);
+
+    await waitFor(() =>
+      expect(leadsService.disqualifyLead).toHaveBeenCalledWith('l1', {
+        reason_id: 'lead_disqualified-other',
+        note: 'abc',
+      }),
     );
   });
 

@@ -47,7 +47,12 @@ describe('NotesSection', () => {
   });
 
   it('mostra estado vazio quando nao ha notas', async () => {
-    vi.mocked(followUpService.listNotes).mockResolvedValue({ data: [], page: 1, limit: 100, total: 0 });
+    vi.mocked(followUpService.listNotes).mockResolvedValue({
+      data: [],
+      page: 1,
+      limit: 100,
+      total: 0,
+    });
     renderSection(['notes:read']);
     expect(await screen.findByText(/nenhuma nota registrada/i)).toBeInTheDocument();
   });
@@ -79,7 +84,12 @@ describe('NotesSection', () => {
 
   it('cria uma nova nota vinculada a entidade', async () => {
     const user = userEvent.setup();
-    vi.mocked(followUpService.listNotes).mockResolvedValue({ data: [], page: 1, limit: 100, total: 0 });
+    vi.mocked(followUpService.listNotes).mockResolvedValue({
+      data: [],
+      page: 1,
+      limit: 100,
+      total: 0,
+    });
     vi.mocked(followUpService.createNote).mockResolvedValue(NOTE);
     renderSection(['notes:read', 'notes:create']);
 

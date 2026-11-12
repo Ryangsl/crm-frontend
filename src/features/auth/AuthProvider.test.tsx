@@ -29,7 +29,9 @@ function Probe() {
 }
 
 // O AuthProvider esvazia o cache do TanStack Query ao encerrar a sessao: precisa de QueryClient.
-function renderAuth(queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })) {
+function renderAuth(
+  queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } }),
+) {
   render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -123,7 +125,10 @@ describe('AuthProvider', () => {
       }
       if (url.includes('/v1/auth/login')) {
         return Promise.resolve(
-          jsonResponse({ error: { code: 'INVALID_CREDENTIALS', message: 'E-mail ou senha invalidos.' } }, 401),
+          jsonResponse(
+            { error: { code: 'INVALID_CREDENTIALS', message: 'E-mail ou senha invalidos.' } },
+            401,
+          ),
         );
       }
       return Promise.resolve(jsonResponse({}, 404));

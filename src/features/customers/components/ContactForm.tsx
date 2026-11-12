@@ -110,7 +110,13 @@ export function ContactForm({ customerId, contact, onSuccess, onCancel }: Contac
         <Button writes type="submit" size="sm" loading={submitting} disabled={submitting}>
           {contact ? 'Salvar' : 'Adicionar'}
         </Button>
-        <Button type="button" size="sm" variant="secondary" onClick={onCancel} disabled={submitting}>
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          onClick={onCancel}
+          disabled={submitting}
+        >
           Cancelar
         </Button>
       </div>

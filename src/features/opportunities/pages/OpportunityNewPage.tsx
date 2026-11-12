@@ -17,7 +17,9 @@ export function OpportunityNewPage() {
   return (
     <div className="flex flex-col gap-4">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Nova oportunidade</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          Nova oportunidade
+        </h1>
       </header>
 
       <Card className="max-w-lg">
