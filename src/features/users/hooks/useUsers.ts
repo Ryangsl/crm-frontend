@@ -115,14 +115,20 @@ interface UserDirectoryResponse {
   data: Array<{ id: string; name: string; status: 'active' | 'inactive' }>;
 }
 
-// Nomes para mostrar responsaveis: diretorio de colegas (D-089), sem e-mail nem papeis, aberto a todo
-// usuario autenticado. Falha = mapa vazio e a tela usa o texto generico.
-export function useUserNames(): Map<string, string> {
+export type DirectoryUser = UserDirectoryResponse['data'][number];
+
+// Diretorio de colegas (D-089): so id, nome e situacao, aberto a todo usuario autenticado.
+export function useUserDirectory() {
   const { status } = useAuth();
-  const { data } = useQuery({
+  return useQuery({
     queryKey: ['users', 'names'],
     queryFn: () => apiGet<UserDirectoryResponse>('/v1/users/directory'),
     enabled: status === 'authenticated',
   });
+}
+
+// Nomes para mostrar responsaveis. Falha = mapa vazio e a tela usa o texto generico.
+export function useUserNames(): Map<string, string> {
+  const { data } = useUserDirectory();
   return useMemo(() => new Map((data?.data ?? []).map((user) => [user.id, user.name])), [data]);
 }

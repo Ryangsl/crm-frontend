@@ -197,6 +197,11 @@ export function apiPost<T>(path: string, body?: unknown, init?: RequestInit): Pr
   });
 }
 
+// Envio de arquivo (multipart). Sem Content-Type: o navegador define o boundary do FormData.
+export function apiPostForm<T>(path: string, form: FormData, init?: RequestInit): Promise<T> {
+  return request<T>(path, { ...init, method: 'POST', body: form });
+}
+
 export function apiPut<T>(path: string, body?: unknown, init?: RequestInit): Promise<T> {
   return request<T>(path, {
     ...init,

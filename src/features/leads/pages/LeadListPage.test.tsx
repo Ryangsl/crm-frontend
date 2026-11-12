@@ -96,6 +96,7 @@ describe('LeadListPage', () => {
     renderPage(['leads:read']);
     await screen.findByText(/nenhum lead encontrado/i);
     expect(screen.queryByRole('button', { name: /novo lead/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Importar' })).not.toBeInTheDocument();
   });
 
   it('RBAC visual: com leads:create, mostra o botao Novo lead', async () => {
@@ -103,6 +104,8 @@ describe('LeadListPage', () => {
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
     renderPage(['leads:read', 'leads:create']);
     expect(await screen.findByRole('button', { name: /novo lead/i })).toBeInTheDocument();
+    // D-096: importar exige criar e ver leads.
+    expect(screen.getByRole('button', { name: 'Importar' })).toBeInTheDocument();
   });
 
   it('filtro de status envia o valor selecionado para a API', async () => {
