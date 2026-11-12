@@ -29,16 +29,16 @@ describe('AccessStatusBanner (F4.7)', () => {
     vi.resetAllMocks();
   });
 
-  it('restringido fora do horario: avisa e cita Leads e Conversas', async () => {
+  it('restringido fora do horário: avisa e cita Leads e Conversas', async () => {
     vi.mocked(service.getAccessStatus).mockResolvedValue(BASE);
     renderBanner();
     const banner = await screen.findByTestId('access-status-banner');
-    expect(banner).toHaveTextContent('Fora do horario de funcionamento');
+    expect(banner).toHaveTextContent('Fora do horário de funcionamento');
     expect(banner).toHaveTextContent('Leads e Conversas');
-    expect(banner).toHaveTextContent(/liberacao excepcional/i);
+    expect(banner).toHaveTextContent(/liberação excepcional/i);
   });
 
-  it('com excecao so de leads: o aviso cita apenas Conversas', async () => {
+  it('com exceção só de leads: o aviso cita apenas Conversas', async () => {
     vi.mocked(service.getAccessStatus).mockResolvedValue({
       ...BASE,
       access: { leads: true, conversations: false },
@@ -50,14 +50,14 @@ describe('AccessStatusBanner (F4.7)', () => {
   });
 
   it.each([
-    ['restricao desligada', { ...BASE, restriction_enabled: false, within_business_hours: null }],
-    ['isento (nao se aplica a mim)', { ...BASE, applies_to_me: false }],
+    ['restrição desligada', { ...BASE, restriction_enabled: false, within_business_hours: null }],
+    ['isento (não se aplica a mim)', { ...BASE, applies_to_me: false }],
     [
-      'dentro do horario',
+      'dentro do horário',
       { ...BASE, within_business_hours: true, access: { leads: true, conversations: true } },
     ],
-    ['liberado em tudo por excecao', { ...BASE, access: { leads: true, conversations: true } }],
-  ] as const)('nao mostra o aviso: %s', async (_label, status) => {
+    ['liberado em tudo por exceção', { ...BASE, access: { leads: true, conversations: true } }],
+  ] as const)('não mostra o aviso: %s', async (_label, status) => {
     vi.mocked(service.getAccessStatus).mockResolvedValue(status);
     renderBanner();
     await waitFor(() => expect(service.getAccessStatus).toHaveBeenCalled());

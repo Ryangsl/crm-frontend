@@ -67,7 +67,7 @@ function otherTab() {
   return { channel, received };
 }
 
-describe('AuthProvider com varias abas (D-091)', () => {
+describe('AuthProvider com várias abas (D-091)', () => {
   let me = { id: '1', name: 'Ana', email: 'ana@x.com', status: 'active' };
   const fetchMock = vi.fn();
 
@@ -96,7 +96,7 @@ describe('AuthProvider com varias abas (D-091)', () => {
   const calls = (path: string) =>
     fetchMock.mock.calls.filter(([input]) => String(input).includes(path)).length;
 
-  it('saida em outra aba encerra a sessao aqui, limpa o cache e nao chama a API', async () => {
+  it('saída em outra aba encerra a sessão aqui, limpa o cache e não chama a API', async () => {
     const queryClient = renderAuth();
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('authenticated'));
     const tab = otherTab();
@@ -119,7 +119,7 @@ describe('AuthProvider com varias abas (D-091)', () => {
     await waitFor(() => expect(tab.received).toEqual([{ type: 'signed-out' }]));
   });
 
-  it('entrada em outra aba (outro usuario): descarta o cache e retoma a sessao atual', async () => {
+  it('entrada em outra aba (outro usuário): descarta o cache e retoma a sessão atual', async () => {
     const queryClient = renderAuth();
     await waitFor(() => expect(screen.getByTestId('user')).toHaveTextContent('ana@x.com'));
     const refreshesBefore = calls('/v1/auth/refresh');

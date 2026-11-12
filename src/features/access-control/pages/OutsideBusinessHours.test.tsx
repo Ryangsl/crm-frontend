@@ -17,7 +17,7 @@ vi.mock('@/features/leads/services/leads');
 // 403 OUTSIDE_BUSINESS_HOURS (D-082) nas telas de Leads e Conversas: mensagem propria, sem o
 // botao "Tentar novamente" (repetir nao muda o resultado) e sem o texto generico de erro.
 const OUTSIDE = () =>
-  new ApiError(403, 'OUTSIDE_BUSINESS_HOURS', 'Acesso indisponivel fora do horario.');
+  new ApiError(403, 'OUTSIDE_BUSINESS_HOURS', 'Acesso indisponível fora do horário.');
 
 describe('403 OUTSIDE_BUSINESS_HOURS nas telas cobertas (F4.7)', () => {
   afterEach(() => {
@@ -25,8 +25,8 @@ describe('403 OUTSIDE_BUSINESS_HOURS nas telas cobertas (F4.7)', () => {
   });
 
   async function expectOutsideNotice() {
-    expect(await screen.findByText('Fora do horario de funcionamento')).toBeInTheDocument();
-    expect(screen.getByText(/liberacao excepcional a um Admin ou Gerente/i)).toBeInTheDocument();
+    expect(await screen.findByText('Fora do horário de funcionamento')).toBeInTheDocument();
+    expect(screen.getByText(/liberação excepcional a um Admin ou Gerente/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /tentar novamente/i })).not.toBeInTheDocument();
   }
 
@@ -40,7 +40,7 @@ describe('403 OUTSIDE_BUSINESS_HOURS nas telas cobertas (F4.7)', () => {
     });
     renderWithProviders(<LeadListPage />, ['leads:read'], { route: '/leads', path: '/leads' });
     await expectOutsideNotice();
-    expect(screen.queryByText('Nao foi possivel carregar os leads')).not.toBeInTheDocument();
+    expect(screen.queryByText('Não foi possível carregar os leads')).not.toBeInTheDocument();
   });
 
   it('detalhe de Lead', async () => {
@@ -56,7 +56,7 @@ describe('403 OUTSIDE_BUSINESS_HOURS nas telas cobertas (F4.7)', () => {
       path: '/leads/:id',
     });
     await expectOutsideNotice();
-    expect(screen.queryByText('Nao foi possivel carregar o lead')).not.toBeInTheDocument();
+    expect(screen.queryByText('Não foi possível carregar o lead')).not.toBeInTheDocument();
   });
 
   it('lista de Conversas', async () => {
@@ -84,15 +84,15 @@ describe('403 OUTSIDE_BUSINESS_HOURS nas telas cobertas (F4.7)', () => {
     await expectOutsideNotice();
   });
 
-  it('um erro que nao e o de horario continua usando a mensagem generica e a nova tentativa', async () => {
+  it('um erro que não e o de horário continua usando a mensagem genérica e a nova tentativa', async () => {
     vi.mocked(conversationsService.listConversations).mockRejectedValue(
-      new ApiError(403, 'FORBIDDEN', 'sem permissao'),
+      new ApiError(403, 'FORBIDDEN', 'sem permissão'),
     );
     renderWithProviders(<ConversationListPage />, ['conversations:read']);
     await waitFor(() =>
-      expect(screen.getByText('Nao foi possivel carregar as conversas')).toBeInTheDocument(),
+      expect(screen.getByText('Não foi possível carregar as conversas')).toBeInTheDocument(),
     );
-    expect(screen.queryByText('Fora do horario de funcionamento')).not.toBeInTheDocument();
+    expect(screen.queryByText('Fora do horário de funcionamento')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /tentar novamente/i })).toBeInTheDocument();
   });
 });

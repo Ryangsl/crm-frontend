@@ -12,14 +12,14 @@ import type { AvailabilityStatus } from '../types/availability';
 function errorMessage(error: unknown): string {
   if (error instanceof ApiError) {
     if (error.code === 'AVAILABILITY_TRAINING_LOCKED') {
-      return 'Voce nao pode alterar a disponibilidade enquanto estiver em Treinamento.';
+      return 'Você não pode alterar a disponibilidade enquanto estiver em Treinamento.';
     }
     if (error.code === 'AVAILABILITY_DISABLED') {
       return 'A disponibilidade foi desabilitada para esta empresa.';
     }
-    if (isPermissionDenied(error)) return 'Voce nao tem permissao para alterar a disponibilidade.';
+    if (isPermissionDenied(error)) return 'Você não tem permissão para alterar a disponibilidade.';
   }
-  return 'Nao foi possivel alterar a disponibilidade.';
+  return 'Não foi possível alterar a disponibilidade.';
 }
 
 function SelectorInner({ className = '' }: { className?: string }) {
@@ -58,7 +58,7 @@ function SelectorInner({ className = '' }: { className?: string }) {
         ))}
       </Select>
       {locked && (
-        <p className="text-xs text-neutral-500">Definido pelo gestor; so ele pode retirar.</p>
+        <p className="text-xs text-neutral-500">Definido pelo gestor; só ele pode retirar.</p>
       )}
       {error && (
         <p role="alert" className="text-danger text-xs">

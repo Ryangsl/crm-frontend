@@ -39,7 +39,7 @@ function renderShell(permissions: string[], roles: string[] = []) {
 }
 
 describe('AppShell — item de plano (D-085)', () => {
-  it('aparece na Administracao do Admin e nao entra na barra inferior, que ja esta cheia', () => {
+  it('aparece na Administracao do Admin e não entra na barra inferior, que já está cheia', () => {
     renderShell([], ['admin']);
     const sidebar = screen.getByRole('navigation', { name: 'Principal' });
     const bottom = screen.getByRole('navigation', { name: 'Atalhos' });
@@ -47,7 +47,7 @@ describe('AppShell — item de plano (D-085)', () => {
     expect(within(bottom).queryByRole('link', { name: /plano/i })).not.toBeInTheDocument();
   });
 
-  it('a barra inferior so tem o que cabe; o resto fica no menu Mais', () => {
+  it('a barra inferior só tem o que cabe; o resto fica no menu Mais', () => {
     renderShell(['tenant_settings:read', 'conversations:read'], ['admin']);
     const bottom = screen.getByRole('navigation', { name: 'Atalhos' });
     expect(within(bottom).getAllByRole('link')).toHaveLength(4);
@@ -66,14 +66,14 @@ describe('AppShell — item de plano (D-085)', () => {
   });
 });
 
-describe('AppShell — item de configuracoes', () => {
-  it('sem tenant_settings:read o item de configuracoes nao aparece (sidebar e bottom nav)', () => {
+describe('AppShell — item de configurações', () => {
+  it('sem tenant_settings:read o item de configurações não aparece (sidebar e bottom nav)', () => {
     renderShell(['leads:read']);
     expect(screen.queryByText('Configurações')).not.toBeInTheDocument();
     expect(screen.getAllByText('Leads').length).toBeGreaterThan(0); // demais itens seguem
   });
 
-  it('com tenant_settings:read o item aparece e aponta para a central de configuracoes', () => {
+  it('com tenant_settings:read o item aparece e aponta para a central de configurações', () => {
     renderShell(['tenant_settings:read'], ['admin']);
     const links = screen.getAllByRole('link', { name: /configurações/i });
     expect(links.length).toBeGreaterThan(0);
@@ -81,8 +81,8 @@ describe('AppShell — item de configuracoes', () => {
   });
 });
 
-describe('AppShell — Administracao so para o Admin', () => {
-  it('quem nao e Admin nao ve a secao Administracao, mesmo com permissoes de leitura', () => {
+describe('AppShell — Administracao só para o Admin', () => {
+  it('quem não e Admin não ve a secao Administracao, mesmo com permissões de leitura', () => {
     renderShell(['tenant_settings:read', 'users:read', 'plan:read'], ['diretor']);
     const sidebar = screen.getByRole('navigation', { name: 'Principal' });
     expect(within(sidebar).queryByText('Administração')).not.toBeInTheDocument();
@@ -90,7 +90,7 @@ describe('AppShell — Administracao so para o Admin', () => {
     expect(within(sidebar).queryByRole('link', { name: /configurações/i })).not.toBeInTheDocument();
   });
 
-  it('o Gerente continua com Liberacoes, fora da Administracao (D-082)', () => {
+  it('o Gerente continua com Liberações, fora da Administracao (D-082)', () => {
     renderShell(['access_exceptions:manage', 'leads:read'], ['gerente']);
     const sidebar = screen.getByRole('navigation', { name: 'Principal' });
     expect(within(sidebar).queryByText('Administração')).not.toBeInTheDocument();

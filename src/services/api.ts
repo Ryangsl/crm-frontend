@@ -101,7 +101,7 @@ async function parseErrorBody(
   }
   return {
     code: 'ERROR',
-    message: `Falha ao processar a requisicao (HTTP ${response.status}).`,
+    message: `Falha ao processar a requisição (HTTP ${response.status}).`,
     details: [],
   };
 }

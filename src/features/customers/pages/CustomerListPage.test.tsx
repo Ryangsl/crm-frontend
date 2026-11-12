@@ -49,7 +49,7 @@ describe('CustomerListPage', () => {
     expect(screen.getByText(/carregando clientes/i)).toBeInTheDocument();
   });
 
-  it('mostra estado vazio quando nao ha clientes', async () => {
+  it('mostra estado vazio quando não há clientes', async () => {
     vi.mocked(customersService.listCustomers).mockResolvedValue(page());
     renderPage(['customers:read']);
     expect(await screen.findByText(/nenhum cliente cadastrado/i)).toBeInTheDocument();
@@ -58,7 +58,7 @@ describe('CustomerListPage', () => {
   it('mostra estado de erro e permite tentar novamente', async () => {
     vi.mocked(customersService.listCustomers).mockRejectedValue(new Error('falhou'));
     renderPage(['customers:read']);
-    expect(await screen.findByText(/nao foi possivel carregar os clientes/i)).toBeInTheDocument();
+    expect(await screen.findByText(/não foi possível carregar os clientes/i)).toBeInTheDocument();
   });
 
   it('lista os clientes retornados pela API', async () => {
@@ -85,7 +85,7 @@ describe('CustomerListPage', () => {
     expect(await screen.findByText('Empresa Alfa')).toBeInTheDocument();
   });
 
-  it('RBAC visual: sem customers:create, nao mostra o botao Novo cliente', async () => {
+  it('RBAC visual: sem customers:create, não mostra o botao Novo cliente', async () => {
     vi.mocked(customersService.listCustomers).mockResolvedValue(page());
     renderPage(['customers:read']);
     await screen.findByText(/nenhum cliente cadastrado/i);

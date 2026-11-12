@@ -162,21 +162,24 @@ export function LatestLeadsCard() {
       )}
       {data && data.data.length > 0 && (
         <div className="-mx-4 lg:-mx-5">
-          <table aria-label="Últimos leads" className="w-full text-left text-sm">
+          {/* Largura fixa: o nome trunca e o status cabe inteiro no cartao estreito. */}
+          <table aria-label="Últimos leads" className="w-full table-fixed text-left text-sm">
             <Thead>
               <Th>Nome</Th>
-              <Th className="hidden xl:table-cell">Origem</Th>
-              <Th>Status</Th>
+              <Th className="hidden w-28 2xl:table-cell">Origem</Th>
+              <Th className="w-36">Status</Th>
             </Thead>
             <Tbody>
               {data.data.map((lead) => (
                 <Tr key={lead.id}>
-                  <Td className="max-w-40 truncate">
+                  <Td className="truncate">
                     <Link to={`/leads/${lead.id}`} className="text-neutral-900 hover:underline">
                       {lead.name || 'Lead sem nome'}
                     </Link>
                   </Td>
-                  <Td className="hidden xl:table-cell">{sourceNames.get(lead.source_id) ?? '—'}</Td>
+                  <Td className="hidden truncate 2xl:table-cell">
+                    {sourceNames.get(lead.source_id) ?? '—'}
+                  </Td>
                   <Td>
                     <LeadStatusBadge status={lead.status} />
                   </Td>

@@ -34,7 +34,7 @@ export function ContactsSection({ customerId }: ContactsSectionProps) {
     try {
       await deleteMutation.mutateAsync(contact.id);
     } catch (err) {
-      setDeleteError(err instanceof ApiError ? err.message : 'Nao foi possivel excluir o contato.');
+      setDeleteError(err instanceof ApiError ? err.message : 'Não foi possível excluir o contato.');
     }
   }
 
@@ -58,7 +58,7 @@ export function ContactsSection({ customerId }: ContactsSectionProps) {
       )}
 
       {deleteError && (
-        <Alert tone="danger" title="Nao foi possivel excluir">
+        <Alert tone="danger" title="Não foi possível excluir">
           {deleteError}
         </Alert>
       )}
@@ -70,7 +70,7 @@ export function ContactsSection({ customerId }: ContactsSectionProps) {
       )}
 
       {isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar os contatos">
+        <Alert tone="danger" title="Não foi possível carregar os contatos">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>

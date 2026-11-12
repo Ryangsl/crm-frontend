@@ -117,7 +117,7 @@ describe('deriveThemeVars', () => {
 });
 
 describe('applyBranding', () => {
-  it('identidade padrao nao escreve nenhuma variavel: valem os tokens do CSS', () => {
+  it('identidade padrão não escreve nenhuma variável: valem os tokens do CSS', () => {
     applyBranding(branding({ is_default: true }));
 
     expect(root.getAttribute('style') ?? '').not.toContain('--color');
@@ -132,7 +132,7 @@ describe('applyBranding', () => {
     expect(root.getAttribute('data-theme')).toBe('light');
   });
 
-  it('trocar de identidade nao deixa sobra da anterior', () => {
+  it('trocar de identidade não deixa sobra da anterior', () => {
     applyBranding(branding({ theme: 'dark', colors: DARK }));
     expect(root.getAttribute('data-theme')).toBe('dark');
 
@@ -143,7 +143,7 @@ describe('applyBranding', () => {
     expect(root.hasAttribute('data-theme')).toBe(false);
   });
 
-  it('sem dado volta ao padrao', () => {
+  it('sem dado volta ao padrão', () => {
     applyBranding(branding());
 
     applyBranding(null);
@@ -153,7 +153,7 @@ describe('applyBranding', () => {
 });
 
 describe('BrandingApplier', () => {
-  it('tenant sem personalizacao fica com o tema padrao', async () => {
+  it('tenant sem personalização fica com o tema padrão', async () => {
     vi.mocked(service.getBranding).mockResolvedValue(branding({ is_default: true }));
     renderApplier(USER);
 
@@ -168,7 +168,7 @@ describe('BrandingApplier', () => {
     await waitFor(() => expect(var_('--color-brand-600')).toBe('#047857'));
   });
 
-  it('API indisponivel: interface segue com o padrao', async () => {
+  it('API indisponível: interface segue com o padrão', async () => {
     vi.mocked(service.getBranding).mockRejectedValue(new Error('x'));
     renderApplier(USER);
 
@@ -176,7 +176,7 @@ describe('BrandingApplier', () => {
     expect(var_('--color-brand-600')).toBe('');
   });
 
-  it('fim da sessao limpa as cores: a proxima sessao nao herda nada', async () => {
+  it('fim da sessão limpa as cores: a próxima sessão não herda nada', async () => {
     vi.mocked(service.getBranding).mockResolvedValue(branding());
     const first = renderApplier(USER);
     await waitFor(() => expect(var_('--color-brand-600')).toBe('#047857'));
@@ -191,7 +191,7 @@ describe('BrandingApplier', () => {
     expect(var_('--color-brand-600')).toBe('');
   });
 
-  it('sem usuario nao consulta', () => {
+  it('sem usuário não consulta', () => {
     renderApplier(null);
 
     expect(service.getBranding).not.toHaveBeenCalled();

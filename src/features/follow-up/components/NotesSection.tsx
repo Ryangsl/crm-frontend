@@ -34,7 +34,7 @@ export function NotesSection({ entityType, entityId }: NotesSectionProps) {
     try {
       await deleteMutation.mutateAsync(note.id);
     } catch (err) {
-      setDeleteError(err instanceof ApiError ? err.message : 'Nao foi possivel excluir a nota.');
+      setDeleteError(err instanceof ApiError ? err.message : 'Não foi possível excluir a nota.');
     }
   }
 
@@ -59,7 +59,7 @@ export function NotesSection({ entityType, entityId }: NotesSectionProps) {
       )}
 
       {deleteError && (
-        <Alert tone="danger" title="Nao foi possivel excluir">
+        <Alert tone="danger" title="Não foi possível excluir">
           {deleteError}
         </Alert>
       )}
@@ -71,7 +71,7 @@ export function NotesSection({ entityType, entityId }: NotesSectionProps) {
       )}
 
       {isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar as notas">
+        <Alert tone="danger" title="Não foi possível carregar as notas">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>

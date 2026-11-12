@@ -29,10 +29,10 @@ export function BusinessHoursPage() {
     return (
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-          Horario de funcionamento
+          Horário de funcionamento
         </h1>
         <Alert tone="warning" title="Acesso restrito">
-          Voce nao tem permissao para acessar as configuracoes da empresa.
+          Você não tem permissão para acessar as configurações da empresa.
         </Alert>
       </div>
     );
@@ -42,31 +42,31 @@ export function BusinessHoursPage() {
     <div className="flex flex-col gap-4">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-          Horario de funcionamento
+          Horário de funcionamento
         </h1>
         <p className="text-sm text-neutral-500">
-          Janelas semanais de funcionamento da empresa, no fuso horario escolhido.
+          Janelas semanais de funcionamento da empresa, no fuso horário escolhido.
         </p>
       </header>
 
       <Alert tone="info">
-        O horario nunca altera a distribuicao de leads nem o status de ninguem. Ele so restringe o
-        acesso de vendedores a Leads e Conversas se o Admin ligar a restricao por horario, mais
-        abaixo (desligada por padrao).
+        O horário nunca altera a distribuição de leads nem o status de ninguém. Ele só restringe o
+        acesso de vendedores a Leads e Conversas se o Admin ligar a restrição por horário, mais
+        abaixo (desligada por padrão).
       </Alert>
 
       {isPending && (
         <p className="flex items-center gap-2 text-neutral-600">
-          <Spinner size="sm" /> Carregando configuracao...
+          <Spinner size="sm" /> Carregando configuração...
         </p>
       )}
 
       {isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar">
+        <Alert tone="danger" title="Não foi possível carregar">
           <p>
             {error instanceof ApiError && error.status === 403
-              ? 'Voce nao tem permissao para acessar as configuracoes da empresa.'
-              : 'Nao foi possivel carregar o horario de funcionamento.'}
+              ? 'Você não tem permissão para acessar as configurações da empresa.'
+              : 'Não foi possível carregar o horário de funcionamento.'}
           </p>
           <Button size="sm" variant="secondary" className="mt-2" onClick={() => void refetch()}>
             Tentar novamente
@@ -78,11 +78,11 @@ export function BusinessHoursPage() {
         <Card>
           {!data.configured && (
             <p className="mb-3">
-              Nenhum horario configurado ainda. Ajuste a sugestao abaixo e salve para registrar.
+              Nenhum horário configurado ainda. Ajuste a sugestão abaixo e salve para registrar.
             </p>
           )}
           {!canUpdate && (
-            <p className="mb-3">Voce pode consultar, mas nao alterar esta configuracao.</p>
+            <p className="mb-3">Você pode consultar, mas não alterar esta configuração.</p>
           )}
           {/* Sem `key`: o formulario guarda o proprio estado apos a montagem, entao salvar nao o
               remonta (a confirmacao permanece) e um refetch nao sobrescreve edicoes em curso. */}

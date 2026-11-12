@@ -71,10 +71,10 @@ export function AccessExceptionsPage() {
     return (
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-          Liberacoes de acesso
+          Liberações de acesso
         </h1>
         <Alert tone="warning" title="Acesso restrito">
-          Voce nao tem permissao para gerenciar liberacoes de acesso.
+          Você não tem permissão para gerenciar liberações de acesso.
         </Alert>
       </div>
     );
@@ -84,14 +84,14 @@ export function AccessExceptionsPage() {
     event.preventDefault();
     setFormError(null);
     setNotice(null);
-    if (!userId) return setFormError('Escolha o usuario.');
-    if (!reason.trim()) return setFormError('Informe o motivo da liberacao.');
+    if (!userId) return setFormError('Escolha o usuário.');
+    if (!reason.trim()) return setFormError('Informe o motivo da liberação.');
     const expires = new Date(expiresAt);
     if (!expiresAt || Number.isNaN(expires.getTime())) {
-      return setFormError('Informe ate quando a liberacao vale.');
+      return setFormError('Informe até quando a liberação vale.');
     }
     if (expires.getTime() <= Date.now()) {
-      return setFormError('A expiracao deve estar no futuro.');
+      return setFormError('A expiração deve estar no futuro.');
     }
     try {
       await createMutation.mutateAsync({
@@ -102,9 +102,9 @@ export function AccessExceptionsPage() {
       });
       setReason('');
       setExpiresAt('');
-      setNotice('Liberacao concedida. Vale a partir de agora ate a expiracao informada.');
+      setNotice('Liberação concedida. Vale a partir de agora até a expiração informada.');
     } catch (err) {
-      setFormError(accessControlErrorMessage(err, 'Nao foi possivel conceder a liberacao.'));
+      setFormError(accessControlErrorMessage(err, 'Não foi possível conceder a liberação.'));
     }
   }
 
@@ -113,9 +113,9 @@ export function AccessExceptionsPage() {
     setNotice(null);
     try {
       await revokeMutation.mutateAsync(id);
-      setNotice('Liberacao revogada. As demais liberacoes do usuario continuam valendo.');
+      setNotice('Liberação revogada. As demais liberações do usuário continuam valendo.');
     } catch (err) {
-      setActionError(accessControlErrorMessage(err, 'Nao foi possivel revogar a liberacao.'));
+      setActionError(accessControlErrorMessage(err, 'Não foi possível revogar a liberação.'));
     }
   }
 
@@ -125,26 +125,26 @@ export function AccessExceptionsPage() {
     <div className="flex flex-col gap-4">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-          Liberacoes de acesso
+          Liberações de acesso
         </h1>
         <p className="text-sm text-neutral-500">
-          Libere, fora do horario de funcionamento, o acesso de um vendedor a Leads, Conversas ou
-          ambos. A liberacao comeca na hora, exige motivo e uma data de expiracao, e pode ser
-          revogada antes do prazo. Varias liberacoes podem valer ao mesmo tempo.
+          Libere, fora do horário de funcionamento, o acesso de um vendedor a Leads, Conversas ou
+          ambos. A liberação começa na hora, exige motivo e uma data de expiração, e pode ser
+          revogada antes do prazo. Várias liberações podem valer ao mesmo tempo.
         </p>
       </header>
 
-      <Card title="Conceder liberacao">
+      <Card title="Conceder liberação">
         <form onSubmit={(event) => void handleCreate(event)} className="flex flex-col gap-3">
           {formError && (
-            <Alert tone="danger" title="Nao foi possivel conceder">
+            <Alert tone="danger" title="Não foi possível conceder">
               {formError}
             </Alert>
           )}
           {notice && <Alert tone="success">{notice}</Alert>}
 
           <Select
-            label="Usuario"
+            label="Usuário"
             value={userId}
             onChange={(event) => setUserId(event.target.value)}
             required
@@ -178,12 +178,12 @@ export function AccessExceptionsPage() {
           />
 
           <Input
-            label="Vale ate"
+            label="Vale até"
             type="datetime-local"
             required
             value={expiresAt}
             onChange={(event) => setExpiresAt(event.target.value)}
-            hint="Obrigatorio e no futuro. Nao ha limite maximo de duracao."
+            hint="Obrigatório e no futuro. Não há limite máximo de duração."
           />
 
           <div>
@@ -194,7 +194,7 @@ export function AccessExceptionsPage() {
               loading={createMutation.isPending}
               disabled={createMutation.isPending}
             >
-              Conceder liberacao
+              Conceder liberação
             </Button>
           </div>
         </form>
@@ -216,19 +216,19 @@ export function AccessExceptionsPage() {
       </div>
 
       {actionError && (
-        <Alert tone="danger" title="Nao foi possivel concluir">
+        <Alert tone="danger" title="Não foi possível concluir">
           {actionError}
         </Alert>
       )}
 
       {list.isPending && (
         <p className="flex items-center gap-2 text-neutral-600">
-          <Spinner size="sm" /> Carregando liberacoes...
+          <Spinner size="sm" /> Carregando liberações...
         </p>
       )}
 
       {list.isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar as liberacoes">
+        <Alert tone="danger" title="Não foi possível carregar as liberações">
           <Button
             size="sm"
             variant="secondary"
@@ -242,8 +242,8 @@ export function AccessExceptionsPage() {
 
       {list.data && list.data.data.length === 0 && (
         <EmptyState
-          title="Nenhuma liberacao encontrada"
-          description="Conceda uma liberacao acima ou ajuste o filtro."
+          title="Nenhuma liberação encontrada"
+          description="Conceda uma liberação acima ou ajuste o filtro."
         />
       )}
 
@@ -258,12 +258,12 @@ export function AccessExceptionsPage() {
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div className="flex min-w-0 flex-col gap-1">
                         <p className="font-medium text-neutral-900">
-                          {userNames.get(item.user_id) ?? 'Usuario'} · {SCOPE_LABELS[item.scope]}
+                          {userNames.get(item.user_id) ?? 'Usuário'} · {SCOPE_LABELS[item.scope]}
                         </p>
                         {/* Motivo livre (ate 1.000 caracteres): sem espacos nao quebraria e estouraria a largura. */}
                         <p className="wrap-anywhere text-sm text-neutral-700">{item.reason}</p>
                         <p className="text-xs text-neutral-500">
-                          {formatDateTime(item.starts_at)} ate {formatDateTime(item.expires_at)} ·{' '}
+                          {formatDateTime(item.starts_at)} até {formatDateTime(item.expires_at)} ·{' '}
                           <span data-testid={`status-${item.id}`}>
                             {exceptionStatusLabel(item)}
                           </span>
@@ -290,7 +290,7 @@ export function AccessExceptionsPage() {
 
           <div className="flex items-center justify-between">
             <p className="text-sm text-neutral-500">
-              Pagina {list.data.page} de {totalPages} · {list.data.total} liberacao(oes)
+              Página {list.data.page} de {totalPages} · {list.data.total} liberação(ões)
             </p>
             <div className="flex gap-2">
               <Button
@@ -307,7 +307,7 @@ export function AccessExceptionsPage() {
                 disabled={page >= totalPages || list.isFetching}
                 onClick={() => setPage((prev) => prev + 1)}
               >
-                Proxima
+                Próxima
               </Button>
             </div>
           </div>

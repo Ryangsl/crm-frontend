@@ -47,7 +47,7 @@ describe('AppointmentsSection', () => {
     vi.restoreAllMocks();
   });
 
-  it('mostra estado vazio quando nao ha compromissos', async () => {
+  it('mostra estado vazio quando não há compromissos', async () => {
     vi.mocked(followUpService.listAppointments).mockResolvedValue({
       data: [],
       page: 1,
@@ -69,7 +69,7 @@ describe('AppointmentsSection', () => {
     expect(await screen.findByRole('listitem')).toBeInTheDocument();
   });
 
-  it('cria um novo compromisso vinculado a entidade e ao usuario atual', async () => {
+  it('cria um novo compromisso vinculado a entidade e ao usuário atual', async () => {
     const user = userEvent.setup();
     vi.mocked(followUpService.listAppointments).mockResolvedValue({
       data: [],
@@ -90,7 +90,7 @@ describe('AppointmentsSection', () => {
     );
   });
 
-  it('RBAC visual: sem appointments:create/update/delete, nao mostra acoes de escrita', async () => {
+  it('RBAC visual: sem appointments:create/update/delete, não mostra ações de escrita', async () => {
     vi.mocked(followUpService.listAppointments).mockResolvedValue({
       data: [APPOINTMENT],
       page: 1,

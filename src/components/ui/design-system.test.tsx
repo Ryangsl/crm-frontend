@@ -90,7 +90,7 @@ describe('Dropdown', () => {
 });
 
 describe('demais componentes', () => {
-  it('Breadcrumb marca a pagina atual e nao transforma ela em link', () => {
+  it('Breadcrumb marca a página atual e não transforma ela em link', () => {
     render(
       <MemoryRouter>
         <Breadcrumb items={[{ label: 'Leads', to: '/leads' }, { label: 'João' }]} />

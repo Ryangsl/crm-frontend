@@ -15,7 +15,7 @@ describe('toE164', () => {
     expect(toE164(raw)).toBe(expected);
   });
 
-  it('vazio vira ausente e o que nao encaixa vai como foi digitado (o backend explica)', () => {
+  it('vazio vira ausente e o que não encaixa vai como foi digitado (o backend explica)', () => {
     expect(toE164('   ')).toBeUndefined();
     expect(toE164('123')).toBe('123');
   });
@@ -43,7 +43,7 @@ describe('describeCustomerValidation', () => {
     );
   });
 
-  it('nao reconhece campo parecido nem outros erros', () => {
+  it('não reconhece campo parecido nem outros erros', () => {
     expect(describeCustomerValidation(validation('nameless qualquer coisa'))).toBeNull();
     expect(describeCustomerValidation(new ApiError(409, 'CONFLICT', 'x'))).toBeNull();
   });

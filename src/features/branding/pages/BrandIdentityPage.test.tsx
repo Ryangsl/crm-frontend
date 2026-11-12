@@ -62,7 +62,7 @@ afterEach(() => {
 });
 
 describe('Identidade Visual', () => {
-  it('sem permissao nao mostra o formulario nem consulta', () => {
+  it('sem permissão não mostra o formulário nem consulta', () => {
     renderPage([]);
 
     expect(screen.getByText(/não tem permissão para ver a identidade/)).toBeInTheDocument();
@@ -78,7 +78,7 @@ describe('Identidade Visual', () => {
     expect(screen.getByLabelText('Claro')).toBeChecked();
   });
 
-  it('a pre-visualizacao muda antes de salvar e nao toca no resto da aplicacao', async () => {
+  it('a pre-visualizacao muda antes de salvar e não toca no resto da aplicação', async () => {
     renderPage();
     const field = await screen.findByLabelText('Barra lateral');
 
@@ -90,7 +90,7 @@ describe('Identidade Visual', () => {
     expect(service.updateBranding).not.toHaveBeenCalled();
   });
 
-  it('cor incompleta nao quebra a pre-visualizacao', async () => {
+  it('cor incompleta não quebra a pre-visualizacao', async () => {
     renderPage();
     const field = await screen.findByLabelText('Cor primária');
 
@@ -130,7 +130,7 @@ describe('Identidade Visual', () => {
   it('valor recusado pelo backend mostra o campo e o motivo', async () => {
     vi.mocked(service.updateBranding).mockRejectedValue(
       new ApiError(422, 'BRANDING_INVALID', 'm', [
-        { field: 'colors.text', issue: 'contraste 1.20:1 com o fundo; minimo 4.5:1' },
+        { field: 'colors.text', issue: 'contraste 1.20:1 com o fundo; mínimo 4.5:1' },
       ]),
     );
     renderPage();
@@ -141,7 +141,7 @@ describe('Identidade Visual', () => {
     expect(await screen.findByText(/colors\.text: contraste/)).toBeInTheDocument();
   });
 
-  it('restaurar pede confirmacao', async () => {
+  it('restaurar pede confirmação', async () => {
     vi.mocked(service.getBranding).mockResolvedValue({ ...DEFAULT, is_default: false });
     vi.mocked(service.resetBrandingToDefault).mockResolvedValue();
     renderPage();
@@ -154,13 +154,13 @@ describe('Identidade Visual', () => {
     expect(await screen.findByText('Identidade padrão restaurada.')).toBeInTheDocument();
   });
 
-  it('identidade padrao nao tem o que restaurar', async () => {
+  it('identidade padrão não tem o que restaurar', async () => {
     renderPage();
 
     expect(await screen.findByRole('button', { name: /Restaurar padrão/ })).toBeDisabled();
   });
 
-  it('logotipo e favicon deixam claro que ainda nao estao disponiveis, sem campo de URL', async () => {
+  it('logotipo e favicon deixam claro que ainda não estão disponíveis, sem campo de URL', async () => {
     renderPage();
     await screen.findByLabelText('Nome de exibição');
 
@@ -169,7 +169,7 @@ describe('Identidade Visual', () => {
     expect(document.querySelector('input[type="file"]')).toBeNull();
   });
 
-  it('nao existe campo de CSS ou codigo', async () => {
+  it('não existe campo de CSS ou código', async () => {
     renderPage();
     await screen.findByLabelText('Nome de exibição');
 
@@ -183,8 +183,8 @@ describe('Identidade Visual', () => {
     expect(await screen.findByRole('button', { name: 'Salvar alterações' })).toBeDisabled();
   });
 
-  describe('servico administrado pela plataforma (D-086)', () => {
-    it('Admin da empresa ve a identidade atual sem nenhum controle de edicao', async () => {
+  describe('serviço administrado pela plataforma (D-086)', () => {
+    it('Admin da empresa ve a identidade atual sem nenhum controle de edição', async () => {
       renderPage(TENANT_ADMIN);
 
       expect(await screen.findByText('Identidade atual')).toBeInTheDocument();
@@ -196,7 +196,7 @@ describe('Identidade Visual', () => {
       expect(screen.getByLabelText('Propor nome, tema e cores')).toBeChecked();
     });
 
-    it('Admin da empresa solicita a alteracao e acompanha', async () => {
+    it('Admin da empresa solicita a alteração e acompanha', async () => {
       vi.mocked(service.createBrandingRequest).mockResolvedValue({
         pending: {
           message: 'Usar o verde da nossa marca.',
@@ -225,7 +225,7 @@ describe('Identidade Visual', () => {
       expect(service.updateBranding).not.toHaveBeenCalled();
     });
 
-    it('recusa do backend aparece como orientacao, sem erro tecnico', async () => {
+    it('recusa do backend aparece como orientacao, sem erro técnico', async () => {
       vi.mocked(service.createBrandingRequest).mockRejectedValue(
         new ApiError(422, 'BRANDING_INVALID', 'm', [
           { field: 'message', issue: 'deve ter entre 10 e 1000 caracteres' },
@@ -234,7 +234,7 @@ describe('Identidade Visual', () => {
       renderPage(TENANT_ADMIN);
       fireEvent.click(await screen.findByLabelText('Propor nome, tema e cores'));
       fireEvent.change(screen.getByLabelText('Descreva o que deseja alterar'), {
-        target: { value: 'Mensagem valida' },
+        target: { value: 'Mensagem válida' },
       });
 
       fireEvent.click(screen.getByRole('button', { name: /Enviar solicitação/ }));
@@ -300,7 +300,7 @@ describe('Identidade Visual', () => {
       );
     });
 
-    it('Diretor so ve: nem editar, nem solicitar', async () => {
+    it('Diretor só ve: nem editar, nem solicitar', async () => {
       vi.mocked(service.getBrandingRequest).mockResolvedValue({
         pending: {
           message: 'Pedido do admin.',
@@ -320,7 +320,7 @@ describe('Identidade Visual', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('a plataforma ve a solicitacao pendente e pode encerra-la sem aplicar', async () => {
+    it('a plataforma ve a solicitação pendente e pode encerra-la sem aplicar', async () => {
       vi.mocked(service.getBrandingRequest).mockResolvedValue({
         pending: {
           message: 'Pedido do admin.',
@@ -339,7 +339,7 @@ describe('Identidade Visual', () => {
       expect(screen.queryByLabelText(/Descreva o que deseja alterar/)).not.toBeInTheDocument();
     });
 
-    it('modo de consulta do Trial desabilita o envio da solicitacao', async () => {
+    it('modo de consulta do Trial desabilita o envio da solicitação', async () => {
       renderPage(TENANT_ADMIN, 'Indisponível: o período de avaliação terminou.');
       fireEvent.change(await screen.findByLabelText('Mensagem (opcional)'), {
         target: { value: 'Mensagem com tamanho suficiente' },

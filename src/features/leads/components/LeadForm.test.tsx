@@ -107,7 +107,7 @@ describe('LeadForm (cadastro manual, D-094)', () => {
     expect(leadsService.createLead).not.toHaveBeenCalled();
   });
 
-  it('aceita so e-mail como contato e recusa telefone, e-mail e documento invalidos', async () => {
+  it('aceita só e-mail como contato e recusa telefone, e-mail e documento inválidos', async () => {
     const user = userEvent.setup();
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
     vi.mocked(leadsService.createLead).mockResolvedValue(LEAD);
@@ -140,7 +140,7 @@ describe('LeadForm (cadastro manual, D-094)', () => {
     );
   });
 
-  it('na edicao, pre-preenche os dados e envia null para o campo apagado', async () => {
+  it('na edição, pre-preenche os dados e envia null para o campo apagado', async () => {
     const user = userEvent.setup();
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
     vi.mocked(leadsService.updateLead).mockResolvedValue({ ...LEAD, source_id: 's2' });
@@ -163,7 +163,7 @@ describe('LeadForm (cadastro manual, D-094)', () => {
     });
   });
 
-  it('sem origens cadastradas: orienta o Admin a cadastrar e nao deixa enviar', async () => {
+  it('sem origens cadastradas: orienta o Admin a cadastrar e não deixa enviar', async () => {
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage([]));
     renderForm({}, ['leads:create', 'lead_sources:create']);
 
@@ -175,7 +175,7 @@ describe('LeadForm (cadastro manual, D-094)', () => {
     expect(screen.getByRole('button', { name: /criar lead/i })).toBeDisabled();
   });
 
-  it('erro de validacao da API aparece com o campo; 403 com a mensagem de permissao', async () => {
+  it('erro de validacao da API aparece com o campo; 403 com a mensagem de permissão', async () => {
     const user = userEvent.setup();
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
     vi.mocked(leadsService.createLead)
@@ -184,7 +184,7 @@ describe('LeadForm (cadastro manual, D-094)', () => {
           { field: 'unknown', issue: 'phone must match /^\\+[1-9]\\d{7,14}$/ regular expression' },
         ]),
       )
-      .mockRejectedValueOnce(new ApiError(403, 'FORBIDDEN', 'Sem permissao.'));
+      .mockRejectedValueOnce(new ApiError(403, 'FORBIDDEN', 'Sem permissão.'));
     renderForm();
 
     await user.type(screen.getByLabelText('Nome'), 'Eva');

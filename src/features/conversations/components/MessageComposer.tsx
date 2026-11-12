@@ -36,7 +36,7 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
       setErrorMessage(
         err instanceof ApiError
           ? conversationErrorMessage(err.code, err.message)
-          : 'Nao foi possivel registrar a mensagem.',
+          : 'Não foi possível registrar a mensagem.',
       );
     }
   }
@@ -44,7 +44,7 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
   return (
     <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-3">
       {errorMessage && (
-        <Alert tone="danger" title="Nao foi possivel registrar">
+        <Alert tone="danger" title="Não foi possível registrar">
           {errorMessage}
         </Alert>
       )}
@@ -60,9 +60,9 @@ export function MessageComposer({ conversationId }: MessageComposerProps) {
         value={direction}
         onChange={(event) => setDirection(event.target.value as '' | MessageDirection)}
       >
-        <option value="">Anotacao interna</option>
+        <option value="">Anotação interna</option>
         <option value="inbound">Entrada (o contato falou)</option>
-        <option value="outbound">Saida (nos falamos)</option>
+        <option value="outbound">Saída (nós falamos)</option>
       </Select>
       <div>
         <Button

@@ -52,7 +52,7 @@ export function EntityConversationsSection({
       setCreateError(
         err instanceof ApiError
           ? conversationErrorMessage(err.code, err.message)
-          : 'Nao foi possivel abrir a conversa.',
+          : 'Não foi possível abrir a conversa.',
       );
     }
   }
@@ -76,7 +76,7 @@ export function EntityConversationsSection({
       </div>
 
       {createError && (
-        <Alert tone="danger" title="Nao foi possivel abrir a conversa">
+        <Alert tone="danger" title="Não foi possível abrir a conversa">
           {createError}
         </Alert>
       )}
@@ -90,7 +90,7 @@ export function EntityConversationsSection({
       {isError && isOutsideBusinessHours(error) && <OutsideBusinessHoursAlert />}
 
       {isError && !isOutsideBusinessHours(error) && (
-        <Alert tone="danger" title="Nao foi possivel carregar as conversas">
+        <Alert tone="danger" title="Não foi possível carregar as conversas">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>
@@ -117,7 +117,7 @@ export function EntityConversationsSection({
               >
                 <span className="text-sm text-neutral-800">
                   {conversation.last_message_at
-                    ? `Ultima mensagem em ${new Date(conversation.last_message_at).toLocaleString('pt-BR')}`
+                    ? `Última mensagem em ${new Date(conversation.last_message_at).toLocaleString('pt-BR')}`
                     : 'Sem mensagens'}
                 </span>
                 <ConversationStatusBadge status={conversation.status} />

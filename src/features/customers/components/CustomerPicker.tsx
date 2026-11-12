@@ -27,7 +27,7 @@ export function CustomerPicker({ selected, onSelect }: CustomerPickerProps) {
       const res = await listCustomers({ q: query.trim(), limit: 5 });
       setResults(res.data);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Nao foi possivel buscar clientes.');
+      setError(err instanceof ApiError ? err.message : 'Não foi possível buscar clientes.');
     } finally {
       setSearching(false);
     }

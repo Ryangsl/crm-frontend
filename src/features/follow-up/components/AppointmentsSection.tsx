@@ -44,7 +44,7 @@ export function AppointmentsSection({ entityType, entityId }: AppointmentsSectio
       await deleteMutation.mutateAsync(appointment.id);
     } catch (err) {
       setDeleteError(
-        err instanceof ApiError ? err.message : 'Nao foi possivel excluir o compromisso.',
+        err instanceof ApiError ? err.message : 'Não foi possível excluir o compromisso.',
       );
     }
   }
@@ -70,7 +70,7 @@ export function AppointmentsSection({ entityType, entityId }: AppointmentsSectio
       )}
 
       {deleteError && (
-        <Alert tone="danger" title="Nao foi possivel excluir">
+        <Alert tone="danger" title="Não foi possível excluir">
           {deleteError}
         </Alert>
       )}
@@ -82,7 +82,7 @@ export function AppointmentsSection({ entityType, entityId }: AppointmentsSectio
       )}
 
       {isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar a agenda">
+        <Alert tone="danger" title="Não foi possível carregar a agenda">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>

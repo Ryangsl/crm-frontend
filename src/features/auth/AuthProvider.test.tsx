@@ -47,7 +47,7 @@ describe('AuthProvider', () => {
     vi.unstubAllGlobals();
   });
 
-  it('comeca em loading e cai para unauthenticated quando o refresh inicial falha', async () => {
+  it('começa em loading e cai para unauthenticated quando o refresh inicial falha', async () => {
     vi.stubGlobal(
       'fetch',
       vi
@@ -64,7 +64,7 @@ describe('AuthProvider', () => {
     expect(screen.getByTestId('user')).toHaveTextContent('none');
   });
 
-  it('restaura a sessao quando o refresh inicial funciona', async () => {
+  it('restaura a sessão quando o refresh inicial funciona', async () => {
     const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL) => {
       const url = String(input);
       if (url.includes('/v1/auth/refresh')) {
@@ -85,7 +85,7 @@ describe('AuthProvider', () => {
     expect(screen.getByTestId('user')).toHaveTextContent('ana@x.com');
   });
 
-  it('login com credenciais validas autentica o usuario', async () => {
+  it('login com credenciais válidas autentica o usuário', async () => {
     const user = userEvent.setup();
     const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL) => {
       const url = String(input);
@@ -114,7 +114,7 @@ describe('AuthProvider', () => {
     expect(screen.getByTestId('user')).toHaveTextContent('ana@x.com');
   });
 
-  it('login com credenciais invalidas mantem o usuario desautenticado e propaga o erro', async () => {
+  it('login com credenciais invalidas mantem o usuário desautenticado e propaga o erro', async () => {
     const user = userEvent.setup();
     const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL) => {
       const url = String(input);
@@ -126,7 +126,7 @@ describe('AuthProvider', () => {
       if (url.includes('/v1/auth/login')) {
         return Promise.resolve(
           jsonResponse(
-            { error: { code: 'INVALID_CREDENTIALS', message: 'E-mail ou senha invalidos.' } },
+            { error: { code: 'INVALID_CREDENTIALS', message: 'E-mail ou senha inválidos.' } },
             401,
           ),
         );
@@ -143,7 +143,7 @@ describe('AuthProvider', () => {
     expect(screen.getByTestId('user')).toHaveTextContent('none');
   });
 
-  it('logout limpa a sessao', async () => {
+  it('logout limpa a sessão', async () => {
     const user = userEvent.setup();
     const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL) => {
       const url = String(input);
@@ -170,7 +170,7 @@ describe('AuthProvider', () => {
     expect(screen.getByTestId('user')).toHaveTextContent('none');
   });
 
-  it('hasPermission reflete as permissoes do usuario autenticado', async () => {
+  it('hasPermission reflete as permissões do usuário autenticado', async () => {
     const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL) => {
       const url = String(input);
       if (url.includes('/v1/auth/refresh')) {

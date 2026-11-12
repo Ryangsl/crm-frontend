@@ -73,32 +73,33 @@ describe('LeadDetailPage', () => {
 
   it('mostra status e origem do lead', async () => {
     renderPage(newLead(), ['leads:read']);
-    expect(await screen.findByText('Novo')).toBeInTheDocument();
+    // O status aparece no selo do cabecalho e na barra do funil.
+    expect((await screen.findAllByText('Novo')).length).toBeGreaterThan(0);
     expect(screen.getByText(/site/i)).toBeInTheDocument();
   });
 
-  it('lead novo: mostra Qualificar e Desqualificar, nao mostra Reabrir', async () => {
+  it('lead novo: mostra Qualificar e Desqualificar, não mostra Reabrir', async () => {
     renderPage(newLead(), ['leads:read', 'leads:update']);
-    await screen.findByText('Novo');
+    await screen.findAllByText('Novo');
     expect(screen.getByRole('button', { name: /^qualificar$/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /desqualificar/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /reabrir/i })).not.toBeInTheDocument();
   });
 
-  it('lead desqualificado: mostra Reabrir, nao mostra Qualificar', async () => {
-    renderPage(newLead({ status: 'disqualified', disqualify_reason: 'Sem orcamento' }), [
+  it('lead desqualificado: mostra Reabrir, não mostra Qualificar', async () => {
+    renderPage(newLead({ status: 'disqualified', disqualify_reason: 'Sem orçamento' }), [
       'leads:read',
       'leads:update',
     ]);
-    await screen.findByText('Desqualificado');
+    await screen.findAllByText('Desqualificado');
     expect(screen.getByRole('button', { name: /reabrir/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^qualificar$/i })).not.toBeInTheDocument();
-    expect(screen.getByText(/sem orcamento/i)).toBeInTheDocument();
+    expect(screen.getByText(/sem orçamento/i)).toBeInTheDocument();
   });
 
-  it('RBAC visual: sem leads:update, nao mostra nenhuma acao de transicao', async () => {
+  it('RBAC visual: sem leads:update, não mostra nenhuma ação de transicao', async () => {
     renderPage(newLead(), ['leads:read']);
-    await screen.findByText('Novo');
+    await screen.findAllByText('Novo');
     expect(screen.queryByRole('button', { name: /^qualificar$/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /desqualificar/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /converter/i })).not.toBeInTheDocument();
@@ -180,24 +181,24 @@ describe('LeadDetailPage', () => {
     await waitFor(() => expect(leadsService.reopenLead).toHaveBeenCalledWith('l1'));
   });
 
-  it('lead convertido com cliente: oferece "Criar oportunidade" so com opportunities:create', async () => {
+  it('lead convertido com cliente: oferece "Criar oportunidade" só com opportunities:create', async () => {
     const converted = newLead({ status: 'converted', customer_id: 'c1' });
     const { unmount } = renderPage(converted, ['leads:read', 'opportunities:create']);
     expect(await screen.findByRole('button', { name: 'Criar oportunidade' })).toBeInTheDocument();
     unmount();
 
     renderPage(converted, ['leads:read']);
-    await screen.findByText('Convertido');
+    await screen.findAllByText('Convertido');
     expect(screen.queryByRole('button', { name: 'Criar oportunidade' })).not.toBeInTheDocument();
   });
 
-  it('lead ainda nao convertido nao oferece "Criar oportunidade"', async () => {
+  it('lead ainda não convertido não oferece "Criar oportunidade"', async () => {
     renderPage(newLead(), ['leads:read', 'opportunities:create']);
-    await screen.findByText('Novo');
+    await screen.findAllByText('Novo');
     expect(screen.queryByRole('button', { name: 'Criar oportunidade' })).not.toBeInTheDocument();
   });
 
-  it('exclusao pede confirmacao antes de chamar a API', async () => {
+  it('exclusão pede confirmação antes de chamar a API', async () => {
     const user = userEvent.setup();
     vi.mocked(leadsService.deleteLead).mockResolvedValue(undefined);
     renderPage(newLead(), ['leads:read', 'leads:delete']);

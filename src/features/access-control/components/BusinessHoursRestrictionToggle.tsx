@@ -33,16 +33,16 @@ export function BusinessHoursRestrictionToggle({ hoursConfigured }: Props) {
     try {
       await mutation.mutateAsync(!enabled);
     } catch (err) {
-      setError(accessControlErrorMessage(err, 'Nao foi possivel alterar a restricao por horario.'));
+      setError(accessControlErrorMessage(err, 'Não foi possível alterar a restrição por horário.'));
     }
   }
 
   return (
-    <Card title="Restricao de acesso por horario">
+    <Card title="Restrição de acesso por horário">
       <p className="mb-3 text-sm text-neutral-700">
-        Quando ligada, vendedores ficam sem acesso a Leads e Conversas fora do horario de
-        funcionamento. Admin, Gerente, Supervisor e Diretor nao sao afetados. Nao altera a
-        disponibilidade nem a distribuicao de leads. Fica desligada ate o Admin ativa-la.
+        Quando ligada, vendedores ficam sem acesso a Leads e Conversas fora do horário de
+        funcionamento. Admin, Gerente, Supervisor e Diretor não são afetados. Não altera a
+        disponibilidade nem a distribuição de leads. Fica desligada até o Admin ativá-la.
       </p>
 
       {query.isPending && (
@@ -52,7 +52,7 @@ export function BusinessHoursRestrictionToggle({ hoursConfigured }: Props) {
       )}
 
       {query.isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar a restricao">
+        <Alert tone="danger" title="Não foi possível carregar a restrição">
           <Button
             size="sm"
             variant="secondary"
@@ -67,11 +67,11 @@ export function BusinessHoursRestrictionToggle({ hoursConfigured }: Props) {
       {query.data && (
         <div className="flex flex-col gap-3">
           <p data-testid="restriction-state" className="font-medium text-neutral-900">
-            Restricao por horario: {enabled ? 'ligada' : 'desligada'}
+            Restrição por horário: {enabled ? 'ligada' : 'desligada'}
           </p>
 
           {error && (
-            <Alert tone="danger" title="Nao foi possivel concluir">
+            <Alert tone="danger" title="Não foi possível concluir">
               {error}
             </Alert>
           )}
@@ -80,7 +80,7 @@ export function BusinessHoursRestrictionToggle({ hoursConfigured }: Props) {
             <div className="flex flex-col gap-2">
               {!enabled && !hoursConfigured && (
                 <Alert tone="info">
-                  Salve um horario de funcionamento valido acima para poder ligar a restricao.
+                  Salve um horário de funcionamento válido acima para poder ligar a restrição.
                 </Alert>
               )}
               <div>
@@ -92,13 +92,13 @@ export function BusinessHoursRestrictionToggle({ hoursConfigured }: Props) {
                   disabled={mutation.isPending || (!enabled && !hoursConfigured)}
                   onClick={() => void toggle()}
                 >
-                  {enabled ? 'Desligar restricao' : 'Ligar restricao'}
+                  {enabled ? 'Desligar restrição' : 'Ligar restrição'}
                 </Button>
               </div>
             </div>
           ) : (
             <p className="text-sm text-neutral-600">
-              Somente o Admin pode ligar ou desligar a restricao.
+              Somente o Admin pode ligar ou desligar a restrição.
             </p>
           )}
         </div>

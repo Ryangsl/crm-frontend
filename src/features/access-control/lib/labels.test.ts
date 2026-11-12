@@ -23,7 +23,7 @@ const exception = (overrides: Partial<AccessException> = {}): AccessException =>
 });
 
 describe('isOutsideBusinessHours', () => {
-  it('so o 403 com o codigo OUTSIDE_BUSINESS_HOURS', () => {
+  it('só o 403 com o código OUTSIDE_BUSINESS_HOURS', () => {
     expect(isOutsideBusinessHours(new ApiError(403, 'OUTSIDE_BUSINESS_HOURS', 'x'))).toBe(true);
     expect(isOutsideBusinessHours(new ApiError(403, 'FORBIDDEN', 'x'))).toBe(false);
     expect(isOutsideBusinessHours(new ApiError(404, 'OUTSIDE_BUSINESS_HOURS', 'x'))).toBe(false);
@@ -36,13 +36,13 @@ describe('accessControlErrorMessage', () => {
   it('traduz os codigos do F4.7 e cai no fallback para o resto', () => {
     expect(
       accessControlErrorMessage(new ApiError(422, 'BUSINESS_HOURS_REQUIRED', 'x'), 'fallback'),
-    ).toMatch(/horario de funcionamento valido/i);
+    ).toMatch(/horário de funcionamento válido/i);
     expect(
       accessControlErrorMessage(
         new ApiError(422, 'ACCESS_EXCEPTION_TARGET_NOT_RESTRICTED', 'x'),
         'fallback',
       ),
-    ).toMatch(/nao esta sujeito/i);
+    ).toMatch(/não está sujeito/i);
     expect(
       accessControlErrorMessage(
         new ApiError(422, 'ACCESS_EXCEPTION_EXPIRY_INVALID', 'x'),
@@ -50,15 +50,15 @@ describe('accessControlErrorMessage', () => {
       ),
     ).toMatch(/no futuro/i);
     expect(accessControlErrorMessage(new ApiError(403, 'FORBIDDEN', 'x'), 'fallback')).toMatch(
-      /permissao/i,
+      /permissão/i,
     );
     expect(accessControlErrorMessage(new ApiError(500, 'ERROR', 'x'), 'fallback')).toBe('fallback');
     expect(accessControlErrorMessage(new Error('x'), 'fallback')).toBe('fallback');
   });
 });
 
-describe('vigencia da excecao (mesma regra do backend)', () => {
-  it('inicio inclusivo e fim exclusivo', () => {
+describe('vigencia da exceção (mesma regra do backend)', () => {
+  it('início inclusivo e fim exclusivo', () => {
     const e = exception();
     expect(isExceptionActive(e, new Date('2026-10-14T18:59:59.999Z'))).toBe(false);
     expect(isExceptionActive(e, new Date('2026-10-14T19:00:00.000Z'))).toBe(true);

@@ -43,7 +43,7 @@ export function CustomerListPage() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Clientes</h1>
-          <p className="text-sm text-neutral-500">Cadastro de clientes do tenant.</p>
+          <p className="text-sm text-neutral-500">Clientes da empresa e seus contatos.</p>
         </div>
         {hasPermission('customers:create') && (
           <Button writes onClick={() => navigate('/customers/new')}>
@@ -75,7 +75,7 @@ export function CustomerListPage() {
       )}
 
       {isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar os clientes">
+        <Alert tone="danger" title="Não foi possível carregar os clientes">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>

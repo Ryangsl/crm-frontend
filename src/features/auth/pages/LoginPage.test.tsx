@@ -40,8 +40,8 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe('Login pelo endereco da empresa (D-088)', () => {
-  it('mostra a empresa do endereco aberto', async () => {
+describe('Login pelo endereço da empresa (D-088)', () => {
+  it('mostra a empresa do endereço aberto', async () => {
     vi.mocked(authService.fetchTenantContext).mockResolvedValue({ tenant_name: 'Empresa A' });
     renderLogin();
 
@@ -49,7 +49,7 @@ describe('Login pelo endereco da empresa (D-088)', () => {
     expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
   });
 
-  it('endereco que nao corresponde a nenhuma empresa nao mostra o formulario', async () => {
+  it('endereço que não corresponde a nenhuma empresa não mostra o formulário', async () => {
     vi.mocked(authService.fetchTenantContext).mockResolvedValue(null);
     renderLogin();
 
@@ -57,18 +57,18 @@ describe('Login pelo endereco da empresa (D-088)', () => {
     expect(screen.queryByLabelText('E-mail')).not.toBeInTheDocument();
   });
 
-  it('falha de rede na consulta da empresa nao bloqueia o login', async () => {
+  it('falha de rede na consulta da empresa não bloqueia o login', async () => {
     vi.mocked(authService.fetchTenantContext).mockRejectedValue(new Error('rede'));
     renderLogin();
 
     expect(await screen.findByLabelText('E-mail')).toBeInTheDocument();
   });
 
-  it('explica a recusa do login por endereco desconhecido', async () => {
+  it('explica a recusa do login por endereço desconhecido', async () => {
     vi.mocked(authService.fetchTenantContext).mockRejectedValue(new Error('rede'));
     const login = vi
       .fn()
-      .mockRejectedValue(new ApiError(404, 'TENANT_DOMAIN_NOT_FOUND', 'Endereco desconhecido'));
+      .mockRejectedValue(new ApiError(404, 'TENANT_DOMAIN_NOT_FOUND', 'Endereço desconhecido'));
     renderLogin(login);
 
     fireEvent.change(await screen.findByLabelText('E-mail'), { target: { value: 'a@b.com' } });

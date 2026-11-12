@@ -57,11 +57,11 @@ export function InteractionForm({
       onSuccess();
     } catch (err) {
       if (isPermissionDenied(err)) {
-        setErrorMessage('Voce nao tem permissao para realizar esta acao.');
+        setErrorMessage('Você não tem permissão para realizar esta ação.');
         return;
       }
       setErrorMessage(
-        err instanceof ApiError ? err.message : 'Nao foi possivel registrar a interacao.',
+        err instanceof ApiError ? err.message : 'Não foi possível registrar a interação.',
       );
     }
   }
@@ -69,7 +69,7 @@ export function InteractionForm({
   return (
     <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-3">
       {errorMessage && (
-        <Alert tone="danger" title="Nao foi possivel registrar">
+        <Alert tone="danger" title="Não foi possível registrar">
           {errorMessage}
         </Alert>
       )}
@@ -83,13 +83,13 @@ export function InteractionForm({
         onChange={(event) => setChannel(event.target.value)}
       />
       <Select
-        label="Direcao"
+        label="Direção"
         value={direction}
         onChange={(event) => setDirection(event.target.value as '' | InteractionDirection)}
       >
-        <option value="">Nao informada</option>
+        <option value="">Não informada</option>
         <option value="inbound">Entrada (o contato nos procurou)</option>
-        <option value="outbound">Saida (nos procuramos o contato)</option>
+        <option value="outbound">Saída (nós procuramos o contato)</option>
       </Select>
       <Textarea
         label="Resumo"

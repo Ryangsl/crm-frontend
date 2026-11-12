@@ -40,8 +40,8 @@ export function ConversationListPage() {
 
   if (!canRead) {
     return (
-      <Alert tone="warning" title="Sem permissao">
-        Voce nao tem permissao para ver conversas.
+      <Alert tone="warning" title="Sem permissão">
+        Você não tem permissão para ver conversas.
       </Alert>
     );
   }
@@ -71,7 +71,7 @@ export function ConversationListPage() {
           <option value="closed">Encerradas</option>
         </Select>
         <Select
-          label="Responsavel"
+          label="Responsável"
           value={assignment}
           onChange={(event) => {
             setPage(1);
@@ -79,7 +79,7 @@ export function ConversationListPage() {
           }}
         >
           <option value="">Todos</option>
-          <option value="unassigned">Sem responsavel</option>
+          <option value="unassigned">Sem responsável</option>
         </Select>
       </div>
 
@@ -92,7 +92,7 @@ export function ConversationListPage() {
       {isError && isOutsideBusinessHours(error) && <OutsideBusinessHoursAlert />}
 
       {isError && !isOutsideBusinessHours(error) && (
-        <Alert tone="danger" title="Nao foi possivel carregar as conversas">
+        <Alert tone="danger" title="Não foi possível carregar as conversas">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>
@@ -133,7 +133,7 @@ export function ConversationListPage() {
                     <ConversationStatusBadge status={conversation.status} />
                   </Td>
                   <Td className="hidden md:table-cell">
-                    {conversation.assigned_to ? 'Com responsavel' : 'Sem responsavel'}
+                    {conversation.assigned_to ? 'Com responsável' : 'Sem responsável'}
                   </Td>
                   <Td className="hidden whitespace-nowrap md:table-cell">
                     {conversation.last_message_at

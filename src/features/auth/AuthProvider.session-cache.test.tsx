@@ -98,12 +98,12 @@ function stubAuthenticatedBackend(extra?: (url: string) => Response | Promise<Re
   return fetchMock;
 }
 
-describe('AuthProvider — isolamento do cache entre sessoes', () => {
+describe('AuthProvider — isolamento do cache entre sessões', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('logout esvazia o cache e uma consulta em andamento nao o repopula depois', async () => {
+  it('logout esvazia o cache e uma consulta em andamento não o repopula depois', async () => {
     const user = userEvent.setup();
     stubAuthenticatedBackend();
     const queryClient = newQueryClient();
@@ -127,7 +127,7 @@ describe('AuthProvider — isolamento do cache entre sessoes', () => {
     expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
   });
 
-  it('401 que sobrevive ao refresh (sessao expirada) encerra a sessao e esvazia o cache', async () => {
+  it('401 que sobrevive ao refresh (sessão expirada) encerra a sessão e esvazia o cache', async () => {
     // O refresh inicial (restauracao da sessao) funciona; a renovacao seguinte falha de forma
     // definitiva, como numa sessao expirada.
     let refreshes = 0;
@@ -151,7 +151,7 @@ describe('AuthProvider — isolamento do cache entre sessoes', () => {
     expectCacheEmpty(queryClient);
   });
 
-  it('renovacao bem-sucedida do access token NAO limpa o cache nem encerra a sessao', async () => {
+  it('renovacao bem-sucedida do access token NAO limpa o cache nem encerra a sessão', async () => {
     let leadsCalls = 0;
     stubAuthenticatedBackend((url) => {
       if (url.includes('/v1/leads')) {
@@ -175,7 +175,7 @@ describe('AuthProvider — isolamento do cache entre sessoes', () => {
     }
   });
 
-  it('login nunca herda cache residual de uma sessao anterior', async () => {
+  it('login nunca herda cache residual de uma sessão anterior', async () => {
     const user = userEvent.setup();
     stubAuthenticatedBackend((url) => {
       if (url.includes('/v1/auth/refresh')) return jsonResponse(UNAUTHORIZED, 401);
@@ -195,7 +195,7 @@ describe('AuthProvider — isolamento do cache entre sessoes', () => {
     expectCacheEmpty(queryClient);
   });
 
-  it('as notificacoes do usuario anterior nao aparecem para o proximo usuario', async () => {
+  it('as notificações do usuário anterior não aparecem para o próximo usuário', async () => {
     const user = userEvent.setup();
     let current: 'A' | 'B' = 'A';
     const bGate = deferred<void>();
@@ -248,7 +248,7 @@ describe('AuthProvider — isolamento do cache entre sessoes', () => {
     // Usuario A ve as proprias notificacoes (contador e lista).
     await user.click(screen.getByText('login A'));
     await waitFor(() => expect(screen.getByTestId('notification-badge')).toHaveTextContent('3'));
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
     expect(await screen.findByText(/Alfa Ltda/)).toBeInTheDocument();
 
     await user.click(screen.getByText('logout'));
@@ -259,7 +259,7 @@ describe('AuthProvider — isolamento do cache entre sessoes', () => {
     await user.click(screen.getByText('login B'));
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('authenticated'));
     expect(screen.queryByTestId('notification-badge')).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
     expect(screen.queryByText(/Alfa Ltda/)).not.toBeInTheDocument();
 
     // Chegam os dados do B: so os dele.

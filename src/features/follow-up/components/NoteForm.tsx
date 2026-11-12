@@ -43,17 +43,17 @@ export function NoteForm({ entityType, entityId, note, onSuccess, onCancel }: No
       onSuccess();
     } catch (err) {
       if (isPermissionDenied(err)) {
-        setErrorMessage('Voce nao tem permissao para realizar esta acao.');
+        setErrorMessage('Você não tem permissão para realizar esta ação.');
         return;
       }
-      setErrorMessage(err instanceof ApiError ? err.message : 'Nao foi possivel salvar a nota.');
+      setErrorMessage(err instanceof ApiError ? err.message : 'Não foi possível salvar a nota.');
     }
   }
 
   return (
     <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-3">
       {errorMessage && (
-        <Alert tone="danger" title="Nao foi possivel salvar">
+        <Alert tone="danger" title="Não foi possível salvar">
           {errorMessage}
         </Alert>
       )}

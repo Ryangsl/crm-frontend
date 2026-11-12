@@ -25,11 +25,11 @@ function manageError(error: unknown): string {
     if (error.code === 'AVAILABILITY_DISABLED') {
       return 'A disponibilidade foi desabilitada para esta empresa.';
     }
-    if (error.code === 'AVAILABILITY_USER_INACTIVE') return 'O usuario esta inativo.';
-    if (isPermissionDenied(error)) return 'Voce nao tem permissao para esta acao.';
-    if (error.status === 404) return 'Usuario nao encontrado.';
+    if (error.code === 'AVAILABILITY_USER_INACTIVE') return 'O usuário está inativo.';
+    if (isPermissionDenied(error)) return 'Você não tem permissão para esta ação.';
+    if (error.status === 404) return 'Usuário não encontrado.';
   }
-  return 'Nao foi possivel concluir a acao.';
+  return 'Não foi possível concluir a ação.';
 }
 
 // Painel de gestao da disponibilidade da equipe (F4.2). `availability:read` ve; so
@@ -59,7 +59,7 @@ export function TeamAvailabilityPage() {
           Disponibilidade da equipe
         </h1>
         <Alert tone="warning" title="Acesso restrito">
-          Voce nao tem permissao para acessar a disponibilidade da equipe.
+          Você não tem permissão para acessar a disponibilidade da equipe.
         </Alert>
       </div>
     );
@@ -86,9 +86,9 @@ export function TeamAvailabilityPage() {
           Disponibilidade da equipe
         </h1>
         <p className="text-sm text-neutral-500">
-          Estado atual de cada usuario ativo. Com a disponibilidade habilitada, so quem esta
-          Disponivel recebe novos Leads pela distribuicao automatica. Quem nunca alterou o estado
-          aparece como Indisponivel.
+          Estado atual de cada usuário ativo. Com a disponibilidade habilitada, só quem está
+          Disponível recebe novos Leads pela distribuição automática. Quem nunca alterou o estado
+          aparece como Indisponível.
         </p>
       </header>
 
@@ -99,8 +99,8 @@ export function TeamAvailabilityPage() {
       )}
 
       {me.isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar">
-          <p>Nao foi possivel verificar a disponibilidade da empresa.</p>
+        <Alert tone="danger" title="Não foi possível carregar">
+          <p>Não foi possível verificar a disponibilidade da empresa.</p>
           <Button size="sm" variant="secondary" className="mt-2" onClick={() => void me.refetch()}>
             Tentar novamente
           </Button>
@@ -147,7 +147,7 @@ export function TeamAvailabilityPage() {
           </div>
 
           {actionError && (
-            <Alert tone="danger" title="Nao foi possivel concluir">
+            <Alert tone="danger" title="Não foi possível concluir">
               {actionError}
             </Alert>
           )}
@@ -159,7 +159,7 @@ export function TeamAvailabilityPage() {
           )}
 
           {list.isError && (
-            <Alert tone="danger" title="Nao foi possivel carregar a equipe">
+            <Alert tone="danger" title="Não foi possível carregar a equipe">
               <Button size="sm" variant="secondary" onClick={() => void list.refetch()}>
                 Tentar novamente
               </Button>
@@ -168,7 +168,7 @@ export function TeamAvailabilityPage() {
 
           {list.data && list.data.data.length === 0 && (
             <EmptyState
-              title="Nenhum usuario encontrado"
+              title="Nenhum usuário encontrado"
               description="Ajuste o filtro de estado."
             />
           )}
@@ -227,7 +227,7 @@ export function TeamAvailabilityPage() {
                 Anterior
               </Button>
               <span className="text-sm text-neutral-600">
-                Pagina {page} de {totalPages}
+                Página {page} de {totalPages}
               </span>
               <Button
                 size="sm"
@@ -235,7 +235,7 @@ export function TeamAvailabilityPage() {
                 disabled={page >= totalPages}
                 onClick={() => setPage((current) => current + 1)}
               >
-                Proxima
+                Próxima
               </Button>
             </div>
           )}

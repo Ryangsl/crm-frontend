@@ -72,7 +72,7 @@ export function PasswordLinkModal({
         <Alert tone="warning" title="Entregue por um canal seguro">
           Vale uma única vez, até {formatExpiry(link.expires_at)}. Quem tiver o link define a senha
           da conta: não o publique em grupos. Este link não será mostrado de novo; gerar outro
-          invalida este.
+          inválida este.
         </Alert>
       </div>
     </Modal>

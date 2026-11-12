@@ -19,7 +19,7 @@ describe('api client', () => {
     vi.unstubAllGlobals();
   });
 
-  it('anexa Authorization quando ha access token e a rota nao e de auth', async () => {
+  it('anexa Authorization quando há access token e a rota não e de auth', async () => {
     setAccessToken('token-123');
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ ok: true }));
     vi.stubGlobal('fetch', fetchMock);
@@ -30,11 +30,13 @@ describe('api client', () => {
     expect((init.headers as Headers).get('Authorization')).toBe('Bearer token-123');
   });
 
-  it('nao anexa Authorization nem tenta refresh em rotas de /v1/auth', async () => {
+  it('não anexa Authorization nem tenta refresh em rotas de /v1/auth', async () => {
     setAccessToken('token-123');
     const fetchMock = vi
       .fn()
-      .mockResolvedValue(jsonResponse({ error: { code: 'INVALID_CREDENTIALS', message: 'x' } }, 401));
+      .mockResolvedValue(
+        jsonResponse({ error: { code: 'INVALID_CREDENTIALS', message: 'x' } }, 401),
+      );
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(apiGet('/v1/auth/login')).rejects.toBeInstanceOf(ApiError);
@@ -43,7 +45,7 @@ describe('api client', () => {
     expect((init.headers as Headers).has('Authorization')).toBe(false);
   });
 
-  it('em 401 fora de /v1/auth, tenta refresh uma unica vez e repete a requisicao original', async () => {
+  it('em 401 fora de /v1/auth, tenta refresh uma única vez e repete a requisição original', async () => {
     setAccessToken('expired');
     const fetchMock = vi
       .fn()
@@ -61,7 +63,7 @@ describe('api client', () => {
     expect((retryInit.headers as Headers).get('Authorization')).toBe('Bearer fresh');
   });
 
-  it('encerra a sessao (via setUnauthorizedHandler) quando o refresh falha apos 401', async () => {
+  it('encerra a sessão (via setUnauthorizedHandler) quando o refresh falha após 401', async () => {
     setAccessToken('expired');
     const onUnauthorized = vi.fn();
     setUnauthorizedHandler(onUnauthorized);
@@ -80,7 +82,7 @@ describe('api client', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it('deduplica refreshes concorrentes: dois 401 simultaneos disparam so um POST /v1/auth/refresh', async () => {
+  it('deduplica refreshes concorrentes: dois 401 simultaneos disparam só um POST /v1/auth/refresh', async () => {
     setAccessToken('expired');
     const callCounts = new Map<string, number>();
     const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL) => {

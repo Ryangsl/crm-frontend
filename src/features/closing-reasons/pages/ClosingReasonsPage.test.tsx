@@ -67,7 +67,7 @@ describe('Motivos de perda e de desqualificação (D-099)', () => {
         id: 'n1',
         name: 'Fora da região',
       })
-      .mockRejectedValueOnce(new ApiError(409, 'CLOSING_REASON_NAME_IN_USE', 'Ja existe.'));
+      .mockRejectedValueOnce(new ApiError(409, 'CLOSING_REASON_NAME_IN_USE', 'Já existe.'));
     renderPage();
     const input = await screen.findByLabelText('Novo motivo em motivos de desqualificação');
 
