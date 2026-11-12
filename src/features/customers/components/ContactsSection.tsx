@@ -34,9 +34,7 @@ export function ContactsSection({ customerId }: ContactsSectionProps) {
     try {
       await deleteMutation.mutateAsync(contact.id);
     } catch (err) {
-      setDeleteError(
-        err instanceof ApiError ? err.message : 'Nao foi possivel excluir o contato.',
-      );
+      setDeleteError(err instanceof ApiError ? err.message : 'Nao foi possivel excluir o contato.');
     }
   }
 
@@ -83,7 +81,10 @@ export function ContactsSection({ customerId }: ContactsSectionProps) {
       )}
 
       {contacts && contacts.length === 0 && mode === null && (
-        <EmptyState title="Nenhum contato cadastrado" description="Adicione o primeiro contato deste cliente." />
+        <EmptyState
+          title="Nenhum contato cadastrado"
+          description="Adicione o primeiro contato deste cliente."
+        />
       )}
 
       {contacts && contacts.length > 0 && (

@@ -71,7 +71,9 @@ export function CustomerDetailPage() {
           <Breadcrumb items={[{ label: 'Clientes', to: '/customers' }, { label: customer.name }]} />
           <header className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">{customer.name}</h1>
+              <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+                {customer.name}
+              </h1>
               <p className="text-sm text-neutral-500">
                 {[customer.document, customer.primary_phone, customer.primary_email]
                   .filter(Boolean)

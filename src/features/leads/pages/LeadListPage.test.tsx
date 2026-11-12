@@ -39,7 +39,13 @@ function page(overrides: Partial<LeadListResponse> = {}): LeadListResponse {
 }
 
 function sourcesPage(overrides: Partial<LeadSourceListResponse> = {}): LeadSourceListResponse {
-  return { data: [{ id: 's1', name: 'Site', created_at: '', updated_at: '' }], page: 1, limit: 100, total: 1, ...overrides };
+  return {
+    data: [{ id: 's1', name: 'Site', created_at: '', updated_at: '' }],
+    page: 1,
+    limit: 100,
+    total: 1,
+    ...overrides,
+  };
 }
 
 const LEAD: Lead = {

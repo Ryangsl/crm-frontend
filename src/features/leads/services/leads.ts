@@ -1,4 +1,5 @@
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/services/api';
+import type { ClosingReasonChoice } from '@/features/closing-reasons/types';
 import type {
   ConvertLeadInput,
   Lead,
@@ -49,8 +50,9 @@ export function qualifyLead(id: string): Promise<Lead> {
   return apiPost<Lead>(`/v1/leads/${id}/qualify`);
 }
 
-export function disqualifyLead(id: string, reason: string): Promise<Lead> {
-  return apiPost<Lead>(`/v1/leads/${id}/disqualify`, { reason });
+// D-099: motivo da lista da empresa + observacao (obrigatoria com "Outro").
+export function disqualifyLead(id: string, choice: ClosingReasonChoice): Promise<Lead> {
+  return apiPost<Lead>(`/v1/leads/${id}/disqualify`, choice);
 }
 
 export function reopenLead(id: string): Promise<Lead> {

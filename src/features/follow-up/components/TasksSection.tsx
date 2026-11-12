@@ -44,7 +44,9 @@ export function TasksSection({ entityType, entityId }: TasksSectionProps) {
         input: { status: task.status === 'done' ? 'pending' : 'done' },
       });
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'Nao foi possivel atualizar a tarefa.');
+      setActionError(
+        err instanceof ApiError ? err.message : 'Nao foi possivel atualizar a tarefa.',
+      );
     }
   }
 
@@ -101,7 +103,10 @@ export function TasksSection({ entityType, entityId }: TasksSectionProps) {
       )}
 
       {tasks && tasks.length === 0 && mode === null && (
-        <EmptyState title="Nenhuma tarefa registrada" description="Adicione a primeira tarefa deste registro." />
+        <EmptyState
+          title="Nenhuma tarefa registrada"
+          description="Adicione a primeira tarefa deste registro."
+        />
       )}
 
       {tasks && tasks.length > 0 && (
@@ -138,7 +143,12 @@ export function TasksSection({ entityType, entityId }: TasksSectionProps) {
                       </Button>
                     )}
                     {canEdit && (
-                      <Button writes size="sm" variant="ghost" onClick={() => setMode({ kind: 'edit', task })}>
+                      <Button
+                        writes
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setMode({ kind: 'edit', task })}
+                      >
                         Editar
                       </Button>
                     )}

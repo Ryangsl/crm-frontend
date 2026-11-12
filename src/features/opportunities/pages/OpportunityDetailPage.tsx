@@ -101,6 +101,7 @@ export function OpportunityDetailPage() {
               {opportunity.status === 'lost' && opportunity.lost_reason && (
                 <p className="text-sm text-neutral-500">
                   Motivo da perda: {opportunity.lost_reason}
+                  {opportunity.lost_note ? ` — ${opportunity.lost_note}` : ''}
                 </p>
               )}
               <Link

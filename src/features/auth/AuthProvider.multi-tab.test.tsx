@@ -80,7 +80,8 @@ describe('AuthProvider com varias abas (D-091)', () => {
       if (url.includes('/v1/auth/refresh') || url.includes('/v1/auth/login')) {
         return Promise.resolve(jsonResponse({ access_token: 't', expires_in: 900 }));
       }
-      if (url.includes('/v1/auth/logout')) return Promise.resolve(new Response(null, { status: 204 }));
+      if (url.includes('/v1/auth/logout'))
+        return Promise.resolve(new Response(null, { status: 204 }));
       if (url.includes('/v1/users/me')) return Promise.resolve(jsonResponse(me));
       return Promise.resolve(jsonResponse({}, 404));
     });

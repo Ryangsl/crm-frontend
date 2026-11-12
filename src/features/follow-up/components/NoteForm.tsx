@@ -34,7 +34,11 @@ export function NoteForm({ entityType, entityId, note, onSuccess, onCancel }: No
       if (note) {
         await updateMutation.mutateAsync({ noteId: note.id, input: { content: content.trim() } });
       } else {
-        await createMutation.mutateAsync({ entity_type: entityType, entity_id: entityId, content: content.trim() });
+        await createMutation.mutateAsync({
+          entity_type: entityType,
+          entity_id: entityId,
+          content: content.trim(),
+        });
       }
       onSuccess();
     } catch (err) {
@@ -65,7 +69,13 @@ export function NoteForm({ entityType, entityId, note, onSuccess, onCancel }: No
         <Button writes type="submit" size="sm" loading={submitting} disabled={submitting}>
           {note ? 'Salvar' : 'Adicionar'}
         </Button>
-        <Button type="button" size="sm" variant="secondary" onClick={onCancel} disabled={submitting}>
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          onClick={onCancel}
+          disabled={submitting}
+        >
           Cancelar
         </Button>
       </div>

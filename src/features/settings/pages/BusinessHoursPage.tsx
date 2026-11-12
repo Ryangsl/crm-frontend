@@ -28,7 +28,9 @@ export function BusinessHoursPage() {
   if (!canRead) {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Horario de funcionamento</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          Horario de funcionamento
+        </h1>
         <Alert tone="warning" title="Acesso restrito">
           Voce nao tem permissao para acessar as configuracoes da empresa.
         </Alert>
@@ -39,7 +41,9 @@ export function BusinessHoursPage() {
   return (
     <div className="flex flex-col gap-4">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Horario de funcionamento</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          Horario de funcionamento
+        </h1>
         <p className="text-sm text-neutral-500">
           Janelas semanais de funcionamento da empresa, no fuso horario escolhido.
         </p>

@@ -9,6 +9,7 @@ import {
   Signpost,
   UserRoundCheck,
   UsersRound,
+  ListChecks,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -61,6 +62,13 @@ const LINKS: SettingsLink[] = [
     description: 'De onde vêm os leads da empresa.',
     Icon: Signpost,
     permission: ['lead_sources:create', 'lead_sources:update', 'lead_sources:delete'],
+  },
+  {
+    to: '/settings/closing-reasons',
+    title: 'Motivos',
+    description: 'Motivos de perda e de desqualificação.',
+    Icon: ListChecks,
+    permission: 'tenant_settings:update',
   },
   {
     to: '/settings/pipelines',

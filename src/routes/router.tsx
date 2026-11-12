@@ -34,6 +34,7 @@ import { FollowUpsPage } from '../features/follow-up/pages/FollowUpsPage';
 import { SearchPage } from '../features/search/pages/SearchPage';
 import { RolesPage, SettingsHomePage } from '../features/settings/pages/SettingsPages';
 import { UsersPage } from '../features/users/pages/UsersPage';
+import { ClosingReasonsPage } from '../features/closing-reasons/pages/ClosingReasonsPage';
 import { LeadSourcesPage } from '../features/leads/pages/LeadSourcesPage';
 import { AvailabilitySettingsPage } from '../features/availability/pages/AvailabilitySettingsPage';
 import { PipelinesSettingsPage } from '../features/pipelines/pages/PipelinesSettingsPage';
@@ -78,6 +79,7 @@ export const router = createBrowserRouter([
           { path: 'settings', element: <SettingsHomePage /> },
           { path: 'settings/users', element: <UsersPage /> },
           { path: 'settings/lead-sources', element: <LeadSourcesPage /> },
+          { path: 'settings/closing-reasons', element: <ClosingReasonsPage /> },
           { path: 'settings/pipelines', element: <PipelinesSettingsPage /> },
           { path: 'settings/availability', element: <AvailabilitySettingsPage /> },
           { path: 'settings/roles', element: <RolesPage /> },

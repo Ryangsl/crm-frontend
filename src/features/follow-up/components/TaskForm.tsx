@@ -39,7 +39,10 @@ export function TaskForm({ entityType, entityId, task, onSuccess, onCancel }: Ta
     try {
       const due_at = fromDatetimeLocalValue(dueAt);
       if (task) {
-        await updateMutation.mutateAsync({ taskId: task.id, input: { title: title.trim(), due_at } });
+        await updateMutation.mutateAsync({
+          taskId: task.id,
+          input: { title: title.trim(), due_at },
+        });
       } else {
         await createMutation.mutateAsync({
           title: title.trim(),
@@ -67,7 +70,12 @@ export function TaskForm({ entityType, entityId, task, onSuccess, onCancel }: Ta
         </Alert>
       )}
 
-      <Input label="Titulo" required value={title} onChange={(event) => setTitle(event.target.value)} />
+      <Input
+        label="Titulo"
+        required
+        value={title}
+        onChange={(event) => setTitle(event.target.value)}
+      />
       <Input
         label="Prazo"
         type="datetime-local"
@@ -80,7 +88,13 @@ export function TaskForm({ entityType, entityId, task, onSuccess, onCancel }: Ta
         <Button writes type="submit" size="sm" loading={submitting} disabled={submitting}>
           {task ? 'Salvar' : 'Adicionar'}
         </Button>
-        <Button type="button" size="sm" variant="secondary" onClick={onCancel} disabled={submitting}>
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          onClick={onCancel}
+          disabled={submitting}
+        >
           Cancelar
         </Button>
       </div>

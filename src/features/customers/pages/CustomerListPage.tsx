@@ -46,7 +46,9 @@ export function CustomerListPage() {
           <p className="text-sm text-neutral-500">Cadastro de clientes do tenant.</p>
         </div>
         {hasPermission('customers:create') && (
-          <Button writes onClick={() => navigate('/customers/new')}>Novo cliente</Button>
+          <Button writes onClick={() => navigate('/customers/new')}>
+            Novo cliente
+          </Button>
         )}
       </header>
 

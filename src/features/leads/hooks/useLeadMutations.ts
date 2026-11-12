@@ -1,3 +1,4 @@
+import type { ClosingReasonChoice } from '@/features/closing-reasons/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -49,7 +50,7 @@ export function useQualifyLead(id: string) {
 export function useDisqualifyLead(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (reason: string) => disqualifyLead(id, reason),
+    mutationFn: (choice: ClosingReasonChoice) => disqualifyLead(id, choice),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['leads'] }),
   });
 }

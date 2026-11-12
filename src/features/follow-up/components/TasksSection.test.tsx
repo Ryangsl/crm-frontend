@@ -49,7 +49,12 @@ describe('TasksSection', () => {
   });
 
   it('mostra estado vazio quando nao ha tarefas', async () => {
-    vi.mocked(followUpService.listTasks).mockResolvedValue({ data: [], page: 1, limit: 100, total: 0 });
+    vi.mocked(followUpService.listTasks).mockResolvedValue({
+      data: [],
+      page: 1,
+      limit: 100,
+      total: 0,
+    });
     renderSection(['tasks:read']);
     expect(await screen.findByText(/nenhuma tarefa registrada/i)).toBeInTheDocument();
   });
@@ -68,7 +73,12 @@ describe('TasksSection', () => {
 
   it('cria uma nova tarefa atribuida ao usuario atual', async () => {
     const user = userEvent.setup();
-    vi.mocked(followUpService.listTasks).mockResolvedValue({ data: [], page: 1, limit: 100, total: 0 });
+    vi.mocked(followUpService.listTasks).mockResolvedValue({
+      data: [],
+      page: 1,
+      limit: 100,
+      total: 0,
+    });
     vi.mocked(followUpService.createTask).mockResolvedValue(TASK);
     renderSection(['tasks:read', 'tasks:create']);
 
@@ -106,7 +116,12 @@ describe('TasksSection', () => {
   });
 
   it('RBAC visual: sem tasks:create, nao mostra Adicionar tarefa', async () => {
-    vi.mocked(followUpService.listTasks).mockResolvedValue({ data: [], page: 1, limit: 100, total: 0 });
+    vi.mocked(followUpService.listTasks).mockResolvedValue({
+      data: [],
+      page: 1,
+      limit: 100,
+      total: 0,
+    });
     renderSection(['tasks:read']);
     await screen.findByText(/nenhuma tarefa registrada/i);
     expect(screen.queryByRole('button', { name: /adicionar tarefa/i })).not.toBeInTheDocument();

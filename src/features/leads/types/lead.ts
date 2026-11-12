@@ -10,7 +10,10 @@ export interface Lead {
   document?: string | null;
   phone?: string | null;
   email?: string | null;
+  // D-099: nome do motivo escolhido (ou o texto livre de registros antigos), id e observacao.
   disqualify_reason: string | null;
+  disqualify_reason_id?: string | null;
+  disqualify_note?: string | null;
   created_at: string;
   updated_at: string;
 }

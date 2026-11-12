@@ -1,6 +1,15 @@
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 
+import { ClosingReasonFields } from '@/features/closing-reasons/components/ClosingReasonFields';
+import {
+  choiceErrorMessage,
+  EMPTY_CHOICE,
+  isChoiceComplete,
+  toChoice,
+} from '@/features/closing-reasons/choice';
+import type { ChoiceDraft } from '@/features/closing-reasons/choice';
+import { useClosingReasonsQuery } from '@/features/closing-reasons/hooks';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -51,7 +60,8 @@ export function OpportunityActionPanel({
   const [destinationId, setDestinationId] = useState('');
   const [justification, setJustification] = useState('');
   const [valueInput, setValueInput] = useState('');
-  const [reason, setReason] = useState('');
+  const [choice, setChoice] = useState<ChoiceDraft>(EMPTY_CHOICE);
+  const lossReasons = useClosingReasonsQuery('opportunity_lost', mode === 'lose');
   const [serverWantsJustification, setServerWantsJustification] = useState(false);
   const [serverWantsValue, setServerWantsValue] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -84,7 +94,7 @@ export function OpportunityActionPanel({
     !valueInvalid &&
     (mode !== 'move' || destinationId !== '') &&
     (!showJustification || justification.trim() !== '') &&
-    (mode !== 'lose' || reason.trim().length >= 3);
+    (mode !== 'lose' || isChoiceComplete(lossReasons.data?.data, choice));
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -106,7 +116,7 @@ export function OpportunityActionPanel({
       } else if (mode === 'win') {
         await winMutation.mutateAsync();
       } else {
-        await loseMutation.mutateAsync(reason.trim());
+        await loseMutation.mutateAsync(toChoice(choice));
       }
       onDone();
     } catch (err) {
@@ -118,6 +128,8 @@ export function OpportunityActionPanel({
         setError(
           'A etapa de destino exige valor: informe o valor da oportunidade e envie novamente.',
         );
+      } else if (choiceErrorMessage(err)) {
+        setError(choiceErrorMessage(err));
       } else if (isPermissionDenied(err)) {
         setError('Você não tem permissão para realizar esta ação.');
       } else {
@@ -179,11 +191,11 @@ export function OpportunityActionPanel({
             A oportunidade será movida para a etapa de perda do pipeline
             {destination ? ` (${destination.name})` : ''}.
           </p>
-          <Input
+          <ClosingReasonFields
+            kind="opportunity_lost"
             label="Motivo da perda"
-            required
-            value={reason}
-            onChange={(event) => setReason(event.target.value)}
+            value={choice}
+            onChange={setChoice}
           />
         </>
       )}
