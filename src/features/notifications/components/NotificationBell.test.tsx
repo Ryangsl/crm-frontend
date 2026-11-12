@@ -58,7 +58,7 @@ describe('NotificationBell', () => {
     vi.resetAllMocks();
   });
 
-  it('sem nao lidas: sem contador; com nao lidas: mostra o numero', async () => {
+  it('sem não lidas: sem contador; com não lidas: mostra o número', async () => {
     vi.mocked(service.getUnreadCount).mockResolvedValue({ count: 0 });
     const { unmount } = renderBell();
     await waitFor(() => expect(service.getUnreadCount).toHaveBeenCalled());
@@ -69,7 +69,7 @@ describe('NotificationBell', () => {
     renderBell();
     expect(await screen.findByTestId('notification-badge')).toHaveTextContent('3');
     expect(
-      screen.getByRole('button', { name: /notificacoes \(3 nao lidas\)/i }),
+      screen.getByRole('button', { name: /notificações \(3 não lidas\)/i }),
     ).toBeInTheDocument();
   });
 
@@ -79,7 +79,7 @@ describe('NotificationBell', () => {
     expect(await screen.findByTestId('notification-badge')).toHaveTextContent('99+');
   });
 
-  it('a lista so e carregada quando o painel e aberto', async () => {
+  it('a lista só e carregada quando o painel e aberto', async () => {
     vi.mocked(service.getUnreadCount).mockResolvedValue({ count: 1 });
     vi.mocked(service.listNotifications).mockResolvedValue(page([UNREAD]));
     const user = userEvent.setup();
@@ -87,51 +87,51 @@ describe('NotificationBell', () => {
     await screen.findByTestId('notification-badge');
     expect(service.listNotifications).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
 
-    expect(await screen.findByText('Lead atribuido a voce: Maria Souza')).toBeInTheDocument();
+    expect(await screen.findByText('Lead atribuído a você: Maria Souza')).toBeInTheDocument();
     expect(service.listNotifications).toHaveBeenCalledWith(undefined);
   });
 
-  it('lista lidas e nao lidas; lead sem nome usa texto proprio; estado vazio', async () => {
+  it('lista lidas e não lidas; lead sem nome usa texto próprio; estado vazio', async () => {
     vi.mocked(service.getUnreadCount).mockResolvedValue({ count: 1 });
     vi.mocked(service.listNotifications).mockResolvedValue(page([UNREAD, READ]));
     const user = userEvent.setup();
     const { unmount } = renderBell();
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
-    expect(await screen.findByText('Lead atribuido a voce: Maria Souza')).toBeInTheDocument();
-    expect(screen.getByText('Um lead sem nome foi atribuido a voce')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
+    expect(await screen.findByText('Lead atribuído a você: Maria Souza')).toBeInTheDocument();
+    expect(screen.getByText('Um lead sem nome foi atribuído a você')).toBeInTheDocument();
     unmount();
 
     vi.mocked(service.listNotifications).mockResolvedValue(page([]));
     renderBell();
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
-    expect(await screen.findByText(/nenhuma notificacao\./i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
+    expect(await screen.findByText(/nenhuma notificação\./i)).toBeInTheDocument();
   });
 
-  it('abrir uma notificacao nao lida a marca como lida e navega para o Lead', async () => {
+  it('abrir uma notificação não lida a marca como lida e navega para o Lead', async () => {
     vi.mocked(service.getUnreadCount).mockResolvedValue({ count: 1 });
     vi.mocked(service.listNotifications).mockResolvedValue(page([UNREAD]));
     vi.mocked(service.markNotificationRead).mockResolvedValue({ ...UNREAD, read_at: 'x' });
     const user = userEvent.setup();
     renderBell();
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
 
-    await user.click(await screen.findByText('Lead atribuido a voce: Maria Souza'));
+    await user.click(await screen.findByText('Lead atribuído a você: Maria Souza'));
 
     await waitFor(() => expect(service.markNotificationRead).toHaveBeenCalledWith('n1'));
     await waitFor(() => expect(screen.getByTestId('where')).toHaveTextContent('/leads/lead-1'));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(); // painel fecha ao navegar
   });
 
-  it('abrir uma notificacao ja lida navega sem chamar a API de leitura', async () => {
+  it('abrir uma notificação já lida navega sem chamar a API de leitura', async () => {
     vi.mocked(service.getUnreadCount).mockResolvedValue({ count: 0 });
     vi.mocked(service.listNotifications).mockResolvedValue(page([READ]));
     const user = userEvent.setup();
     renderBell();
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
 
-    await user.click(await screen.findByText('Um lead sem nome foi atribuido a voce'));
+    await user.click(await screen.findByText('Um lead sem nome foi atribuído a você'));
 
     await waitFor(() => expect(screen.getByTestId('where')).toHaveTextContent('/leads/lead-2'));
     expect(service.markNotificationRead).not.toHaveBeenCalled();
@@ -146,32 +146,32 @@ describe('NotificationBell', () => {
     const user = userEvent.setup();
     renderBell();
     await screen.findByTestId('notification-badge');
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
 
-    await user.click(await screen.findByText('Lead atribuido a voce: Maria Souza'));
+    await user.click(await screen.findByText('Lead atribuído a você: Maria Souza'));
 
     await waitFor(() => expect(screen.queryByTestId('notification-badge')).not.toBeInTheDocument());
   });
 
-  it('"Marcar todas como lidas" chama a API; desabilitado sem nao lidas', async () => {
+  it('"Marcar todas como lidas" chama a API; desabilitado sem não lidas', async () => {
     vi.mocked(service.getUnreadCount).mockResolvedValue({ count: 2 });
     vi.mocked(service.listNotifications).mockResolvedValue(page([UNREAD, READ]));
     vi.mocked(service.markAllNotificationsRead).mockResolvedValue({ updated: 2 });
     const user = userEvent.setup();
     renderBell();
     await screen.findByTestId('notification-badge');
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
 
     await user.click(await screen.findByRole('button', { name: /marcar todas como lidas/i }));
     await waitFor(() => expect(service.markAllNotificationsRead).toHaveBeenCalledTimes(1));
   });
 
-  it('"Marcar todas" fica desabilitado quando nao ha nao lidas', async () => {
+  it('"Marcar todas" fica desabilitado quando não há não lidas', async () => {
     vi.mocked(service.getUnreadCount).mockResolvedValue({ count: 0 });
     vi.mocked(service.listNotifications).mockResolvedValue(page([READ]));
     const user = userEvent.setup();
     renderBell();
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
     expect(await screen.findByRole('button', { name: /marcar todas como lidas/i })).toBeDisabled();
   });
 
@@ -182,11 +182,11 @@ describe('NotificationBell', () => {
       .mockResolvedValueOnce(page([READ]));
     const user = userEvent.setup();
     renderBell();
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
 
     await user.click(await screen.findByRole('button', { name: /carregar mais/i }));
 
-    expect(await screen.findByText('Um lead sem nome foi atribuido a voce')).toBeInTheDocument();
+    expect(await screen.findByText('Um lead sem nome foi atribuído a você')).toBeInTheDocument();
     expect(service.listNotifications).toHaveBeenLastCalledWith('cursor-1');
     expect(screen.queryByRole('button', { name: /carregar mais/i })).not.toBeInTheDocument();
   });
@@ -198,13 +198,13 @@ describe('NotificationBell', () => {
       .mockResolvedValueOnce(page([UNREAD]));
     const user = userEvent.setup();
     renderBell();
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
 
     expect(
-      await screen.findByText(/nao foi possivel carregar as notificacoes/i),
+      await screen.findByText(/não foi possível carregar as notificações/i),
     ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /tentar novamente/i }));
-    expect(await screen.findByText('Lead atribuido a voce: Maria Souza')).toBeInTheDocument();
+    expect(await screen.findByText('Lead atribuído a você: Maria Souza')).toBeInTheDocument();
   });
 
   it('Escape fecha o painel', async () => {
@@ -212,7 +212,7 @@ describe('NotificationBell', () => {
     vi.mocked(service.listNotifications).mockResolvedValue(page([]));
     const user = userEvent.setup();
     renderBell();
-    await user.click(screen.getByRole('button', { name: /notificacoes/i }));
+    await user.click(screen.getByRole('button', { name: /notificações/i }));
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
 
     await user.keyboard('{Escape}');

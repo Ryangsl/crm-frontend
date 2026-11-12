@@ -34,13 +34,13 @@ function renderWithAuth(status: AuthState['status']) {
 }
 
 describe('ProtectedRoute', () => {
-  it('mostra estado de carregamento enquanto a sessao e restaurada', () => {
+  it('mostra estado de carregamento enquanto a sessão e restaurada', () => {
     renderWithAuth('loading');
     expect(screen.getByRole('status')).toBeInTheDocument();
     expect(screen.queryByText('Conteudo protegido')).not.toBeInTheDocument();
   });
 
-  it('redireciona para o login quando nao autenticado', () => {
+  it('redireciona para o login quando não autenticado', () => {
     renderWithAuth('unauthenticated');
     expect(screen.getByText('Tela de login')).toBeInTheDocument();
   });

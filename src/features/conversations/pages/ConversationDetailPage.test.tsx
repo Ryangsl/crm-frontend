@@ -41,12 +41,12 @@ describe('ConversationDetailPage', () => {
     vi.resetAllMocks();
   });
 
-  it('sem conversations:read mostra aviso e nao consulta a API', () => {
+  it('sem conversations:read mostra aviso e não consulta a API', () => {
     renderWithProviders(<ConversationDetailPage />, ['leads:read'], {
       route: '/conversations/conv-1',
       path: '/conversations/:id',
     });
-    expect(screen.getByText(/nao tem permissao para ver conversas/i)).toBeInTheDocument();
+    expect(screen.getByText(/não tem permissão para ver conversas/i)).toBeInTheDocument();
     expect(service.getConversation).not.toHaveBeenCalled();
     expect(service.listMessages).not.toHaveBeenCalled();
   });
@@ -80,14 +80,14 @@ describe('ConversationDetailPage', () => {
     expect(screen.queryByText('Ana Cliente')).not.toBeInTheDocument();
   });
 
-  it('conversa inexistente (404): mostra "nao encontrada"', async () => {
+  it('conversa inexistente (404): mostra "não encontrada"', async () => {
     vi.mocked(service.getConversation).mockRejectedValue(new ApiError(404, 'NOT_FOUND', 'x'));
     vi.mocked(service.listMessages).mockResolvedValue(messagesPage([]));
     renderWithProviders(<ConversationDetailPage />, READ, {
       route: '/conversations/conv-1',
       path: '/conversations/:id',
     });
-    expect(await screen.findByText('Conversa nao encontrada')).toBeInTheDocument();
+    expect(await screen.findByText('Conversa não encontrada')).toBeInTheDocument();
   });
 
   it('mostra o contexto CRM com links para a entidade, o estado e o canal neutro', async () => {
@@ -131,11 +131,11 @@ describe('ConversationDetailPage', () => {
     ]);
     expect(items[0]).toHaveTextContent('Interna');
     expect(items[1]).toHaveTextContent('Entrada');
-    expect(items[2]).toHaveTextContent('Saida');
-    expect(items[2]).toHaveTextContent('Voce');
+    expect(items[2]).toHaveTextContent('Saída');
+    expect(items[2]).toHaveTextContent('Você');
   });
 
-  it('"Carregar anteriores" busca a pagina seguinte pelo cursor e a coloca no inicio', async () => {
+  it('"Carregar anteriores" busca a página seguinte pelo cursor e a coloca no início', async () => {
     vi.mocked(service.listMessages)
       .mockResolvedValueOnce(messagesPage([message('m2', '2026-10-07T11:00:00Z')], 'cursor-1'))
       .mockResolvedValueOnce(messagesPage([message('m1', '2026-10-07T10:00:00Z')]));
@@ -153,7 +153,7 @@ describe('ConversationDetailPage', () => {
     expect(screen.queryByRole('button', { name: /carregar anteriores/i })).not.toBeInTheDocument();
   });
 
-  it('sem conversations:update: nao ha composer nem encerrar/reabrir', async () => {
+  it('sem conversations:update: não há composer nem encerrar/reabrir', async () => {
     vi.mocked(service.listMessages).mockResolvedValue(messagesPage());
     renderDetail(READ);
     await screen.findByText('texto m2');
@@ -162,7 +162,7 @@ describe('ConversationDetailPage', () => {
     expect(screen.queryByRole('button', { name: /reabrir conversa/i })).not.toBeInTheDocument();
   });
 
-  it('registra mensagem com direcao opcional e limpa o campo', async () => {
+  it('registra mensagem com direção opcional e limpa o campo', async () => {
     vi.mocked(service.listMessages).mockResolvedValue(messagesPage([]));
     vi.mocked(service.createMessage).mockResolvedValue(message('m9', '2026-10-07T13:00:00Z'));
     const user = userEvent.setup();
@@ -181,7 +181,7 @@ describe('ConversationDetailPage', () => {
     await waitFor(() => expect(screen.getByLabelText('Mensagem')).toHaveValue(''));
   });
 
-  it('mensagem sem tipo e anotacao interna (sem direction no payload)', async () => {
+  it('mensagem sem tipo e anotação interna (sem direction no payload)', async () => {
     vi.mocked(service.listMessages).mockResolvedValue(messagesPage([]));
     vi.mocked(service.createMessage).mockResolvedValue(message('m9', '2026-10-07T13:00:00Z'));
     const user = userEvent.setup();
@@ -207,7 +207,7 @@ describe('ConversationDetailPage', () => {
     await user.click(screen.getByRole('button', { name: /registrar mensagem/i }));
 
     expect(
-      await screen.findByText(/conversa esta encerrada\. reabra-a para continuar/i),
+      await screen.findByText(/conversa está encerrada\. reabra-a para continuar/i),
     ).toBeInTheDocument();
   });
 
@@ -236,15 +236,15 @@ describe('ConversationDetailPage', () => {
     await waitFor(() => expect(service.reopenConversation).toHaveBeenCalledWith('conv-1'));
   });
 
-  it('atribuicao so aparece com conversations:assign; lista apenas usuarios ativos', async () => {
+  it('atribuicao só aparece com conversations:assign; lista apenas usuários ativos', async () => {
     vi.mocked(service.listMessages).mockResolvedValue(messagesPage([]));
     renderDetail(AGENT);
-    await screen.findByText('Sem responsavel', { selector: 'p' });
+    await screen.findByText('Sem responsável', { selector: 'p' });
     expect(screen.queryByLabelText('Atribuir a')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /atribuir a mim/i })).not.toBeInTheDocument();
   });
 
-  it('atribui a um usuario escolhido, a mim e remove o responsavel', async () => {
+  it('atribui a um usuário escolhido, a mim e remove o responsável', async () => {
     vi.mocked(service.listMessages).mockResolvedValue(messagesPage([]));
     vi.mocked(service.assignConversation).mockResolvedValue(CONVERSATION);
     const user = userEvent.setup();
@@ -270,13 +270,13 @@ describe('ConversationDetailPage', () => {
       expect(service.assignConversation).toHaveBeenLastCalledWith('conv-1', 'u-me'),
     );
 
-    await user.click(screen.getByRole('button', { name: /remover responsavel/i }));
+    await user.click(screen.getByRole('button', { name: /remover responsável/i }));
     await waitFor(() =>
       expect(service.assignConversation).toHaveBeenLastCalledWith('conv-1', null),
     );
   });
 
-  it('erro 422 de responsavel inelegivel e explicado', async () => {
+  it('erro 422 de responsável inelegivel e explicado', async () => {
     vi.mocked(service.listMessages).mockResolvedValue(messagesPage([]));
     vi.mocked(service.assignConversation).mockRejectedValue(
       new ApiError(422, 'CONVERSATION_ASSIGNEE_INELIGIBLE', 'x'),
@@ -286,6 +286,6 @@ describe('ConversationDetailPage', () => {
 
     await user.click(await screen.findByRole('button', { name: /atribuir a mim/i }));
 
-    expect(await screen.findByText(/nao pode receber conversas/i)).toBeInTheDocument();
+    expect(await screen.findByText(/não pode receber conversas/i)).toBeInTheDocument();
   });
 });

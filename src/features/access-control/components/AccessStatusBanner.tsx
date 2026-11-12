@@ -15,9 +15,9 @@ export function AccessStatusBanner() {
 
   return (
     <div className="mb-4" data-testid="access-status-banner">
-      <Alert tone="warning" title="Fora do horario de funcionamento">
-        O acesso a {blocked.join(' e ')} esta indisponivel neste horario. Se precisar acessar agora,
-        peca uma liberacao excepcional a um Admin ou Gerente.
+      <Alert tone="warning" title="Fora do horário de funcionamento">
+        O acesso a {blocked.join(' e ')} está indisponível neste horário. Se precisar acessar agora,
+        peça uma liberação excepcional a um Admin ou Gerente.
       </Alert>
     </div>
   );

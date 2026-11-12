@@ -38,36 +38,36 @@ function renderShell(permissions: string[], authenticated = true) {
   );
 }
 
-describe('AppShell — sino de notificacoes (F4.5)', () => {
+describe('AppShell — sino de notificações (F4.5)', () => {
   afterEach(() => {
     vi.resetAllMocks();
   });
 
-  it('qualquer usuario autenticado ve o sino, mesmo sem nenhuma permissao (barra superior)', async () => {
+  it('qualquer usuário autenticado ve o sino, mesmo sem nenhuma permissão (barra superior)', async () => {
     renderShell([]);
-    const bells = await screen.findAllByRole('button', { name: /notificacoes/i });
+    const bells = await screen.findAllByRole('button', { name: /notificações/i });
     expect(bells).toHaveLength(1);
     await waitFor(() => expect(service.getUnreadCount).toHaveBeenCalled());
   });
 
-  it('mostra o contador de nao lidas vindo da API', async () => {
+  it('mostra o contador de não lidas vindo da API', async () => {
     renderShell(['leads:read']);
     const badges = await screen.findAllByTestId('notification-badge');
     for (const badge of badges) expect(badge).toHaveTextContent('2');
   });
 
-  it('nao adiciona item na navegacao (nem no bottom nav mobile)', async () => {
+  it('não adiciona item na navegacao (nem no bottom nav mobile)', async () => {
     renderShell(['leads:read']);
-    await screen.findAllByRole('button', { name: /notificacoes/i });
+    await screen.findAllByRole('button', { name: /notificações/i });
     for (const nav of screen.getAllByRole('navigation', { name: 'Principal' })) {
       expect(nav).not.toHaveTextContent(/notifica/i);
     }
     expect(screen.queryByRole('link', { name: /notifica/i })).not.toBeInTheDocument();
   });
 
-  it('sem usuario autenticado nao ha sino e nenhuma consulta e feita', () => {
+  it('sem usuário autenticado não há sino e nenhuma consulta e feita', () => {
     renderShell([], false);
-    expect(screen.queryByRole('button', { name: /notificacoes/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /notificações/i })).not.toBeInTheDocument();
     expect(service.getUnreadCount).not.toHaveBeenCalled();
   });
 });

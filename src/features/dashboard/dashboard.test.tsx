@@ -125,13 +125,13 @@ beforeEach(() => {
 afterEach(() => vi.clearAllMocks());
 
 describe('painel inicial', () => {
-  it('cumprimenta o usuario pelo primeiro nome', async () => {
+  it('cumprimenta o usuário pelo primeiro nome', async () => {
     renderHome();
     expect(screen.getByRole('heading', { name: 'Olá, Ana!' })).toBeInTheDocument();
     await screen.findByRole('link', { name: /^Leads/ });
   });
 
-  it('mostra os indicadores reais, com a variacao e a direcao em texto', async () => {
+  it('mostra os indicadores reais, com a variacao e a direção em texto', async () => {
     renderHome();
 
     const leadsCard = await screen.findByRole('link', { name: /^Leads/ });
@@ -150,7 +150,7 @@ describe('painel inicial', () => {
     expect(card).not.toHaveTextContent('%');
   });
 
-  it('bloco sem permissao nao aparece', async () => {
+  it('bloco sem permissão não aparece', async () => {
     vi.mocked(service.getDashboardSummary).mockResolvedValue({
       ...SUMMARY,
       leads: null,
@@ -164,7 +164,7 @@ describe('painel inicial', () => {
     expect(screen.queryByText('Pipeline de oportunidades')).not.toBeInTheDocument();
   });
 
-  it('trocar o periodo consulta de novo com o periodo escolhido', async () => {
+  it('trocar o período consulta de novo com o período escolhido', async () => {
     renderHome();
     await screen.findByRole('link', { name: /^Leads/ });
 
@@ -190,7 +190,7 @@ describe('painel inicial', () => {
     expect(screen.getByText('Ver como tabela')).toBeInTheDocument();
   });
 
-  it('periodo sem nenhum movimento nao desenha um grafico vazio', async () => {
+  it('período sem nenhum movimento não desenha um grafico vazio', async () => {
     vi.mocked(service.getDashboardSummary).mockResolvedValue({
       ...SUMMARY,
       evolution: {
@@ -204,7 +204,7 @@ describe('painel inicial', () => {
     expect(screen.queryByRole('img', { name: /Evolução/ })).not.toBeInTheDocument();
   });
 
-  it('agenda do dia e ultimos leads respeitam a permissao', async () => {
+  it('agenda do dia e últimos leads respeitam a permissão', async () => {
     renderHome(['tasks:read', 'leads:read', 'lead_sources:read']);
 
     expect(await screen.findByText('Ligar para cliente')).toBeInTheDocument();
@@ -217,7 +217,7 @@ describe('painel inicial', () => {
     );
   });
 
-  it('sem permissao nao consulta agenda nem leads', async () => {
+  it('sem permissão não consulta agenda nem leads', async () => {
     renderHome();
     await screen.findByRole('link', { name: /^Leads/ });
 
@@ -226,12 +226,12 @@ describe('painel inicial', () => {
     expect(screen.queryByText('Atividades de hoje')).not.toBeInTheDocument();
   });
 
-  it('metas nao existem no produto: o painel diz isso, sem numero nenhum', async () => {
+  it('metas não existem no produto: o painel diz isso, sem número nenhum', async () => {
     renderHome();
     expect(await screen.findByText('Metas ainda não disponíveis')).toBeInTheDocument();
   });
 
-  it('erro no resumo oferece nova tentativa e nao esconde o resto', async () => {
+  it('erro no resumo oferece nova tentativa e não esconde o resto', async () => {
     vi.mocked(service.getDashboardSummary).mockRejectedValue(new Error('x'));
     renderHome();
 

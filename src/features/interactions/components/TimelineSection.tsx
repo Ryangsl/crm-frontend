@@ -18,7 +18,7 @@ interface TimelineSectionProps {
 
 const DIRECTION_LABEL: Record<InteractionDirection, string> = {
   inbound: 'Entrada',
-  outbound: 'Saida',
+  outbound: 'Saída',
 };
 
 // F4.4: historico (interacoes + notas) do registro. O historico de um Lead nao aparece no
@@ -57,7 +57,7 @@ export function TimelineSection({ entityType, entityId }: TimelineSectionProps) 
       await deleteMutation.mutateAsync(item.id);
     } catch (err) {
       setDeleteError(
-        err instanceof ApiError ? err.message : 'Nao foi possivel excluir a interacao.',
+        err instanceof ApiError ? err.message : 'Não foi possível excluir a interação.',
       );
     }
   }
@@ -65,10 +65,10 @@ export function TimelineSection({ entityType, entityId }: TimelineSectionProps) 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold text-neutral-900">Historico</h2>
+        <h2 className="text-base font-semibold text-neutral-900">Histórico</h2>
         {canCreate && !creating && (
           <Button writes size="sm" variant="secondary" onClick={() => setCreating(true)}>
-            Registrar interacao
+            Registrar interação
           </Button>
         )}
       </div>
@@ -83,19 +83,19 @@ export function TimelineSection({ entityType, entityId }: TimelineSectionProps) 
       )}
 
       {deleteError && (
-        <Alert tone="danger" title="Nao foi possivel excluir">
+        <Alert tone="danger" title="Não foi possível excluir">
           {deleteError}
         </Alert>
       )}
 
       {isPending && (
         <p className="flex items-center gap-2 text-neutral-600">
-          <Spinner size="sm" /> Carregando historico...
+          <Spinner size="sm" /> Carregando histórico...
         </p>
       )}
 
       {isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar o historico">
+        <Alert tone="danger" title="Não foi possível carregar o histórico">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>
@@ -107,11 +107,11 @@ export function TimelineSection({ entityType, entityId }: TimelineSectionProps) 
 
       {!isPending && !isError && items.length === 0 && !creating && (
         <EmptyState
-          title="Nenhum registro no historico"
+          title="Nenhum registro no histórico"
           description={
             entityType === 'customer'
               ? 'Interações e notas deste cliente e interações das oportunidades dele aparecem aqui.'
-              : 'Interacoes e notas deste registro aparecem aqui.'
+              : 'Interações e notas deste registro aparecem aqui.'
           }
         />
       )}
@@ -126,7 +126,7 @@ export function TimelineSection({ entityType, entityId }: TimelineSectionProps) 
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="flex flex-wrap items-center gap-x-2 text-sm font-medium text-neutral-700">
-                    <span>{item.type === 'note' ? 'Nota' : 'Interacao'}</span>
+                    <span>{item.type === 'note' ? 'Nota' : 'Interação'}</span>
                     {item.channel && <span className="text-neutral-500">· {item.channel}</span>}
                     {item.direction && (
                       <span className="text-neutral-500">· {DIRECTION_LABEL[item.direction]}</span>

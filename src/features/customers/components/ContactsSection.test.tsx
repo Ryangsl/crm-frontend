@@ -47,7 +47,7 @@ describe('ContactsSection', () => {
     vi.restoreAllMocks();
   });
 
-  it('mostra estado vazio quando o cliente nao tem contatos', async () => {
+  it('mostra estado vazio quando o cliente não tem contatos', async () => {
     vi.mocked(customersService.listContacts).mockResolvedValue([]);
     renderSection(['customers:read']);
     expect(await screen.findByText(/nenhum contato cadastrado/i)).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('ContactsSection', () => {
     expect(await screen.findByText('Fulano')).toBeInTheDocument();
   });
 
-  it('RBAC visual: sem customers:update, nao mostra Adicionar contato nem Editar', async () => {
+  it('RBAC visual: sem customers:update, não mostra Adicionar contato nem Editar', async () => {
     vi.mocked(customersService.listContacts).mockResolvedValue([CONTACT]);
     renderSection(['customers:read']);
     await screen.findByText('Fulano');

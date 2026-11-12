@@ -131,7 +131,7 @@ describe('OpportunityActionPanel', () => {
     const user = userEvent.setup();
     vi.mocked(service.moveOpportunity)
       .mockRejectedValueOnce(
-        new ApiError(422, 'OPPORTUNITY_JUSTIFICATION_REQUIRED', 'Justificativa obrigatoria.'),
+        new ApiError(422, 'OPPORTUNITY_JUSTIFICATION_REQUIRED', 'Justificativa obrigatória.'),
       )
       .mockResolvedValueOnce(makeOpportunity({ stage_id: 'st2' }));
     const { onDone } = renderPanel('move', makeOpportunity({ value: '10.00' }));
@@ -156,7 +156,7 @@ describe('OpportunityActionPanel', () => {
     const user = userEvent.setup();
     // Frontend acreditava que não precisava (oportunidade já tinha valor no cache), backend recusa.
     vi.mocked(service.moveOpportunity)
-      .mockRejectedValueOnce(new ApiError(422, 'OPPORTUNITY_VALUE_REQUIRED', 'Valor obrigatorio.'))
+      .mockRejectedValueOnce(new ApiError(422, 'OPPORTUNITY_VALUE_REQUIRED', 'Valor obrigatório.'))
       .mockResolvedValueOnce(makeOpportunity({ stage_id: 'st3' }));
     vi.mocked(service.updateOpportunity).mockResolvedValue(makeOpportunity({ value: '20.00' }));
     const { onDone } = renderPanel('move', makeOpportunity({ stage_id: 'st2', value: '5.00' }));
@@ -244,14 +244,14 @@ describe('OpportunityActionPanel', () => {
   it('mostra erro do backend (ex.: oportunidade já encerrada) e não fecha o painel', async () => {
     const user = userEvent.setup();
     vi.mocked(service.moveOpportunity).mockRejectedValue(
-      new ApiError(409, 'OPPORTUNITY_TERMINAL', 'A oportunidade ja esta encerrada.'),
+      new ApiError(409, 'OPPORTUNITY_TERMINAL', 'A oportunidade já está encerrada.'),
     );
     const { onDone } = renderPanel('move', makeOpportunity({ value: '10.00' }));
 
     await user.selectOptions(screen.getByLabelText('Mover para'), 'st2');
     await user.click(screen.getByRole('button', { name: 'Mover' }));
 
-    expect(await screen.findByText(/ja esta encerrada/i)).toBeInTheDocument();
+    expect(await screen.findByText(/já está encerrada/i)).toBeInTheDocument();
     expect(onDone).not.toHaveBeenCalled();
   });
 });

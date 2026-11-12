@@ -102,7 +102,7 @@ describe('Origens de Lead (D-094)', () => {
     expect(await screen.findByText('Origem desativada.')).toBeInTheDocument();
   });
 
-  it('so leitura: lista sem acoes de gestao', async () => {
+  it('só leitura: lista sem ações de gestao', async () => {
     renderPage(['lead_sources:read']);
     expect(await screen.findByText('Site')).toBeInTheDocument();
     expect(screen.queryByLabelText('Nova origem')).not.toBeInTheDocument();
@@ -110,7 +110,7 @@ describe('Origens de Lead (D-094)', () => {
     expect(screen.queryByRole('button', { name: /^Desativar/ })).not.toBeInTheDocument();
   });
 
-  it('sem lead_sources:read nao consulta', () => {
+  it('sem lead_sources:read não consulta', () => {
     renderPage([]);
     expect(screen.getByText(/não tem permissão para ver as origens/)).toBeInTheDocument();
     expect(leadsService.listLeadSources).not.toHaveBeenCalled();

@@ -46,7 +46,7 @@ describe('NotesSection', () => {
     vi.restoreAllMocks();
   });
 
-  it('mostra estado vazio quando nao ha notas', async () => {
+  it('mostra estado vazio quando não há notas', async () => {
     vi.mocked(followUpService.listNotes).mockResolvedValue({
       data: [],
       page: 1,
@@ -68,7 +68,7 @@ describe('NotesSection', () => {
     expect(await screen.findByText('Cliente pediu retorno')).toBeInTheDocument();
   });
 
-  it('RBAC visual: sem notes:create/update/delete, nao mostra acoes de escrita', async () => {
+  it('RBAC visual: sem notes:create/update/delete, não mostra ações de escrita', async () => {
     vi.mocked(followUpService.listNotes).mockResolvedValue({
       data: [NOTE],
       page: 1,

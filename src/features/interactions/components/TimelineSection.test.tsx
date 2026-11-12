@@ -69,7 +69,7 @@ describe('TimelineSection', () => {
     vi.resetAllMocks();
   });
 
-  it('D-095: interacao de uma Oportunidade do Cliente aparece marcada, com link para ela', async () => {
+  it('D-095: interação de uma Oportunidade do Cliente aparece marcada, com link para ela', async () => {
     vi.mocked(service.listTimeline).mockResolvedValue(
       page([
         { ...INTERACTION, id: 'i9', entity_type: 'opportunity', entity_id: 'o7' },
@@ -83,7 +83,7 @@ describe('TimelineSection', () => {
     expect(screen.getAllByRole('link', { name: '· na oportunidade' })).toHaveLength(1);
   });
 
-  it('sem interactions:read nao renderiza nada nem consulta a API', () => {
+  it('sem interactions:read não renderiza nada nem consulta a API', () => {
     const { container } = renderSection(['notes:read', 'interactions:create']);
     expect(container).toBeEmptyDOMElement();
     expect(service.listTimeline).not.toHaveBeenCalled();
@@ -92,10 +92,10 @@ describe('TimelineSection', () => {
   it('mostra estado vazio', async () => {
     vi.mocked(service.listTimeline).mockResolvedValue(page([]));
     renderSection(['interactions:read']);
-    expect(await screen.findByText(/nenhum registro no historico/i)).toBeInTheDocument();
+    expect(await screen.findByText(/nenhum registro no histórico/i)).toBeInTheDocument();
   });
 
-  it('lista interacoes e notas na ordem recebida, com canal, direcao e resultado', async () => {
+  it('lista interações e notas na ordem recebida, com canal, direção e resultado', async () => {
     vi.mocked(service.listTimeline).mockResolvedValue(page([INTERACTION, NOTE]));
     renderSection(['interactions:read']);
 
@@ -125,15 +125,15 @@ describe('TimelineSection', () => {
     expect(screen.queryByRole('button', { name: /carregar mais/i })).not.toBeInTheDocument();
   });
 
-  it('RBAC visual: sem create/delete nao mostra registrar nem excluir', async () => {
+  it('RBAC visual: sem create/delete não mostra registrar nem excluir', async () => {
     vi.mocked(service.listTimeline).mockResolvedValue(page([INTERACTION, NOTE]));
     renderSection(['interactions:read']);
     await screen.findByText('Cliente ligou pedindo proposta');
-    expect(screen.queryByRole('button', { name: /registrar interacao/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /registrar interação/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^excluir$/i })).not.toBeInTheDocument();
   });
 
-  it('exclusao so aparece para interacoes (nunca para notas) e chama a API', async () => {
+  it('exclusão só aparece para interações (nunca para notas) e chama a API', async () => {
     const user = userEvent.setup();
     vi.mocked(service.listTimeline).mockResolvedValue(page([INTERACTION, NOTE]));
     vi.mocked(service.deleteInteraction).mockResolvedValue(undefined);
@@ -145,7 +145,7 @@ describe('TimelineSection', () => {
     await waitFor(() => expect(service.deleteInteraction).toHaveBeenCalledWith('i1'));
   });
 
-  it('registra uma interacao vinculada a entidade (sem edicao)', async () => {
+  it('registra uma interação vinculada a entidade (sem edição)', async () => {
     const user = userEvent.setup();
     vi.mocked(service.listTimeline).mockResolvedValue(page([]));
     vi.mocked(service.createInteraction).mockResolvedValue({
@@ -162,9 +162,9 @@ describe('TimelineSection', () => {
     });
     renderSection(['interactions:read', 'interactions:create']);
 
-    await user.click(await screen.findByRole('button', { name: /registrar interacao/i }));
+    await user.click(await screen.findByRole('button', { name: /registrar interação/i }));
     await user.type(screen.getByLabelText(/^canal/i), 'e-mail');
-    await user.selectOptions(screen.getByLabelText(/direcao/i), 'outbound');
+    await user.selectOptions(screen.getByLabelText(/direção/i), 'outbound');
     await user.type(screen.getByLabelText(/^resumo/i), 'Enviei proposta');
     await user.click(screen.getByRole('button', { name: /^registrar$/i }));
 
@@ -182,13 +182,13 @@ describe('TimelineSection', () => {
     expect(vi.mocked(service.createInteraction).mock.calls[0][0]).not.toHaveProperty('outcome');
   });
 
-  it('sem direcao selecionada, direction nao e enviado', async () => {
+  it('sem direção selecionada, direction não e enviado', async () => {
     const user = userEvent.setup();
     vi.mocked(service.listTimeline).mockResolvedValue(page([]));
     vi.mocked(service.createInteraction).mockResolvedValue({} as never);
     renderSection(['interactions:read', 'interactions:create']);
 
-    await user.click(await screen.findByRole('button', { name: /registrar interacao/i }));
+    await user.click(await screen.findByRole('button', { name: /registrar interação/i }));
     await user.type(screen.getByLabelText(/^canal/i), 'presencial');
     await user.type(screen.getByLabelText(/^resumo/i), 'Visita');
     await user.click(screen.getByRole('button', { name: /^registrar$/i }));
@@ -197,14 +197,14 @@ describe('TimelineSection', () => {
     expect(vi.mocked(service.createInteraction).mock.calls[0][0]).not.toHaveProperty('direction');
   });
 
-  it('mostra erro de carregamento com opcao de tentar novamente', async () => {
+  it('mostra erro de carregamento com opção de tentar novamente', async () => {
     const user = userEvent.setup();
     vi.mocked(service.listTimeline)
       .mockRejectedValueOnce(new Error('falhou'))
       .mockResolvedValueOnce(page([INTERACTION]));
     renderSection(['interactions:read']);
 
-    expect(await screen.findByText(/nao foi possivel carregar o historico/i)).toBeInTheDocument();
+    expect(await screen.findByText(/não foi possível carregar o histórico/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /tentar novamente/i }));
     expect(await screen.findByText('Cliente ligou pedindo proposta')).toBeInTheDocument();
   });

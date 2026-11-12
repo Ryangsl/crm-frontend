@@ -31,7 +31,7 @@ export function LeadEditPage() {
       )}
 
       {isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar o lead">
+        <Alert tone="danger" title="Não foi possível carregar o lead">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>

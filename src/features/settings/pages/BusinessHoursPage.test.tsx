@@ -55,7 +55,7 @@ describe('BusinessHoursPage', () => {
 
   it('sem tenant_settings:read: mostra acesso restrito e nem consulta a API', () => {
     renderPage(['leads:read']);
-    expect(screen.getByText(/nao tem permissao para acessar/i)).toBeInTheDocument();
+    expect(screen.getByText(/não tem permissão para acessar/i)).toBeInTheDocument();
     expect(service.getBusinessHours).not.toHaveBeenCalled();
   });
 
@@ -63,41 +63,41 @@ describe('BusinessHoursPage', () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue(CONFIGURED);
     renderPage(ADMIN);
 
-    expect(screen.getByText(/carregando configuracao/i)).toBeInTheDocument();
-    expect(await screen.findByLabelText('Inicio (janela 1)')).toHaveValue('09:00');
+    expect(screen.getByText(/carregando configuração/i)).toBeInTheDocument();
+    expect(await screen.findByLabelText('Início (janela 1)')).toHaveValue('09:00');
     expect(screen.getByLabelText('Fim (janela 1)')).toHaveValue('17:00');
-    expect(screen.getByLabelText('Fuso horario')).toHaveValue('America/Sao_Paulo');
+    expect(screen.getByLabelText('Fuso horário')).toHaveValue('America/Sao_Paulo');
     expect(screen.getByRole('checkbox', { name: 'Seg' })).toBeChecked();
     expect(screen.getByRole('checkbox', { name: 'Sab' })).not.toBeChecked();
-    expect(screen.queryByText(/nenhum horario configurado/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/nenhum horário configurado/i)).not.toBeInTheDocument();
   });
 
   // F4.7: o horario deixou de ser so um registro, mas continua sem alterar disponibilidade e
   // distribuicao; so restringe o acesso se o Admin ligar a restricao (desligada por padrao).
-  it('explica que o horario so restringe acesso se o Admin ligar a restricao', async () => {
+  it('explica que o horário só restringe acesso se o Admin ligar a restrição', async () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue(CONFIGURED);
     renderPage(ADMIN);
-    expect(await screen.findByText(/nunca altera a distribuicao de leads/i)).toBeInTheDocument();
+    expect(await screen.findByText(/nunca altera a distribuição de leads/i)).toBeInTheDocument();
     expect(await screen.findByTestId('restriction-state')).toHaveTextContent('desligada');
   });
 
-  it('so o Admin (tenant_settings:update) liga a restricao; quem so le ve o estado sem botao', async () => {
+  it('só o Admin (tenant_settings:update) liga a restrição; quem só le ve o estado sem botao', async () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue(CONFIGURED);
     renderPage(['tenant_settings:read']);
     expect(await screen.findByTestId('restriction-state')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Ligar restricao' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Ligar restrição' })).not.toBeInTheDocument();
   });
 
-  it('tenant sem configuracao: mostra a sugestao e nada e gravado sem salvar', async () => {
+  it('tenant sem configuração: mostra a sugestão e nada e gravado sem salvar', async () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue(EMPTY);
     renderPage(ADMIN);
 
-    expect(await screen.findByText(/nenhum horario configurado/i)).toBeInTheDocument();
-    expect(screen.getByLabelText('Inicio (janela 1)')).toHaveValue('08:00');
+    expect(await screen.findByText(/nenhum horário configurado/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('Início (janela 1)')).toHaveValue('08:00');
     expect(service.saveBusinessHours).not.toHaveBeenCalled();
   });
 
-  it('salva alteracoes enviando o formato v1 e mostra confirmacao', async () => {
+  it('salva alterações enviando o formato v1 e mostra confirmação', async () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue(CONFIGURED);
     vi.mocked(service.saveBusinessHours).mockResolvedValue({
       ...CONFIGURED,
@@ -110,7 +110,7 @@ describe('BusinessHoursPage', () => {
     const user = userEvent.setup();
     renderPage(ADMIN);
 
-    fireEvent.change(await screen.findByLabelText('Inicio (janela 1)'), {
+    fireEvent.change(await screen.findByLabelText('Início (janela 1)'), {
       target: { value: '10:00' },
     });
     await user.click(screen.getByRole('checkbox', { name: 'Sab' }));
@@ -123,12 +123,12 @@ describe('BusinessHoursPage', () => {
         weekly: [{ days: [1, 2, 3, 4, 5, 6], start: '10:00', end: '17:00' }],
       }),
     );
-    expect(await screen.findByText(/horario de funcionamento salvo/i)).toBeInTheDocument();
+    expect(await screen.findByText(/horário de funcionamento salvo/i)).toBeInTheDocument();
     // Reflete o valor persistido devolvido pela API.
-    expect(screen.getByLabelText('Inicio (janela 1)')).toHaveValue('10:00');
+    expect(screen.getByLabelText('Início (janela 1)')).toHaveValue('10:00');
   });
 
-  it('validacao local: inicio >= fim nao chama a API', async () => {
+  it('validacao local: início >= fim não chama a API', async () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue(CONFIGURED);
     const user = userEvent.setup();
     renderPage(ADMIN);
@@ -138,11 +138,11 @@ describe('BusinessHoursPage', () => {
     });
     await user.click(screen.getByRole('button', { name: 'Salvar' }));
 
-    expect(await screen.findByText(/inicio deve ser anterior ao fim/i)).toBeInTheDocument();
+    expect(await screen.findByText(/início deve ser anterior ao fim/i)).toBeInTheDocument();
     expect(service.saveBusinessHours).not.toHaveBeenCalled();
   });
 
-  it('validacao local: janela sem nenhum dia nao chama a API', async () => {
+  it('validacao local: janela sem nenhum dia não chama a API', async () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue({
       ...CONFIGURED,
       business_hours: { ...HOURS, weekly: [{ days: [1], start: '09:00', end: '17:00' }] },
@@ -163,10 +163,10 @@ describe('BusinessHoursPage', () => {
     renderPage(ADMIN);
 
     await user.click(await screen.findByRole('button', { name: 'Adicionar janela' }));
-    expect(screen.getByLabelText('Inicio (janela 2)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Início (janela 2)')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Remover janela 2' }));
-    expect(screen.queryByLabelText('Inicio (janela 2)')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Início (janela 2)')).not.toBeInTheDocument();
     // Com uma unica janela nao ha como remover (o backend exige pelo menos uma).
     expect(screen.queryByRole('button', { name: /remover janela/i })).not.toBeInTheDocument();
   });
@@ -174,25 +174,25 @@ describe('BusinessHoursPage', () => {
   it('erro do servidor ao salvar (422) e exibido', async () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue(CONFIGURED);
     vi.mocked(service.saveBusinessHours).mockRejectedValue(
-      new ApiError(422, 'BUSINESS_HOURS_INVALID', 'Horario de funcionamento invalido.'),
+      new ApiError(422, 'BUSINESS_HOURS_INVALID', 'Horário de funcionamento inválido.'),
     );
     const user = userEvent.setup();
     renderPage(ADMIN);
 
     await user.click(await screen.findByRole('button', { name: 'Salvar' }));
 
-    expect(await screen.findByText('Horario de funcionamento invalido.')).toBeInTheDocument();
-    expect(screen.queryByText(/horario de funcionamento salvo/i)).not.toBeInTheDocument();
+    expect(await screen.findByText('Horário de funcionamento inválido.')).toBeInTheDocument();
+    expect(screen.queryByText(/horário de funcionamento salvo/i)).not.toBeInTheDocument();
   });
 
-  it('403 ao salvar mostra mensagem de permissao', async () => {
+  it('403 ao salvar mostra mensagem de permissão', async () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue(CONFIGURED);
     vi.mocked(service.saveBusinessHours).mockRejectedValue(new ApiError(403, 'FORBIDDEN', 'x'));
     const user = userEvent.setup();
     renderPage(ADMIN);
 
     await user.click(await screen.findByRole('button', { name: 'Salvar' }));
-    expect(await screen.findByText(/nao tem permissao para alterar/i)).toBeInTheDocument();
+    expect(await screen.findByText(/não tem permissão para alterar/i)).toBeInTheDocument();
   });
 
   it('falha ao carregar: mostra erro e permite tentar de novo', async () => {
@@ -202,20 +202,20 @@ describe('BusinessHoursPage', () => {
     const user = userEvent.setup();
     renderPage(ADMIN);
 
-    expect(await screen.findByText(/nao foi possivel carregar o horario/i)).toBeInTheDocument();
+    expect(await screen.findByText(/não foi possível carregar o horário/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Tentar novamente' }));
-    expect(await screen.findByLabelText('Inicio (janela 1)')).toHaveValue('09:00');
+    expect(await screen.findByLabelText('Início (janela 1)')).toHaveValue('09:00');
   });
 
-  it('so leitura (sem tenant_settings:update): campos desabilitados e sem acoes de escrita', async () => {
+  it('só leitura (sem tenant_settings:update): campos desabilitados e sem ações de escrita', async () => {
     vi.mocked(service.getBusinessHours).mockResolvedValue(CONFIGURED);
     renderPage(['tenant_settings:read']);
 
-    expect(await screen.findByLabelText('Inicio (janela 1)')).toBeDisabled();
-    expect(screen.getByLabelText('Fuso horario')).toBeDisabled();
+    expect(await screen.findByLabelText('Início (janela 1)')).toBeDisabled();
+    expect(screen.getByLabelText('Fuso horário')).toBeDisabled();
     expect(screen.getByRole('checkbox', { name: 'Seg' })).toBeDisabled();
     expect(screen.queryByRole('button', { name: 'Salvar' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Adicionar janela' })).not.toBeInTheDocument();
-    expect(screen.getByText(/pode consultar, mas nao alterar/i)).toBeInTheDocument();
+    expect(screen.getByText(/pode consultar, mas não alterar/i)).toBeInTheDocument();
   });
 });

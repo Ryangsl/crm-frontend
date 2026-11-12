@@ -39,7 +39,7 @@ function renderShell(permissions: string[]) {
 }
 
 describe('AppShell — item de conversas (F4.6)', () => {
-  it('sem conversations:read o item nao aparece (sidebar e bottom nav)', () => {
+  it('sem conversations:read o item não aparece (sidebar e bottom nav)', () => {
     renderShell(['leads:read']);
     expect(screen.queryByText('Conversas')).not.toBeInTheDocument();
     expect(screen.getAllByText('Leads').length).toBeGreaterThan(0);

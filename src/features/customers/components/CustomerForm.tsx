@@ -79,12 +79,12 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
         return;
       }
       if (isPermissionDenied(err)) {
-        setErrorMessage('Voce nao tem permissao para realizar esta acao.');
+        setErrorMessage('Você não tem permissão para realizar esta ação.');
         return;
       }
       setErrorMessage(
         describeCustomerValidation(err) ??
-          (err instanceof ApiError ? err.message : 'Nao foi possivel salvar o cliente.'),
+          (err instanceof ApiError ? err.message : 'Não foi possível salvar o cliente.'),
       );
     }
   }
@@ -92,17 +92,17 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
   return (
     <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-4">
       {errorMessage && (
-        <Alert tone="danger" title="Nao foi possivel salvar">
+        <Alert tone="danger" title="Não foi possível salvar">
           {errorMessage}
         </Alert>
       )}
 
       {duplicates && (
-        <Alert tone="warning" title="Ja existe cliente com esses dados">
+        <Alert tone="warning" title="Já existe cliente com esses dados">
           <p className="mb-2">
             Encontramos {duplicates.length === 1 ? 'um cliente' : `${duplicates.length} clientes`}{' '}
-            com o mesmo documento, telefone ou e-mail neste tenant. Revise antes de continuar — nada
-            foi criado.
+            com o mesmo documento, telefone ou e-mail nesta empresa. Revise antes de continuar —
+            nada foi criado.
           </p>
           <ul className="flex flex-col gap-1">
             {duplicates.map((candidate) => (
@@ -127,7 +127,7 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
       />
       <Input
         label="Documento (CPF/CNPJ)"
-        hint="Somente numeros ou com mascara — a mascara e removida automaticamente."
+        hint="Somente números ou com máscara — a máscara é removida automaticamente."
         value={form.document}
         onChange={(event) => updateField('document', event.target.value)}
       />
@@ -146,7 +146,7 @@ export function CustomerForm({ customer, onSuccess, onCancel }: CustomerFormProp
 
       <div className="flex gap-2">
         <Button writes type="submit" loading={submitting} disabled={submitting}>
-          {customer ? 'Salvar alteracoes' : 'Criar cliente'}
+          {customer ? 'Salvar alterações' : 'Criar cliente'}
         </Button>
         {onCancel && (
           <Button type="button" variant="secondary" onClick={onCancel} disabled={submitting}>

@@ -71,7 +71,7 @@ describe('LeadListPage', () => {
     expect(screen.getByText(/carregando leads/i)).toBeInTheDocument();
   });
 
-  it('mostra estado vazio quando nao ha leads', async () => {
+  it('mostra estado vazio quando não há leads', async () => {
     vi.mocked(leadsService.listLeads).mockResolvedValue(page());
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
     renderPage(['leads:read']);
@@ -82,7 +82,7 @@ describe('LeadListPage', () => {
     vi.mocked(leadsService.listLeads).mockRejectedValue(new Error('falhou'));
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
     renderPage(['leads:read']);
-    expect(await screen.findByText(/nao foi possivel carregar os leads/i)).toBeInTheDocument();
+    expect(await screen.findByText(/não foi possível carregar os leads/i)).toBeInTheDocument();
   });
 
   it('lista os leads com status e origem', async () => {
@@ -96,7 +96,7 @@ describe('LeadListPage', () => {
     expect(screen.getAllByText('Site').length).toBeGreaterThan(0);
   });
 
-  it('RBAC visual: sem leads:create, nao mostra o botao Novo lead', async () => {
+  it('RBAC visual: sem leads:create, não mostra o botao Novo lead', async () => {
     vi.mocked(leadsService.listLeads).mockResolvedValue(page());
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
     renderPage(['leads:read']);

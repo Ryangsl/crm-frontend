@@ -65,7 +65,7 @@ describe('CustomerDetailPage', () => {
     expect(screen.getByRole('heading', { name: /contatos/i })).toBeInTheDocument();
   });
 
-  it('RBAC visual: sem customers:update/delete, nao mostra Editar nem Excluir', async () => {
+  it('RBAC visual: sem customers:update/delete, não mostra Editar nem Excluir', async () => {
     vi.mocked(customersService.getCustomer).mockResolvedValue(CUSTOMER);
     vi.mocked(customersService.listContacts).mockResolvedValue([]);
     renderPage(['customers:read']);
@@ -75,7 +75,7 @@ describe('CustomerDetailPage', () => {
     expect(screen.queryByRole('button', { name: /^excluir$/i })).not.toBeInTheDocument();
   });
 
-  it('exclusao pede confirmacao antes de chamar a API', async () => {
+  it('exclusão pede confirmação antes de chamar a API', async () => {
     const user = userEvent.setup();
     vi.mocked(customersService.getCustomer).mockResolvedValue(CUSTOMER);
     vi.mocked(customersService.listContacts).mockResolvedValue([]);
@@ -85,7 +85,7 @@ describe('CustomerDetailPage', () => {
     await user.click(await screen.findByRole('button', { name: /^excluir$/i }));
     expect(customersService.deleteCustomer).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', { name: /confirmar exclusao/i }));
+    await user.click(screen.getByRole('button', { name: /confirmar exclusão/i }));
     await waitFor(() => expect(customersService.deleteCustomer).toHaveBeenCalledWith('c1'));
     expect(await screen.findByText('Lista de clientes')).toBeInTheDocument();
   });
@@ -104,7 +104,7 @@ describe('CustomerDetailPage', () => {
     renderPage(['customers:read', 'customers:delete']);
 
     await user.click(await screen.findByRole('button', { name: /^excluir$/i }));
-    await user.click(screen.getByRole('button', { name: /confirmar exclusao/i }));
+    await user.click(screen.getByRole('button', { name: /confirmar exclusão/i }));
 
     expect(await screen.findByText(/1 oportunidade em andamento/)).toBeInTheDocument();
     expect(screen.queryByText('Lista de clientes')).not.toBeInTheDocument();

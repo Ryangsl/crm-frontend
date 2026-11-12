@@ -67,15 +67,15 @@ export function AppointmentForm({
       onSuccess();
     } catch (err) {
       if (isPermissionDenied(err)) {
-        setErrorMessage('Voce nao tem permissao para realizar esta acao.');
+        setErrorMessage('Você não tem permissão para realizar esta ação.');
         return;
       }
       if (err instanceof ApiError && err.code === 'APPOINTMENT_INVALID_RANGE') {
-        setErrorMessage('O inicio deve ser anterior ao termino do compromisso.');
+        setErrorMessage('O início deve ser anterior ao término do compromisso.');
         return;
       }
       setErrorMessage(
-        err instanceof ApiError ? err.message : 'Nao foi possivel salvar o compromisso.',
+        err instanceof ApiError ? err.message : 'Não foi possível salvar o compromisso.',
       );
     }
   }
@@ -83,13 +83,13 @@ export function AppointmentForm({
   return (
     <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-3">
       {errorMessage && (
-        <Alert tone="danger" title="Nao foi possivel salvar">
+        <Alert tone="danger" title="Não foi possível salvar">
           {errorMessage}
         </Alert>
       )}
 
       <Input
-        label="Inicio"
+        label="Início"
         type="datetime-local"
         required
         value={startsAt}

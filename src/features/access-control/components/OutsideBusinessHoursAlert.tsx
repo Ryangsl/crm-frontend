@@ -5,9 +5,9 @@ import { Alert } from '@/components/ui/Alert';
 // liberacao excepcional ser concedida.
 export function OutsideBusinessHoursAlert() {
   return (
-    <Alert tone="warning" title="Fora do horario de funcionamento">
-      O acesso a Leads e Conversas esta indisponivel neste horario. Tente novamente dentro do
-      horario de funcionamento ou peca uma liberacao excepcional a um Admin ou Gerente.
+    <Alert tone="warning" title="Fora do horário de funcionamento">
+      O acesso a Leads e Conversas está indisponível neste horário. Tente novamente dentro do
+      horário de funcionamento ou peça uma liberação excepcional a um Admin ou Gerente.
     </Alert>
   );
 }

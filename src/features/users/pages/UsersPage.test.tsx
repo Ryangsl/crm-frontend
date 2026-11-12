@@ -101,8 +101,8 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe('Usuarios (gestao pelo Admin da empresa)', () => {
-  it('lista usuarios com papeis, situacao e indica a propria pessoa', async () => {
+describe('Usuários (gestao pelo Admin da empresa)', () => {
+  it('lista usuários com papeis, situação e indica a própria pessoa', async () => {
     renderPage();
 
     const row = (await screen.findByRole('button', { name: 'Bruno Vendas' })).closest('tr')!;
@@ -121,7 +121,7 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     expect(screen.getByRole('button', { name: 'Reativar Carla Antiga' })).toBeInTheDocument();
   });
 
-  it('consulta os detalhes de um usuario', async () => {
+  it('consulta os detalhes de um usuário', async () => {
     renderPage();
     fireEvent.click(await screen.findByRole('button', { name: 'Carla Antiga' }));
 
@@ -131,7 +131,7 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     expect(within(dialog).getByText(/Use Reativar para devolver o acesso/)).toBeInTheDocument();
   });
 
-  it('cria usuario com papeis', async () => {
+  it('cria usuário com papeis', async () => {
     vi.mocked(api.apiPost).mockResolvedValue({ ...BRUNO, id: 'u-novo' });
     renderPage();
     fireEvent.click(await screen.findByRole('button', { name: /Novo usuário/ }));
@@ -158,7 +158,7 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     expect(await screen.findByText('Usuário criado.')).toBeInTheDocument();
   });
 
-  it('edita nome e papeis enviando so o que mudou', async () => {
+  it('edita nome e papeis enviando só o que mudou', async () => {
     vi.mocked(api.apiPatch).mockResolvedValue(BRUNO);
     renderPage();
     fireEvent.click(await screen.findByRole('button', { name: 'Editar Bruno Vendas' }));
@@ -176,7 +176,7 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     );
   });
 
-  it('o Admin nao tem "Desativar" na propria linha: so outro Admin o desativa', async () => {
+  it('o Admin não tem "Desativar" na própria linha: só outro Admin o desativa', async () => {
     renderPage();
     expect(await screen.findByRole('button', { name: 'Editar Ana Admin' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Desativar Ana Admin' })).not.toBeInTheDocument();
@@ -201,7 +201,7 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     ).toBeInTheDocument();
   });
 
-  it('desativa outro usuario depois de confirmar', async () => {
+  it('desativa outro usuário depois de confirmar', async () => {
     vi.mocked(api.apiDelete).mockResolvedValue(undefined);
     renderPage();
     fireEvent.click(await screen.findByRole('button', { name: 'Desativar Bruno Vendas' }));
@@ -215,7 +215,7 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     expect(api.apiDelete).toHaveBeenCalledWith('/v1/users/u-bruno');
   });
 
-  it('quem nao e Admin ve o papel Admin indisponivel e a recusa do backend explicada', async () => {
+  it('quem não e Admin ve o papel Admin indisponível e a recusa do backend explicada', async () => {
     const editor = ['users:read', 'users:update', 'roles:read', 'leads:read', 'leads:update'];
     vi.mocked(api.apiPatch).mockRejectedValue(
       new ApiError(403, 'ROLE_ASSIGNMENT_FORBIDDEN', 'x', [
@@ -243,7 +243,7 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     ).toBeInTheDocument();
   });
 
-  it('Diretor (so leitura) consulta sem acoes de gestao', async () => {
+  it('Diretor (só leitura) consulta sem ações de gestao', async () => {
     renderPage(['users:read', 'roles:read', 'leads:read'], ['diretor']);
 
     expect(await screen.findByRole('button', { name: 'Bruno Vendas' })).toBeInTheDocument();
@@ -253,7 +253,7 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     expect(screen.queryByRole('columnheader', { name: 'Ações' })).not.toBeInTheDocument();
   });
 
-  it('reativa um usuario e mostra o link de senha uma vez (D-093)', async () => {
+  it('reativa um usuário e mostra o link de senha uma vez (D-093)', async () => {
     vi.mocked(api.apiPost).mockResolvedValue({
       ...CARLA,
       status: 'active',
@@ -309,7 +309,7 @@ describe('Usuarios (gestao pelo Admin da empresa)', () => {
     expect(await within(dialog).findByText(/limite de usuários ativos/)).toBeInTheDocument();
   });
 
-  it('sem users:read nao consulta', () => {
+  it('sem users:read não consulta', () => {
     renderPage([], []);
 
     expect(screen.getByText(/não tem permissão para ver os usuários/)).toBeInTheDocument();

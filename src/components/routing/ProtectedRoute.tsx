@@ -13,7 +13,7 @@ export function ProtectedRoute() {
   if (status === 'loading') {
     return (
       <div className="flex min-h-dvh items-center justify-center">
-        <Spinner label="Restaurando sessao" />
+        <Spinner label="Restaurando sessão" />
       </div>
     );
   }

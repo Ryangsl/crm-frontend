@@ -92,7 +92,7 @@ export function BrandIdentityPage() {
       )}
       {data && canManage && (
         <BrandIdentityForm
-          key={`${data.updated_at ?? 'padrao'}-${draft.version}`}
+          key={`${data.updated_at ?? 'padrão'}-${draft.version}`}
           branding={data}
           initial={draft.values}
           onSaved={() => setToast('Identidade visual salva.')}

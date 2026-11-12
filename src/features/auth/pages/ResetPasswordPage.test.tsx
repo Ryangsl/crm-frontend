@@ -32,7 +32,7 @@ afterEach(() => {
 });
 
 describe('Redefinir senha pelo link (D-064)', () => {
-  it('le o token do fragmento, apaga-o da barra de endereco e define a senha', async () => {
+  it('le o token do fragmento, apaga-o da barra de endereço e define a senha', async () => {
     vi.mocked(api.apiPost).mockImplementation(async (path: string) =>
       path.endsWith('/check') ? { expires_at: '2026-11-07T12:00:00.000Z' } : undefined,
     );
@@ -58,7 +58,7 @@ describe('Redefinir senha pelo link (D-064)', () => {
     expect(screen.getByRole('link', { name: 'Entrar no CRM' })).toHaveAttribute('href', '/login');
   });
 
-  it('link vencido ou ja usado: explica e nao mostra o formulario', async () => {
+  it('link vencido ou já usado: explica e não mostra o formulário', async () => {
     vi.mocked(api.apiPost).mockRejectedValue(
       new ApiError(400, 'INVALID_PASSWORD_RESET_TOKEN', 'x'),
     );
@@ -68,7 +68,7 @@ describe('Redefinir senha pelo link (D-064)', () => {
     expect(screen.queryByLabelText('Nova senha')).not.toBeInTheDocument();
   });
 
-  it('sem token no endereco: nao chama a API', async () => {
+  it('sem token no endereço: não chama a API', async () => {
     open('');
     expect(screen.getByText(/exatamente como recebeu/)).toBeInTheDocument();
     await waitFor(() => expect(api.apiPost).not.toHaveBeenCalled());

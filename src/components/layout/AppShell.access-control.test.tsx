@@ -38,12 +38,12 @@ function renderShell(permissions: string[]) {
   );
 }
 
-describe('AppShell — F4.7 (liberacoes e banner de horario)', () => {
+describe('AppShell — F4.7 (liberações e banner de horário)', () => {
   afterEach(() => {
     vi.resetAllMocks();
   });
 
-  it('o item "Liberações" so aparece com access_exceptions:manage e aponta para a tela', () => {
+  it('o item "Liberações" só aparece com access_exceptions:manage e aponta para a tela', () => {
     vi.mocked(accessService.getAccessStatus).mockResolvedValue({
       restriction_enabled: false,
       applies_to_me: false,
@@ -60,7 +60,7 @@ describe('AppShell — F4.7 (liberacoes e banner de horario)', () => {
     for (const link of links) expect(link).toHaveAttribute('href', '/settings/access-exceptions');
   });
 
-  it('o banner de fora do horario aparece acima do conteudo para o usuario restringido', async () => {
+  it('o banner de fora do horário aparece acima do conteúdo para o usuário restringido', async () => {
     vi.mocked(accessService.getAccessStatus).mockResolvedValue({
       restriction_enabled: true,
       applies_to_me: true,
@@ -73,7 +73,7 @@ describe('AppShell — F4.7 (liberacoes e banner de horario)', () => {
     expect(screen.getByText('Conteudo')).toBeInTheDocument();
   });
 
-  it('sem restricao em vigor nao ha banner', async () => {
+  it('sem restrição em vigor não há banner', async () => {
     vi.mocked(accessService.getAccessStatus).mockResolvedValue({
       restriction_enabled: true,
       applies_to_me: false,

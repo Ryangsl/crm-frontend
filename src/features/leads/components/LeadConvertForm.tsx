@@ -56,7 +56,7 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
       const res = await listCustomers({ q: query.trim(), limit: 5 });
       setResults(res.data);
     } catch (err) {
-      setErrorMessage(err instanceof ApiError ? err.message : 'Nao foi possivel buscar clientes.');
+      setErrorMessage(err instanceof ApiError ? err.message : 'Não foi possível buscar clientes.');
     } finally {
       setSearching(false);
     }
@@ -82,12 +82,12 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
         return;
       }
       if (isPermissionDenied(err)) {
-        setErrorMessage('Voce nao tem permissao para realizar esta acao.');
+        setErrorMessage('Você não tem permissão para realizar esta ação.');
         return;
       }
       setErrorMessage(
         describeCustomerValidation(err) ??
-          (err instanceof ApiError ? err.message : 'Nao foi possivel converter o lead.'),
+          (err instanceof ApiError ? err.message : 'Não foi possível converter o lead.'),
       );
     }
   }
@@ -106,13 +106,13 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
   return (
     <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-4">
       {errorMessage && (
-        <Alert tone="danger" title="Nao foi possivel converter">
+        <Alert tone="danger" title="Não foi possível converter">
           {errorMessage}
         </Alert>
       )}
 
       {duplicates.length > 0 && (
-        <Alert tone="warning" title="Ja existe cliente com esses dados">
+        <Alert tone="warning" title="Já existe cliente com esses dados">
           <p className="mb-2">Revise antes de continuar — nada foi criado nem vinculado.</p>
           <ul className="flex flex-col gap-1">
             {duplicates.map((candidate) => (

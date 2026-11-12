@@ -67,8 +67,13 @@ describe('OpportunityDetailPage', () => {
     renderPage(makeOpportunity({ stage_id: 'st3', value: '1500.50' }), ['opportunities:read']);
 
     expect(await screen.findByRole('heading', { name: 'Cliente Alfa' })).toBeInTheDocument();
-    expect(await screen.findByText(/Etapa: Proposta · Valor: R\$ 1\.500,50/)).toBeInTheDocument();
-    expect(screen.getByText('Responsável: Ana')).toBeInTheDocument();
+    // Resumo ao lado: cada dado no seu rotulo.
+    const summary = (label: string) =>
+      screen.getByText(label, { selector: 'dt' }).parentElement as HTMLElement;
+    await screen.findByText('Valor', { selector: 'dt' });
+    expect(summary('Valor')).toHaveTextContent('R$ 1.500,50');
+    expect(summary('Etapa')).toHaveTextContent('Proposta');
+    expect(summary('Responsável')).toHaveTextContent('Ana');
     expect(screen.getByText('Aberta')).toBeInTheDocument();
   });
 

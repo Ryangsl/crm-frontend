@@ -26,8 +26,8 @@ import { conversationErrorMessage, conversationTitle, DIRECTION_LABELS } from '.
 
 function actionError(err: unknown, fallback: string): string {
   if (err instanceof ApiError) {
-    if (isOutsideBusinessHours(err)) return 'Acesso indisponivel fora do horario de funcionamento.';
-    if (isPermissionDenied(err)) return 'Voce nao tem permissao para esta acao.';
+    if (isOutsideBusinessHours(err)) return 'Acesso indisponível fora do horário de funcionamento.';
+    if (isPermissionDenied(err)) return 'Você não tem permissão para esta ação.';
     return conversationErrorMessage(err.code, err.message);
   }
   return fallback;
@@ -56,8 +56,8 @@ export function ConversationDetailPage() {
 
   if (!canRead) {
     return (
-      <Alert tone="warning" title="Sem permissao">
-        Voce nao tem permissao para ver conversas.
+      <Alert tone="warning" title="Sem permissão">
+        Você não tem permissão para ver conversas.
       </Alert>
     );
   }
@@ -86,10 +86,10 @@ export function ConversationDetailPage() {
       conversationQuery.error instanceof ApiError && conversationQuery.error.status === 404;
     return (
       <div className="flex flex-col gap-3">
-        <Alert tone="danger" title={notFound ? 'Conversa nao encontrada' : 'Erro ao carregar'}>
+        <Alert tone="danger" title={notFound ? 'Conversa não encontrada' : 'Erro ao carregar'}>
           {notFound
-            ? 'A conversa nao existe ou voce nao tem acesso a ela.'
-            : 'Nao foi possivel carregar a conversa.'}
+            ? 'A conversa não existe ou você não tem acesso a ela.'
+            : 'Não foi possível carregar a conversa.'}
         </Alert>
         <Link to="/conversations" className="text-brand-700 text-sm underline">
           Voltar para conversas
@@ -103,9 +103,9 @@ export function ConversationDetailPage() {
   // A API devolve da mais recente para a mais antiga; a tela mostra em ordem cronologica.
   const messages = (messagesQuery.data?.pages.flatMap((page) => page.data) ?? []).slice().reverse();
   const assigneeName = (assigneeId: string | null): string => {
-    if (!assigneeId) return 'Sem responsavel';
-    if (assigneeId === user?.id) return 'Voce';
-    return assignees.data?.find((option) => option.id === assigneeId)?.name ?? 'Outro usuario';
+    if (!assigneeId) return 'Sem responsável';
+    if (assigneeId === user?.id) return 'Você';
+    return assignees.data?.find((option) => option.id === assigneeId)?.name ?? 'Outro usuário';
   };
 
   async function run(action: () => Promise<unknown>, fallback: string) {
@@ -132,7 +132,7 @@ export function ConversationDetailPage() {
       </header>
 
       {error && (
-        <Alert tone="danger" title="Nao foi possivel concluir a acao">
+        <Alert tone="danger" title="Não foi possível concluir a ação">
           {error}
         </Alert>
       )}
@@ -173,7 +173,7 @@ export function ConversationDetailPage() {
         </ul>
       </Card>
 
-      <Card title="Responsavel">
+      <Card title="Responsável">
         <p>{assigneeName(conversation.assigned_to)}</p>
         {canAssign && isOpen && (
           <div className="mt-3 flex flex-col gap-2">
@@ -200,7 +200,7 @@ export function ConversationDetailPage() {
                 onClick={() =>
                   void run(
                     () => assignMutation.mutateAsync(selectedUser),
-                    'Nao foi possivel atribuir a conversa.',
+                    'Não foi possível atribuir a conversa.',
                   )
                 }
               >
@@ -215,7 +215,7 @@ export function ConversationDetailPage() {
                   onClick={() =>
                     void run(
                       () => assignMutation.mutateAsync(user.id),
-                      'Nao foi possivel atribuir a conversa.',
+                      'Não foi possível atribuir a conversa.',
                     )
                   }
                 >
@@ -231,11 +231,11 @@ export function ConversationDetailPage() {
                   onClick={() =>
                     void run(
                       () => assignMutation.mutateAsync(null),
-                      'Nao foi possivel remover o responsavel.',
+                      'Não foi possível remover o responsável.',
                     )
                   }
                 >
-                  Remover responsavel
+                  Remover responsável
                 </Button>
               )}
             </div>
@@ -253,7 +253,7 @@ export function ConversationDetailPage() {
               loading={closeMutation.isPending}
               disabled={closeMutation.isPending}
               onClick={() =>
-                void run(() => closeMutation.mutateAsync(), 'Nao foi possivel encerrar a conversa.')
+                void run(() => closeMutation.mutateAsync(), 'Não foi possível encerrar a conversa.')
               }
             >
               Encerrar conversa
@@ -266,7 +266,7 @@ export function ConversationDetailPage() {
               loading={reopenMutation.isPending}
               disabled={reopenMutation.isPending}
               onClick={() =>
-                void run(() => reopenMutation.mutateAsync(), 'Nao foi possivel reabrir a conversa.')
+                void run(() => reopenMutation.mutateAsync(), 'Não foi possível reabrir a conversa.')
               }
             >
               Reabrir conversa
@@ -296,7 +296,7 @@ export function ConversationDetailPage() {
           )}
 
           {messagesQuery.isError && (
-            <Alert tone="danger" title="Nao foi possivel carregar as mensagens">
+            <Alert tone="danger" title="Não foi possível carregar as mensagens">
               <Button size="sm" variant="secondary" onClick={() => void messagesQuery.refetch()}>
                 Tentar novamente
               </Button>
@@ -326,7 +326,7 @@ export function ConversationDetailPage() {
                   <p className="text-xs text-neutral-500">
                     {message.direction ? DIRECTION_LABELS[message.direction] : 'Interna'}
                     {' · '}
-                    {message.sender_user_id === user?.id ? 'Voce' : 'Atendente'}
+                    {message.sender_user_id === user?.id ? 'Você' : 'Atendente'}
                     {' · '}
                     {new Date(message.created_at).toLocaleString('pt-BR')}
                   </p>

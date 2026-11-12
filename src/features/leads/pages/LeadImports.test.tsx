@@ -184,7 +184,7 @@ describe('Importação de leads (D-096)', () => {
 
   it('mostra o erro devolvido pela API no envio', async () => {
     vi.mocked(importsService.importLeads).mockRejectedValue(
-      new Error('O limite por importacao e de 5000 leads.'),
+      new Error('O limite por importação e de 5000 leads.'),
     );
     renderAt('/leads/imports');
     await screen.findByRole('option', { name: 'Planilha' });
@@ -193,7 +193,7 @@ describe('Importação de leads (D-096)', () => {
     });
     fireEvent.change(screen.getByLabelText('Origem'), { target: { value: 's1' } });
     fireEvent.click(screen.getByRole('button', { name: 'Enviar arquivo' }));
-    expect(await screen.findByText('O limite por importacao e de 5000 leads.')).toBeInTheDocument();
+    expect(await screen.findByText('O limite por importação e de 5000 leads.')).toBeInTheDocument();
   });
 
   it('sem permissão de criar e ver leads, não oferece o envio', async () => {

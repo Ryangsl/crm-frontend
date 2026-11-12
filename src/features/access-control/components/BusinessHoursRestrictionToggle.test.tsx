@@ -32,55 +32,55 @@ function renderToggle(permissions: string[], hoursConfigured = true) {
   );
 }
 
-describe('BusinessHoursRestrictionToggle (F4.7, so o Admin)', () => {
+describe('BusinessHoursRestrictionToggle (F4.7, só o Admin)', () => {
   afterEach(() => {
     vi.resetAllMocks();
   });
 
-  it('sem tenant_settings:read (ex.: Gerente) nao renderiza nada nem consulta a API', () => {
+  it('sem tenant_settings:read (ex.: Gerente) não renderiza nada nem consulta a API', () => {
     const { container } = renderToggle(['access_exceptions:manage', 'users:read']);
     expect(container).toBeEmptyDOMElement();
     expect(service.getRestrictionSetting).not.toHaveBeenCalled();
   });
 
-  it('desligada por padrao: mostra o estado e o botao Ligar para o Admin', async () => {
+  it('desligada por padrão: mostra o estado e o botao Ligar para o Admin', async () => {
     vi.mocked(service.getRestrictionSetting).mockResolvedValue({ enabled: false });
     renderToggle(ADMIN);
     expect(await screen.findByTestId('restriction-state')).toHaveTextContent('desligada');
-    expect(screen.getByRole('button', { name: 'Ligar restricao' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Ligar restrição' })).toBeEnabled();
   });
 
-  it('ligar chama o servico com enabled=true e reflete o novo estado', async () => {
+  it('ligar chama o serviço com enabled=true e reflete o novo estado', async () => {
     const user = userEvent.setup();
     vi.mocked(service.getRestrictionSetting).mockResolvedValue({ enabled: false });
     vi.mocked(service.setRestrictionSetting).mockResolvedValue({ enabled: true });
     renderToggle(ADMIN);
 
-    await user.click(await screen.findByRole('button', { name: 'Ligar restricao' }));
+    await user.click(await screen.findByRole('button', { name: 'Ligar restrição' }));
 
     await waitFor(() => expect(service.setRestrictionSetting).toHaveBeenCalledWith(true));
-    expect(await screen.findByRole('button', { name: 'Desligar restricao' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Desligar restrição' })).toBeInTheDocument();
     expect(screen.getByTestId('restriction-state')).toHaveTextContent('ligada');
   });
 
-  it('desligar chama o servico com enabled=false', async () => {
+  it('desligar chama o serviço com enabled=false', async () => {
     const user = userEvent.setup();
     vi.mocked(service.getRestrictionSetting).mockResolvedValue({ enabled: true });
     vi.mocked(service.setRestrictionSetting).mockResolvedValue({ enabled: false });
     renderToggle(ADMIN);
 
-    await user.click(await screen.findByRole('button', { name: 'Desligar restricao' }));
+    await user.click(await screen.findByRole('button', { name: 'Desligar restrição' }));
     await waitFor(() => expect(service.setRestrictionSetting).toHaveBeenCalledWith(false));
   });
 
-  it('sem horario valido: o botao Ligar fica desabilitado e orienta a salvar o horario', async () => {
+  it('sem horário válido: o botao Ligar fica desabilitado e orienta a salvar o horário', async () => {
     vi.mocked(service.getRestrictionSetting).mockResolvedValue({ enabled: false });
     renderToggle(ADMIN, false);
-    expect(await screen.findByRole('button', { name: 'Ligar restricao' })).toBeDisabled();
-    expect(screen.getByText(/salve um horario de funcionamento valido/i)).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Ligar restrição' })).toBeDisabled();
+    expect(screen.getByText(/salve um horário de funcionamento válido/i)).toBeInTheDocument();
   });
 
-  it('o backend recusa ativar sem horario valido: mostra a mensagem do codigo', async () => {
+  it('o backend recusa ativar sem horário válido: mostra a mensagem do código', async () => {
     const user = userEvent.setup();
     vi.mocked(service.getRestrictionSetting).mockResolvedValue({ enabled: false });
     vi.mocked(service.setRestrictionSetting).mockRejectedValue(
@@ -88,18 +88,18 @@ describe('BusinessHoursRestrictionToggle (F4.7, so o Admin)', () => {
     );
     renderToggle(ADMIN);
 
-    await user.click(await screen.findByRole('button', { name: 'Ligar restricao' }));
+    await user.click(await screen.findByRole('button', { name: 'Ligar restrição' }));
     expect(
-      await screen.findByText(/horario de funcionamento valido antes de ativar/i),
+      await screen.findByText(/horário de funcionamento válido antes de ativar/i),
     ).toBeInTheDocument();
     expect(screen.getByTestId('restriction-state')).toHaveTextContent('desligada');
   });
 
-  it('quem so le (tenant_settings:read) ve o estado mas nao tem botao: so o Admin altera', async () => {
+  it('quem só le (tenant_settings:read) ve o estado mas não tem botao: só o Admin altera', async () => {
     vi.mocked(service.getRestrictionSetting).mockResolvedValue({ enabled: true });
     renderToggle(['tenant_settings:read']);
     expect(await screen.findByTestId('restriction-state')).toHaveTextContent('ligada');
-    expect(screen.queryByRole('button', { name: /restricao/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /restrição/i })).not.toBeInTheDocument();
     expect(screen.getByText(/somente o admin pode ligar ou desligar/i)).toBeInTheDocument();
   });
 });

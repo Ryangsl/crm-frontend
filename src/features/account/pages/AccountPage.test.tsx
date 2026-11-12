@@ -54,8 +54,8 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe('Minha conta — troca da propria senha (D-064)', () => {
-  it('troca a senha e guarda o access token novo (as outras sessoes caem no backend)', async () => {
+describe('Minha conta — troca da própria senha (D-064)', () => {
+  it('troca a senha e guarda o access token novo (as outras sessões caem no backend)', async () => {
     vi.mocked(api.apiPost).mockResolvedValue({ access_token: 'novo', expires_in: 900 });
     renderPage();
 
@@ -71,7 +71,7 @@ describe('Minha conta — troca da propria senha (D-064)', () => {
     expect(api.setAccessToken).toHaveBeenCalledWith('novo');
   });
 
-  it('confere tamanho e confirmacao antes de enviar', () => {
+  it('confere tamanho e confirmação antes de enviar', () => {
     renderPage();
     fill('Atual123!', 'curta');
     expect(screen.getByText(/de 8 a 72 caracteres/)).toBeInTheDocument();

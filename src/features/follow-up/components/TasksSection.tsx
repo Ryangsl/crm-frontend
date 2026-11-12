@@ -17,7 +17,7 @@ interface TasksSectionProps {
 
 const STATUS_LABEL: Record<Task['status'], string> = {
   pending: 'Pendente',
-  done: 'Concluida',
+  done: 'Concluída',
   overdue: 'Atrasada',
 };
 
@@ -45,7 +45,7 @@ export function TasksSection({ entityType, entityId }: TasksSectionProps) {
       });
     } catch (err) {
       setActionError(
-        err instanceof ApiError ? err.message : 'Nao foi possivel atualizar a tarefa.',
+        err instanceof ApiError ? err.message : 'Não foi possível atualizar a tarefa.',
       );
     }
   }
@@ -55,7 +55,7 @@ export function TasksSection({ entityType, entityId }: TasksSectionProps) {
     try {
       await deleteMutation.mutateAsync(task.id);
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'Nao foi possivel excluir a tarefa.');
+      setActionError(err instanceof ApiError ? err.message : 'Não foi possível excluir a tarefa.');
     }
   }
 
@@ -80,7 +80,7 @@ export function TasksSection({ entityType, entityId }: TasksSectionProps) {
       )}
 
       {actionError && (
-        <Alert tone="danger" title="Nao foi possivel completar a acao">
+        <Alert tone="danger" title="Não foi possível completar a ação">
           {actionError}
         </Alert>
       )}
@@ -92,7 +92,7 @@ export function TasksSection({ entityType, entityId }: TasksSectionProps) {
       )}
 
       {isError && (
-        <Alert tone="danger" title="Nao foi possivel carregar as tarefas">
+        <Alert tone="danger" title="Não foi possível carregar as tarefas">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>

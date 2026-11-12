@@ -64,7 +64,7 @@ export function LoginPage() {
         setError('Muitas tentativas de entrar. Aguarde alguns minutos e tente de novo.');
       } else {
         setError(
-          err instanceof ApiError ? err.message : 'Nao foi possivel entrar. Tente novamente.',
+          err instanceof ApiError ? err.message : 'Não foi possível entrar. Tente novamente.',
         );
       }
     } finally {
@@ -105,7 +105,7 @@ export function LoginPage() {
           ) : (
             <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-4">
               {error && (
-                <Alert tone="danger" title="Nao foi possivel entrar">
+                <Alert tone="danger" title="Não foi possível entrar">
                   {error}
                 </Alert>
               )}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import { ClosingReasonFields } from '@/features/closing-reasons/components/ClosingReasonFields';
 import {
@@ -11,8 +11,27 @@ import {
 } from '@/features/closing-reasons/choice';
 import type { ChoiceDraft } from '@/features/closing-reasons/choice';
 import { useClosingReasonsQuery } from '@/features/closing-reasons/hooks';
+import {
+  Building2,
+  CalendarDays,
+  CircleSlash,
+  IdCard,
+  Mail,
+  Phone,
+  Signpost,
+  Trash2,
+  UserRound,
+} from 'lucide-react';
+import {
+  RecordHeader,
+  RecordLayout,
+  StageSteps,
+  SummaryCard,
+  SummaryItem,
+} from '@/components/record/Record';
+import type { Step } from '@/components/record/Record';
+import { useUserNames } from '@/features/users/hooks/useUsers';
 import { Alert } from '@/components/ui/Alert';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { OutsideBusinessHoursAlert } from '@/features/access-control/components/OutsideBusinessHoursAlert';
 import { isOutsideBusinessHours } from '@/features/access-control/lib/labels';
 import { Button } from '@/components/ui/Button';
@@ -43,10 +62,34 @@ const CONVERTIBLE: LeadStatus[] = ['new', 'in_progress', 'qualified'];
 
 // Acoes respeitam o status atual (secao 19): backend revalida tudo de novo (nunca confia so
 // no frontend) — aqui e so UX, escondendo acoes que o backend rejeitaria com 409.
+const FUNNEL: { status: LeadStatus; label: string }[] = [
+  { status: 'new', label: 'Novo' },
+  { status: 'in_progress', label: 'Em andamento' },
+  { status: 'qualified', label: 'Qualificado' },
+  { status: 'converted', label: 'Convertido' },
+];
+
+// Funil do lead. Desqualificado sai do funil: mostra de onde saiu so como "Novo -> Desqualificado".
+function leadSteps(status: LeadStatus): Step[] {
+  if (status === 'disqualified') {
+    return [
+      { id: 'new', label: 'Novo', state: 'done' },
+      { id: 'disqualified', label: 'Desqualificado', state: 'current' },
+    ];
+  }
+  const current = FUNNEL.findIndex((step) => step.status === status);
+  return FUNNEL.map((step, index) => ({
+    id: step.status,
+    label: step.label,
+    state: index < current ? 'done' : index === current ? 'current' : 'upcoming',
+  }));
+}
+
 export function LeadDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
+  const userNames = useUserNames();
   const { data: lead, isPending, isError, error, refetch } = useLeadQuery(id);
   const { data: sources } = useLeadSourcesQuery();
 
@@ -105,7 +148,7 @@ export function LeadDetailPage() {
       {isError && isOutsideBusinessHours(error) && <OutsideBusinessHoursAlert />}
 
       {isError && !isOutsideBusinessHours(error) && (
-        <Alert tone="danger" title="Nao foi possivel carregar o lead">
+        <Alert tone="danger" title="Não foi possível carregar o lead">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>
@@ -117,204 +160,237 @@ export function LeadDetailPage() {
 
       {lead && (
         <>
-          <Breadcrumb items={[{ label: 'Leads', to: '/leads' }, { label: lead.name || 'Lead' }]} />
-          <header className="flex flex-wrap items-start justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-                  {lead.name || 'Lead'}
-                </h1>
-                <LeadStatusBadge status={lead.status} />
-              </div>
-              <p className="text-sm text-neutral-500">Origem: {sourceName ?? '—'}</p>
-              <p className="text-sm text-neutral-500">
-                Responsável: {lead.owner_id ? 'Atribuído' : 'Sem responsável'}
-              </p>
-              {lead.status === 'disqualified' && lead.disqualify_reason && (
-                <p className="text-sm text-neutral-500">
-                  Motivo: {lead.disqualify_reason}
-                  {lead.disqualify_note ? ` — ${lead.disqualify_note}` : ''}
-                </p>
-              )}
-            </div>
-            {canUpdate && (
-              <Button
-                writes
-                variant="secondary"
-                size="sm"
-                onClick={() => navigate(`/leads/${lead.id}/edit`)}
-              >
-                Editar
-              </Button>
-            )}
-          </header>
+          <RecordHeader
+            breadcrumb={[{ label: 'Leads', to: '/leads' }, { label: lead.name || 'Lead' }]}
+            title={lead.name || 'Lead'}
+            badge={<LeadStatusBadge status={lead.status} />}
+            actions={
+              <>
+                {canUpdate && QUALIFIABLE.includes(lead.status) && (
+                  <Button
+                    writes
+                    size="sm"
+                    loading={qualifyMutation.isPending}
+                    onClick={() => void runAction(() => qualifyMutation.mutateAsync())}
+                  >
+                    Qualificar
+                  </Button>
+                )}
+                {canUpdate && CONVERTIBLE.includes(lead.status) && panel !== 'convert' && (
+                  <Button writes size="sm" variant="secondary" onClick={() => setPanel('convert')}>
+                    Converter
+                  </Button>
+                )}
+                {canUpdate && DISQUALIFIABLE.includes(lead.status) && panel !== 'disqualify' && (
+                  <Button
+                    writes
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setPanel('disqualify')}
+                  >
+                    Desqualificar
+                  </Button>
+                )}
+                {canUpdate && REOPENABLE.includes(lead.status) && (
+                  <Button
+                    writes
+                    size="sm"
+                    loading={reopenMutation.isPending}
+                    onClick={() => void runAction(() => reopenMutation.mutateAsync())}
+                  >
+                    Reabrir
+                  </Button>
+                )}
+                {hasPermission('opportunities:create') &&
+                  lead.status === 'converted' &&
+                  lead.customer_id && (
+                    <Button
+                      writes
+                      size="sm"
+                      onClick={() =>
+                        navigate(
+                          `/opportunities/new?lead_id=${lead.id}&customer_id=${lead.customer_id}`,
+                        )
+                      }
+                    >
+                      Criar oportunidade
+                    </Button>
+                  )}
+                {canUpdate && (
+                  <Button
+                    writes
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => navigate(`/leads/${lead.id}/edit`)}
+                  >
+                    Editar
+                  </Button>
+                )}
+              </>
+            }
+          />
 
-          {/* D-094: dados de contato do lead (os mesmos que viram o Cliente na conversao). */}
-          <Card title="Dados do lead">
-            <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-              {(
-                [
-                  ['Nome', lead.name],
-                  ['Telefone', lead.phone],
-                  ['E-mail', lead.email],
-                  ['CPF ou CNPJ', lead.document],
-                ] as const
-              ).map(([label, value]) => (
-                <div key={label} className="min-w-0">
-                  <dt className="text-neutral-500">{label}</dt>
-                  <dd className="break-all text-neutral-900">{value || '—'}</dd>
-                </div>
-              ))}
-            </dl>
-          </Card>
+          <StageSteps
+            label="Situação"
+            steps={leadSteps(lead.status)}
+            tone={
+              lead.status === 'disqualified'
+                ? 'danger'
+                : lead.status === 'converted'
+                  ? 'success'
+                  : 'brand'
+            }
+          />
 
           {actionError && (
-            <Alert tone="danger" title="Nao foi possivel completar a acao">
+            <Alert tone="danger" title="Não foi possível completar a ação">
               {actionError}
             </Alert>
           )}
 
-          <Card title="Ações">
-            <div className="flex flex-wrap gap-2">
-              {canUpdate && QUALIFIABLE.includes(lead.status) && (
-                <Button
-                  writes
-                  size="sm"
-                  loading={qualifyMutation.isPending}
-                  onClick={() => void runAction(() => qualifyMutation.mutateAsync())}
-                >
-                  Qualificar
-                </Button>
-              )}
-              {canUpdate && DISQUALIFIABLE.includes(lead.status) && panel !== 'disqualify' && (
-                <Button writes size="sm" variant="secondary" onClick={() => setPanel('disqualify')}>
-                  Desqualificar
-                </Button>
-              )}
-              {canUpdate && REOPENABLE.includes(lead.status) && (
-                <Button
-                  writes
-                  size="sm"
-                  loading={reopenMutation.isPending}
-                  onClick={() => void runAction(() => reopenMutation.mutateAsync())}
-                >
-                  Reabrir
-                </Button>
-              )}
-              {canUpdate && CONVERTIBLE.includes(lead.status) && panel !== 'convert' && (
-                <Button writes size="sm" variant="secondary" onClick={() => setPanel('convert')}>
-                  Converter
-                </Button>
-              )}
-              {hasPermission('opportunities:create') &&
-                lead.status === 'converted' &&
-                lead.customer_id && (
-                  <Button
-                    writes
-                    size="sm"
-                    onClick={() =>
-                      navigate(
-                        `/opportunities/new?lead_id=${lead.id}&customer_id=${lead.customer_id}`,
-                      )
-                    }
-                  >
-                    Criar oportunidade
-                  </Button>
+          <RecordLayout
+            main={
+              <>
+                {panel === 'disqualify' && (
+                  <Card title="Desqualificar lead">
+                    <form
+                      onSubmit={(event) => void handleDisqualify(event)}
+                      className="flex flex-col gap-3"
+                    >
+                      <ClosingReasonFields
+                        kind="lead_disqualified"
+                        label="Motivo da desqualificação"
+                        value={choice}
+                        onChange={setChoice}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          writes
+                          type="submit"
+                          size="sm"
+                          loading={disqualifyMutation.isPending}
+                          disabled={
+                            disqualifyMutation.isPending ||
+                            !isChoiceComplete(disqualifyReasons.data?.data, choice)
+                          }
+                        >
+                          Confirmar
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setPanel('none')}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </form>
+                  </Card>
                 )}
-              {hasPermission('leads:delete') && panel !== 'delete' && (
-                <Button writes size="sm" variant="danger" onClick={() => setPanel('delete')}>
-                  Excluir
-                </Button>
-              )}
-            </div>
 
-            {panel === 'disqualify' && (
-              <form
-                onSubmit={(event) => void handleDisqualify(event)}
-                className="mt-4 flex flex-col gap-3"
+                {panel === 'convert' && (
+                  <Card title="Converter em cliente">
+                    <LeadConvertForm
+                      leadId={lead.id}
+                      onSuccess={() => setPanel('none')}
+                      onCancel={() => setPanel('none')}
+                    />
+                  </Card>
+                )}
+
+                {panel === 'delete' && (
+                  <Alert tone="warning" title="Excluir este lead?">
+                    <p className="mb-2">
+                      O lead deixará de aparecer nas listagens. Esta ação só pode ser revertida por
+                      quem tem acesso ao banco de dados.
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        writes
+                        size="sm"
+                        variant="danger"
+                        loading={deleteMutation.isPending}
+                        onClick={() => void handleDelete()}
+                      >
+                        Confirmar exclusão
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={() => setPanel('none')}>
+                        Cancelar
+                      </Button>
+                    </div>
+                  </Alert>
+                )}
+
+                <Card>
+                  <TimelineSection entityType="lead" entityId={leadId} />
+                </Card>
+                <Card>
+                  <EntityConversationsSection entityType="lead" entityId={leadId} />
+                </Card>
+                <Card>
+                  <TasksSection entityType="lead" entityId={leadId} />
+                </Card>
+                <Card>
+                  <AppointmentsSection entityType="lead" entityId={leadId} />
+                </Card>
+                <Card>
+                  <NotesSection entityType="lead" entityId={leadId} />
+                </Card>
+              </>
+            }
+            aside={
+              // D-094: dados de contato do lead (os mesmos que viram o Cliente na conversão).
+              <SummaryCard
+                title="Dados do lead"
+                footer={
+                  hasPermission('leads:delete') && panel !== 'delete' ? (
+                    <Button writes size="sm" variant="ghost" onClick={() => setPanel('delete')}>
+                      <Trash2 aria-hidden="true" className="size-4" />
+                      Excluir
+                    </Button>
+                  ) : undefined
+                }
               >
-                <ClosingReasonFields
-                  kind="lead_disqualified"
-                  label="Motivo da desqualificação"
-                  value={choice}
-                  onChange={setChoice}
-                />
-                <div className="flex gap-2">
-                  <Button
-                    writes
-                    type="submit"
-                    size="sm"
-                    loading={disqualifyMutation.isPending}
-                    disabled={
-                      disqualifyMutation.isPending ||
-                      !isChoiceComplete(disqualifyReasons.data?.data, choice)
-                    }
-                  >
-                    Confirmar
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => setPanel('none')}
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </form>
-            )}
-
-            {panel === 'convert' && (
-              <div className="mt-4">
-                <LeadConvertForm
-                  leadId={lead.id}
-                  onSuccess={() => setPanel('none')}
-                  onCancel={() => setPanel('none')}
-                />
-              </div>
-            )}
-
-            {panel === 'delete' && (
-              <Alert tone="warning" title="Excluir este lead?">
-                <p className="mb-2">
-                  O lead deixará de aparecer nas listagens. Esta ação só pode ser revertida por quem
-                  tem acesso ao banco de dados.
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    writes
-                    size="sm"
-                    variant="danger"
-                    loading={deleteMutation.isPending}
-                    onClick={() => void handleDelete()}
-                  >
-                    Confirmar exclusão
-                  </Button>
-                  <Button size="sm" variant="secondary" onClick={() => setPanel('none')}>
-                    Cancelar
-                  </Button>
-                </div>
-              </Alert>
-            )}
-          </Card>
-
-          <Card>
-            <TimelineSection entityType="lead" entityId={leadId} />
-          </Card>
-
-          <Card>
-            <EntityConversationsSection entityType="lead" entityId={leadId} />
-          </Card>
-
-          <Card>
-            <NotesSection entityType="lead" entityId={leadId} />
-          </Card>
-          <Card>
-            <TasksSection entityType="lead" entityId={leadId} />
-          </Card>
-          <Card>
-            <AppointmentsSection entityType="lead" entityId={leadId} />
-          </Card>
+                <SummaryItem icon={Phone} label="Telefone">
+                  {lead.phone || '—'}
+                </SummaryItem>
+                <SummaryItem icon={Mail} label="E-mail">
+                  {lead.email || '—'}
+                </SummaryItem>
+                <SummaryItem icon={IdCard} label="CPF ou CNPJ">
+                  {lead.document || '—'}
+                </SummaryItem>
+                <SummaryItem icon={Signpost} label="Origem">
+                  {sourceName ?? '—'}
+                </SummaryItem>
+                <SummaryItem icon={UserRound} label="Responsável">
+                  {lead.owner_id
+                    ? (userNames.get(lead.owner_id) ?? 'Atribuído')
+                    : 'Sem responsável'}
+                </SummaryItem>
+                <SummaryItem icon={CalendarDays} label="Criado em">
+                  {new Date(lead.created_at).toLocaleDateString('pt-BR')}
+                </SummaryItem>
+                {lead.status === 'disqualified' && lead.disqualify_reason && (
+                  <SummaryItem icon={CircleSlash} label="Motivo da desqualificação">
+                    {lead.disqualify_reason}
+                    {lead.disqualify_note ? ` — ${lead.disqualify_note}` : ''}
+                  </SummaryItem>
+                )}
+                {lead.customer_id && (
+                  <SummaryItem icon={Building2} label="Cliente">
+                    <Link
+                      to={`/customers/${lead.customer_id}`}
+                      className="text-brand-700 hover:underline"
+                    >
+                      Ver cliente
+                    </Link>
+                  </SummaryItem>
+                )}
+              </SummaryCard>
+            }
+          />
         </>
       )}
     </div>

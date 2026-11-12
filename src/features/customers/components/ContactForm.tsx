@@ -68,17 +68,17 @@ export function ContactForm({ customerId, contact, onSuccess, onCancel }: Contac
       onSuccess();
     } catch (err) {
       if (isPermissionDenied(err)) {
-        setErrorMessage('Voce nao tem permissao para realizar esta acao.');
+        setErrorMessage('Você não tem permissão para realizar esta ação.');
         return;
       }
-      setErrorMessage(err instanceof ApiError ? err.message : 'Nao foi possivel salvar o contato.');
+      setErrorMessage(err instanceof ApiError ? err.message : 'Não foi possível salvar o contato.');
     }
   }
 
   return (
     <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-3">
       {errorMessage && (
-        <Alert tone="danger" title="Nao foi possivel salvar">
+        <Alert tone="danger" title="Não foi possível salvar">
           {errorMessage}
         </Alert>
       )}
@@ -101,7 +101,7 @@ export function ContactForm({ customerId, contact, onSuccess, onCancel }: Contac
         onChange={(event) => updateField('email', event.target.value)}
       />
       <Input
-        label="Cargo/relacao"
+        label="Cargo/relação"
         value={form.role}
         onChange={(event) => updateField('role', event.target.value)}
       />

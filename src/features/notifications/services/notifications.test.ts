@@ -25,7 +25,7 @@ describe('notifications service', () => {
     expect(api.apiGet).toHaveBeenLastCalledWith('/v1/notifications?limit=20&cursor=a%2Bb%2Fc%3D');
   });
 
-  it('conta nao lidas, marca uma como lida e marca todas', async () => {
+  it('conta não lidas, marca uma como lida e marca todas', async () => {
     vi.mocked(api.apiGet).mockResolvedValue({ count: 1 });
     vi.mocked(api.apiPost).mockResolvedValue({});
 

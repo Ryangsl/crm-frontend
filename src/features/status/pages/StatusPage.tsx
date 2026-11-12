@@ -17,7 +17,7 @@ export function StatusPage() {
     <div className="flex flex-col gap-4">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-          Status da fundacao
+          Status da fundação
         </h1>
         <p className="text-sm text-neutral-500">API monitorada: {apiBaseUrl}</p>
       </header>

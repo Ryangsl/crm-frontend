@@ -45,14 +45,14 @@ describe('AppShell — disponibilidade', () => {
     vi.restoreAllMocks();
   });
 
-  it('sem permissoes de disponibilidade: sem seletor, sem item de menu e sem chamada a API', () => {
+  it('sem permissões de disponibilidade: sem seletor, sem item de menu e sem chamada a API', () => {
     renderShell(['leads:read'], true);
     expect(screen.queryByLabelText('Disponibilidade')).not.toBeInTheDocument();
     expect(screen.queryByText('Equipe')).not.toBeInTheDocument();
     expect(service.getMyAvailability).not.toHaveBeenCalled();
   });
 
-  it('vendedor (availability:update) com a flag ligada: ve o seletor, mas nao o painel da equipe', async () => {
+  it('vendedor (availability:update) com a flag ligada: ve o seletor, mas não o painel da equipe', async () => {
     renderShell(['availability:update'], true);
     expect((await screen.findAllByLabelText('Disponibilidade')).length).toBeGreaterThan(0);
     expect(screen.queryByText('Equipe')).not.toBeInTheDocument();
@@ -65,13 +65,13 @@ describe('AppShell — disponibilidade', () => {
     for (const link of links) expect(link).toHaveAttribute('href', '/team/availability');
   });
 
-  it('supervisor (so read): ve o item "Equipe" mas nao o seletor', async () => {
+  it('supervisor (só read): ve o item "Equipe" mas não o seletor', async () => {
     renderShell(['availability:read'], true);
     expect((await screen.findAllByRole('link', { name: /equipe/i })).length).toBeGreaterThan(0);
     expect(screen.queryByLabelText('Disponibilidade')).not.toBeInTheDocument();
   });
 
-  it('flag desabilitada: nem seletor nem item "Equipe", mesmo com todas as permissoes', async () => {
+  it('flag desabilitada: nem seletor nem item "Equipe", mesmo com todas as permissões', async () => {
     renderShell(['availability:read', 'availability:update', 'availability:manage'], false);
     await waitFor(() => expect(service.getMyAvailability).toHaveBeenCalled());
     expect(screen.queryByLabelText('Disponibilidade')).not.toBeInTheDocument();

@@ -7,20 +7,20 @@ export const STATUS_LABELS: Record<ConversationStatus, string> = {
 
 export const DIRECTION_LABELS: Record<MessageDirection, string> = {
   inbound: 'Entrada',
-  outbound: 'Saida',
+  outbound: 'Saída',
 };
 
 // Erros de dominio do core de conversas -> texto para o usuario.
 export function conversationErrorMessage(code: string | undefined, fallback: string): string {
   switch (code) {
     case 'CONVERSATION_CLOSED':
-      return 'A conversa esta encerrada. Reabra-a para continuar.';
+      return 'A conversa está encerrada. Reabra-a para continuar.';
     case 'CONVERSATION_NOT_CLOSED':
-      return 'A conversa nao esta encerrada.';
+      return 'A conversa não está encerrada.';
     case 'CONVERSATION_ASSIGNEE_INELIGIBLE':
-      return 'Esse usuario nao pode receber conversas (inativo ou sem permissao de atendimento).';
+      return 'Esse usuário não pode receber conversas (inativo ou sem permissão de atendimento).';
     case 'CONVERSATION_REFERENCE_MISMATCH':
-      return 'Os vinculos informados nao sao coerentes entre si.';
+      return 'Os vínculos informados não são coerentes entre si.';
     default:
       return fallback;
   }

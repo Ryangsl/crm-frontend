@@ -19,7 +19,11 @@ describe('Button', () => {
 
   it('bloqueia clique enquanto carrega', async () => {
     const onClick = vi.fn();
-    render(<Button loading onClick={onClick}>Enviar</Button>);
+    render(
+      <Button loading onClick={onClick}>
+        Enviar
+      </Button>,
+    );
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-busy', 'true');

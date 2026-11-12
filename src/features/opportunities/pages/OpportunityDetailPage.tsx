@@ -1,8 +1,24 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 
+import {
+  Building2,
+  CalendarDays,
+  CircleSlash,
+  Columns3,
+  Trash2,
+  UserRound,
+  Wallet,
+} from 'lucide-react';
+import {
+  RecordHeader,
+  RecordLayout,
+  StageSteps,
+  SummaryCard,
+  SummaryItem,
+} from '@/components/record/Record';
+import type { Step } from '@/components/record/Record';
 import { Alert } from '@/components/ui/Alert';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
@@ -20,6 +36,28 @@ import { StageHistorySection } from '../components/StageHistorySection';
 import { useDeleteOpportunity } from '../hooks/useOpportunityMutations';
 import { useOpportunityQuery, usePipelineQuery } from '../hooks/useOpportunities';
 import { formatMoney } from '../lib/money';
+import type { OpportunityStatus, Stage } from '../types/opportunity';
+
+const MODE_TITLE: Record<ActionMode, string> = {
+  move: 'Mover de etapa',
+  win: 'Marcar como ganha',
+  lose: 'Marcar como perdida',
+};
+
+// Etapas de trabalho do pipeline e a etapa final que vale para esta oportunidade: a de ganho
+// enquanto aberta ou ganha, a de perda quando perdida.
+function stageSteps(stages: Stage[], currentId: string, status: OpportunityStatus): Step[] {
+  const ordered = [...stages].sort((x, y) => x.order - y.order);
+  const visible = ordered.filter((stage) => (status === 'lost' ? !stage.is_won : !stage.is_lost));
+  const current = visible.findIndex((stage) => stage.id === currentId);
+  return visible.map((stage, index) => ({
+    id: stage.id,
+    label: stage.name,
+    // Perdida: nao se sabe por quais etapas passou so pela etapa atual; nada fica "feito".
+    state:
+      index === current ? 'current' : index < current && status !== 'lost' ? 'done' : 'upcoming',
+  }));
+}
 
 // Acoes seguem status E permissao — o backend revalida tudo (409 se a oportunidade ja foi
 // encerrada). Ganha/perdida e terminal (BR-11): nenhuma acao de pipeline aparece.
@@ -80,48 +118,56 @@ export function OpportunityDetailPage() {
 
       {opportunity && (
         <>
-          <Breadcrumb
-            items={[
+          <RecordHeader
+            breadcrumb={[
               { label: 'Oportunidades', to: '/opportunities' },
               { label: opportunity.customer.name },
             ]}
+            title={opportunity.customer.name}
+            badge={<OpportunityStatusBadge status={opportunity.status} />}
+            subtitle={isOpen ? undefined : 'Oportunidade encerrada — não pode voltar ao pipeline.'}
+            actions={
+              <>
+                {canUpdate && isOpen && mode === null && (
+                  <>
+                    <Button writes size="sm" onClick={() => setMode('win')}>
+                      Ganhar
+                    </Button>
+                    <Button writes size="sm" variant="secondary" onClick={() => setMode('move')}>
+                      Mover
+                    </Button>
+                    <Button writes size="sm" variant="secondary" onClick={() => setMode('lose')}>
+                      Perder
+                    </Button>
+                  </>
+                )}
+                {canUpdate && (
+                  <Button
+                    writes
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => navigate(`/opportunities/${opportunity.id}/edit`)}
+                  >
+                    Editar
+                  </Button>
+                )}
+              </>
+            }
           />
-          <header className="flex flex-wrap items-start justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-                  {opportunity.customer.name}
-                </h1>
-                <OpportunityStatusBadge status={opportunity.status} />
-              </div>
-              <p className="text-sm text-neutral-500">
-                Etapa: {stage?.name ?? '—'} · Valor: {formatMoney(opportunity.value)}
-              </p>
-              <p className="text-sm text-neutral-500">Responsável: {opportunity.owner.name}</p>
-              {opportunity.status === 'lost' && opportunity.lost_reason && (
-                <p className="text-sm text-neutral-500">
-                  Motivo da perda: {opportunity.lost_reason}
-                  {opportunity.lost_note ? ` — ${opportunity.lost_note}` : ''}
-                </p>
-              )}
-              <Link
-                to={`/customers/${opportunity.customer_id}`}
-                className="text-sm text-brand-700 hover:underline"
-              >
-                Ver cliente
-              </Link>
-            </div>
-            {canUpdate && (
-              <Button
-                writes
-                variant="secondary"
-                size="sm"
-                onClick={() => navigate(`/opportunities/${opportunity.id}/edit`)}
-              >
-                Editar
-              </Button>
-            )}
-          </header>
+
+          {pipeline && (
+            <StageSteps
+              label="Etapa"
+              steps={stageSteps(pipeline.stages, opportunity.stage_id, opportunity.status)}
+              tone={
+                opportunity.status === 'won'
+                  ? 'success'
+                  : opportunity.status === 'lost'
+                    ? 'danger'
+                    : 'brand'
+              }
+            />
+          )}
 
           {deleteError && (
             <Alert tone="danger" title="Não foi possível excluir">
@@ -129,97 +175,117 @@ export function OpportunityDetailPage() {
             </Alert>
           )}
 
-          <Card title="Ações">
-            {!isOpen && (
-              <p className="text-sm text-neutral-500">
-                Oportunidade encerrada — não pode voltar ao pipeline.
-              </p>
-            )}
+          <RecordLayout
+            main={
+              <>
+                {mode !== null && pipeline && (
+                  <Card title={MODE_TITLE[mode]}>
+                    <OpportunityActionPanel
+                      opportunity={opportunity}
+                      stages={pipeline.stages}
+                      mode={mode}
+                      onDone={() => setMode(null)}
+                      onCancel={() => setMode(null)}
+                    />
+                  </Card>
+                )}
 
-            <div className="flex flex-wrap gap-2">
-              {canUpdate && isOpen && mode === null && (
-                <>
-                  <Button writes size="sm" variant="secondary" onClick={() => setMode('move')}>
-                    Mover
-                  </Button>
-                  <Button writes size="sm" onClick={() => setMode('win')}>
-                    Ganhar
-                  </Button>
-                  <Button writes size="sm" variant="secondary" onClick={() => setMode('lose')}>
-                    Perder
-                  </Button>
-                </>
-              )}
-              {hasPermission('opportunities:delete') && !confirmingDelete && (
-                <Button writes size="sm" variant="danger" onClick={() => setConfirmingDelete(true)}>
-                  Excluir
-                </Button>
-              )}
-            </div>
+                {confirmingDelete && (
+                  <Alert tone="warning" title="Excluir esta oportunidade?">
+                    <p className="mb-2">
+                      A oportunidade deixará de aparecer nas listagens e no pipeline. O histórico de
+                      etapas é preservado.
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        writes
+                        size="sm"
+                        variant="danger"
+                        loading={deleteMutation.isPending}
+                        onClick={() => void handleDelete()}
+                      >
+                        Confirmar exclusão
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => setConfirmingDelete(false)}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </Alert>
+                )}
 
-            {mode !== null && pipeline && (
-              <div className="mt-4">
-                <OpportunityActionPanel
-                  opportunity={opportunity}
-                  stages={pipeline.stages}
-                  mode={mode}
-                  onDone={() => setMode(null)}
-                  onCancel={() => setMode(null)}
-                />
-              </div>
-            )}
-
-            {confirmingDelete && (
-              <div className="mt-4">
-                <Alert tone="warning" title="Excluir esta oportunidade?">
-                  <p className="mb-2">
-                    A oportunidade deixará de aparecer nas listagens e no pipeline. O histórico de
-                    etapas é preservado.
-                  </p>
-                  <div className="flex gap-2">
-                    <Button
-                      writes
-                      size="sm"
-                      variant="danger"
-                      loading={deleteMutation.isPending}
-                      onClick={() => void handleDelete()}
+                <Card>
+                  <TimelineSection entityType="opportunity" entityId={opportunityId} />
+                </Card>
+                <Card>
+                  <EntityConversationsSection entityType="opportunity" entityId={opportunityId} />
+                </Card>
+                <Card>
+                  <TasksSection entityType="opportunity" entityId={opportunityId} />
+                </Card>
+                <Card>
+                  <AppointmentsSection entityType="opportunity" entityId={opportunityId} />
+                </Card>
+                <Card>
+                  <NotesSection entityType="opportunity" entityId={opportunityId} />
+                </Card>
+              </>
+            }
+            aside={
+              <>
+                <SummaryCard
+                  title="Dados da oportunidade"
+                  footer={
+                    hasPermission('opportunities:delete') && !confirmingDelete ? (
+                      <Button
+                        writes
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setConfirmingDelete(true)}
+                      >
+                        <Trash2 aria-hidden="true" className="size-4" />
+                        Excluir
+                      </Button>
+                    ) : undefined
+                  }
+                >
+                  <SummaryItem icon={Wallet} label="Valor">
+                    {formatMoney(opportunity.value)}
+                  </SummaryItem>
+                  <SummaryItem icon={Columns3} label="Etapa">
+                    {stage?.name ?? '—'}
+                    {pipeline ? ` · ${pipeline.name}` : ''}
+                  </SummaryItem>
+                  <SummaryItem icon={Building2} label="Cliente">
+                    <Link
+                      to={`/customers/${opportunity.customer_id}`}
+                      className="text-brand-700 hover:underline"
                     >
-                      Confirmar exclusão
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => setConfirmingDelete(false)}
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-                </Alert>
-              </div>
-            )}
-          </Card>
-
-          <Card>
-            <StageHistorySection opportunityId={opportunityId} />
-          </Card>
-
-          <Card>
-            <TimelineSection entityType="opportunity" entityId={opportunityId} />
-          </Card>
-
-          <Card>
-            <EntityConversationsSection entityType="opportunity" entityId={opportunityId} />
-          </Card>
-
-          <Card>
-            <NotesSection entityType="opportunity" entityId={opportunityId} />
-          </Card>
-          <Card>
-            <TasksSection entityType="opportunity" entityId={opportunityId} />
-          </Card>
-          <Card>
-            <AppointmentsSection entityType="opportunity" entityId={opportunityId} />
-          </Card>
+                      Ver cliente
+                    </Link>
+                  </SummaryItem>
+                  <SummaryItem icon={UserRound} label="Responsável">
+                    {opportunity.owner.name}
+                  </SummaryItem>
+                  <SummaryItem icon={CalendarDays} label="Criada em">
+                    {new Date(opportunity.created_at).toLocaleDateString('pt-BR')}
+                  </SummaryItem>
+                  {opportunity.status === 'lost' && opportunity.lost_reason && (
+                    <SummaryItem icon={CircleSlash} label="Motivo da perda">
+                      {opportunity.lost_reason}
+                      {opportunity.lost_note ? ` — ${opportunity.lost_note}` : ''}
+                    </SummaryItem>
+                  )}
+                </SummaryCard>
+                <Card>
+                  <StageHistorySection opportunityId={opportunityId} />
+                </Card>
+              </>
+            }
+          />
         </>
       )}
     </div>

@@ -162,7 +162,7 @@ describe('OpportunityForm', () => {
         new ApiError(
           409,
           'LEAD_ALREADY_HAS_OPPORTUNITY',
-          'Ja existe uma oportunidade vinculada a este lead.',
+          'Já existe uma oportunidade vinculada a este lead.',
         ),
       )
       .mockRejectedValueOnce(new ApiError(403, 'FORBIDDEN', 'x'));
@@ -178,7 +178,7 @@ describe('OpportunityForm', () => {
     await user.click(screen.getByRole('button', { name: 'Criar oportunidade' }));
     expect(
       await screen.findByText(
-        /já existe uma oportunidade vinculada|ja existe uma oportunidade vinculada/i,
+        /já existe uma oportunidade vinculada|já existe uma oportunidade vinculada/i,
       ),
     ).toBeInTheDocument();
 

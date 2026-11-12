@@ -2,10 +2,10 @@ import type { AvailabilityStatus } from '../types/availability';
 
 // Rotulos em portugues (identificadores seguem em ingles, como no backend).
 export const STATUS_LABELS: Record<AvailabilityStatus, string> = {
-  available: 'Disponivel',
-  unavailable: 'Indisponivel',
+  available: 'Disponível',
+  unavailable: 'Indisponível',
   break: 'Pausa',
-  lunch: 'Almoco',
+  lunch: 'Almoço',
   training: 'Treinamento',
 };
 

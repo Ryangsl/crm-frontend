@@ -36,7 +36,7 @@ const EXPIRADA: AccessException = {
   ...VIGENTE,
   id: 'e-expirada',
   scope: 'all',
-  reason: 'Ja venceu',
+  reason: 'Já venceu',
   expires_at: '2020-02-01T00:00:00.000Z',
 };
 
@@ -83,12 +83,12 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
 
   it('sem access_exceptions:manage: acesso restrito e nenhuma chamada a API', () => {
     renderPage(['leads:read']);
-    expect(screen.getByText(/nao tem permissao para gerenciar liberacoes/i)).toBeInTheDocument();
+    expect(screen.getByText(/não tem permissão para gerenciar liberações/i)).toBeInTheDocument();
     expect(service.listAccessExceptions).not.toHaveBeenCalled();
     expect(service.listExceptionUsers).not.toHaveBeenCalled();
   });
 
-  it('lista com usuario, escopo, motivo e estado; so a vigente tem o botao Revogar', async () => {
+  it('lista com usuário, escopo, motivo e estado; só a vigente tem o botao Revogar', async () => {
     mockLists();
     renderPage(MANAGER);
 
@@ -105,7 +105,7 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
     });
   });
 
-  it('motivo longo sem espacos (1.000 caracteres) pode quebrar em qualquer ponto e nao estoura a largura (D1)', async () => {
+  it('motivo longo sem espacos (1.000 caracteres) pode quebrar em qualquer ponto e não estoura a largura (D1)', async () => {
     const longo = 'a'.repeat(1000);
     vi.mocked(service.listAccessExceptions).mockResolvedValue(
       page([{ ...VIGENTE, reason: longo }]),
@@ -120,7 +120,7 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
     expect(motivo.parentElement).toHaveClass('min-w-0');
   });
 
-  it('o filtro pede so vigentes (active=true) ou so revogadas/expiradas (active=false)', async () => {
+  it('o filtro pede só vigentes (active=true) ou só revogadas/expiradas (active=false)', async () => {
     const user = userEvent.setup();
     mockLists();
     renderPage(MANAGER);
@@ -144,7 +144,7 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
     );
   });
 
-  it('concede: envia usuario, escopo, motivo sem espacos e expiracao em ISO; nao envia inicio', async () => {
+  it('concede: envia usuário, escopo, motivo sem espacos e expiração em ISO; não envia início', async () => {
     const user = userEvent.setup();
     mockLists();
     vi.mocked(service.createAccessException).mockResolvedValue(VIGENTE);
@@ -152,13 +152,13 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
     await screen.findByText('Plantao de sabado');
 
     // so usuarios ativos entram na lista
-    const userSelect = screen.getByLabelText('Usuario');
+    const userSelect = screen.getByLabelText('Usuário');
     expect(within(userSelect).queryByText('Inativo')).not.toBeInTheDocument();
     await user.selectOptions(userSelect, 'u-vendedor');
     await user.selectOptions(screen.getByLabelText('Acesso liberado'), 'all');
     await user.type(screen.getByLabelText('Motivo'), '  Atendimento especial  ');
-    fireEvent.change(screen.getByLabelText('Vale ate'), { target: { value: FUTURE_LOCAL } });
-    await user.click(screen.getByRole('button', { name: 'Conceder liberacao' }));
+    fireEvent.change(screen.getByLabelText('Vale até'), { target: { value: FUTURE_LOCAL } });
+    await user.click(screen.getByRole('button', { name: 'Conceder liberação' }));
 
     await waitFor(() =>
       expect(service.createAccessException).toHaveBeenCalledWith({
@@ -168,36 +168,36 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
         expires_at: new Date(FUTURE_LOCAL).toISOString(),
       }),
     );
-    expect(await screen.findByText(/liberacao concedida/i)).toBeInTheDocument();
+    expect(await screen.findByText(/liberação concedida/i)).toBeInTheDocument();
     // a lista e consultada de novo e o formulario limpa motivo e data
     await waitFor(() => expect(service.listAccessExceptions).toHaveBeenCalledTimes(2));
     expect(screen.getByLabelText('Motivo')).toHaveValue('');
   });
 
-  it('validacao local: motivo, data e data futura sao obrigatorios (nada e enviado)', async () => {
+  it('validacao local: motivo, data e data futura são obrigatórios (nada e enviado)', async () => {
     const user = userEvent.setup();
     mockLists();
     renderPage(MANAGER);
     await screen.findByText('Plantao de sabado');
-    const submit = () => user.click(screen.getByRole('button', { name: 'Conceder liberacao' }));
+    const submit = () => user.click(screen.getByRole('button', { name: 'Conceder liberação' }));
 
     // formulario nativo: required impede o envio sem usuario; escolhe o usuario para chegar na regra
-    await user.selectOptions(screen.getByLabelText('Usuario'), 'u-vendedor');
+    await user.selectOptions(screen.getByLabelText('Usuário'), 'u-vendedor');
     await user.type(screen.getByLabelText('Motivo'), '   ');
-    fireEvent.change(screen.getByLabelText('Vale ate'), { target: { value: FUTURE_LOCAL } });
-    fireEvent.submit(screen.getByRole('button', { name: 'Conceder liberacao' }).closest('form')!);
+    fireEvent.change(screen.getByLabelText('Vale até'), { target: { value: FUTURE_LOCAL } });
+    fireEvent.submit(screen.getByRole('button', { name: 'Conceder liberação' }).closest('form')!);
     expect(await screen.findByText(/informe o motivo/i)).toBeInTheDocument();
 
     await user.clear(screen.getByLabelText('Motivo'));
     await user.type(screen.getByLabelText('Motivo'), 'Motivo');
-    fireEvent.change(screen.getByLabelText('Vale ate'), { target: { value: '2001-01-01T10:00' } });
+    fireEvent.change(screen.getByLabelText('Vale até'), { target: { value: '2001-01-01T10:00' } });
     await submit();
-    expect(await screen.findByText(/expiracao deve estar no futuro/i)).toBeInTheDocument();
+    expect(await screen.findByText(/expiração deve estar no futuro/i)).toBeInTheDocument();
 
     expect(service.createAccessException).not.toHaveBeenCalled();
   });
 
-  it('o backend rejeita conceder a quem nao esta sujeito a restricao: mostra a mensagem', async () => {
+  it('o backend rejeita conceder a quem não está sujeito a restrição: mostra a mensagem', async () => {
     const user = userEvent.setup();
     mockLists();
     vi.mocked(service.createAccessException).mockRejectedValue(
@@ -206,17 +206,17 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
     renderPage(MANAGER);
     await screen.findByText('Plantao de sabado');
 
-    await user.selectOptions(screen.getByLabelText('Usuario'), 'u-vendedor');
+    await user.selectOptions(screen.getByLabelText('Usuário'), 'u-vendedor');
     await user.type(screen.getByLabelText('Motivo'), 'Motivo');
-    fireEvent.change(screen.getByLabelText('Vale ate'), { target: { value: FUTURE_LOCAL } });
-    await user.click(screen.getByRole('button', { name: 'Conceder liberacao' }));
+    fireEvent.change(screen.getByLabelText('Vale até'), { target: { value: FUTURE_LOCAL } });
+    await user.click(screen.getByRole('button', { name: 'Conceder liberação' }));
 
     expect(
-      await screen.findByText(/nao esta sujeito a restricao por horario/i),
+      await screen.findByText(/não está sujeito a restrição por horário/i),
     ).toBeInTheDocument();
   });
 
-  it('revoga a vigente: chama o servico, avisa que as demais continuam e recarrega', async () => {
+  it('revoga a vigente: chama o serviço, avisa que as demais continuam e recarrega', async () => {
     const user = userEvent.setup();
     mockLists();
     vi.mocked(service.revokeAccessException).mockResolvedValue({
@@ -230,7 +230,7 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
 
     await waitFor(() => expect(service.revokeAccessException).toHaveBeenCalledWith('e-vigente'));
     expect(
-      await screen.findByText(/demais liberacoes do usuario continuam valendo/i),
+      await screen.findByText(/demais liberações do usuário continuam valendo/i),
     ).toBeInTheDocument();
     await waitFor(() => expect(service.listAccessExceptions).toHaveBeenCalledTimes(2));
   });
@@ -243,23 +243,23 @@ describe('AccessExceptionsPage (F4.7, Admin e Gerente)', () => {
     await screen.findByText('Plantao de sabado');
 
     await user.click(screen.getByRole('button', { name: 'Revogar' }));
-    expect(await screen.findByText(/registro nao encontrado/i)).toBeInTheDocument();
+    expect(await screen.findByText(/registro não encontrado/i)).toBeInTheDocument();
   });
 
   it('estado vazio e erro de carregamento com nova tentativa', async () => {
     vi.mocked(service.listExceptionUsers).mockResolvedValue({ data: [] });
     vi.mocked(service.listAccessExceptions).mockResolvedValueOnce(page([]));
     renderPage(MANAGER);
-    expect(await screen.findByText('Nenhuma liberacao encontrada')).toBeInTheDocument();
+    expect(await screen.findByText('Nenhuma liberação encontrada')).toBeInTheDocument();
   });
 
-  it('D-089: sem users:read (ex.: Gerente) o destinatario vem do diretorio de colegas', async () => {
+  it('D-089: sem users:read (ex.: Gerente) o destinatário vem do diretorio de colegas', async () => {
     vi.mocked(service.listAccessExceptions).mockResolvedValue(page([]));
     vi.mocked(service.listExceptionUsers).mockResolvedValue({
       data: [{ id: 'u-vend', name: 'Vendedor', status: 'active' }],
     });
     renderPage(['access_exceptions:manage']);
     expect(await screen.findByRole('option', { name: 'Vendedor' })).toBeInTheDocument();
-    expect(screen.queryByLabelText('Usuario (id)')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Usuário (id)')).not.toBeInTheDocument();
   });
 });

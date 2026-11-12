@@ -58,12 +58,12 @@ describe('TeamAvailabilityPage', () => {
 
   it('sem availability:read: acesso restrito e nenhuma chamada a API', () => {
     renderPage(['availability:update']);
-    expect(screen.getByText(/nao tem permissao para acessar/i)).toBeInTheDocument();
+    expect(screen.getByText(/não tem permissão para acessar/i)).toBeInTheDocument();
     expect(service.getMyAvailability).not.toHaveBeenCalled();
     expect(service.listAvailability).not.toHaveBeenCalled();
   });
 
-  it('mecanismo desabilitado: mostra aviso e nao lista a equipe', async () => {
+  it('mecanismo desabilitado: mostra aviso e não lista a equipe', async () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue({ ...ME_ON, enabled: false });
     renderPage(MANAGER);
 
@@ -82,7 +82,7 @@ describe('TeamAvailabilityPage', () => {
     expect(service.listAvailability).not.toHaveBeenCalled();
   });
 
-  it('lista usuarios com estado e desde quando; sem registro aparece como Indisponivel', async () => {
+  it('lista usuários com estado e desde quando; sem registro aparece como Indisponível', async () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue(ME_ON);
     vi.mocked(service.listAvailability).mockResolvedValue(LIST);
     renderPage(['availability:read']);
@@ -90,11 +90,11 @@ describe('TeamAvailabilityPage', () => {
     expect(await screen.findByText('Vendedor Vera')).toBeInTheDocument();
     expect(screen.getByTestId('status-u2')).toHaveTextContent('Pausa');
     expect(screen.getByTestId('status-u3')).toHaveTextContent('Treinamento');
-    expect(screen.getByTestId('status-u4')).toHaveTextContent('Indisponivel');
+    expect(screen.getByTestId('status-u4')).toHaveTextContent('Indisponível');
     expect(screen.getByText(/desde sem registro/i)).toBeInTheDocument();
   });
 
-  it('so leitura (supervisor/diretor): nenhuma acao de escrita', async () => {
+  it('só leitura (supervisor/diretor): nenhuma ação de escrita', async () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue(ME_ON);
     vi.mocked(service.listAvailability).mockResolvedValue(LIST);
     renderPage(['availability:read']);
@@ -103,7 +103,7 @@ describe('TeamAvailabilityPage', () => {
     expect(screen.queryByRole('button', { name: /treinamento/i })).not.toBeInTheDocument();
   });
 
-  it('manage: oferece Treinamento so para terceiros (nunca para o proprio usuario) e so a acao correta por estado', async () => {
+  it('manage: oferece Treinamento só para terceiros (nunca para o próprio usuário) e só a ação correta por estado', async () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue(ME_ON);
     vi.mocked(service.listAvailability).mockResolvedValue(LIST);
     renderPage(MANAGER);
@@ -121,7 +121,7 @@ describe('TeamAvailabilityPage', () => {
     ).toBeInTheDocument();
     // Nao ha controle para alterar Disponivel/Pausa/Almoco de terceiros.
     expect(
-      screen.queryByRole('button', { name: /disponivel|pausa|almoco/i }),
+      screen.queryByRole('button', { name: /disponível|pausa|almoço/i }),
     ).not.toBeInTheDocument();
   });
 
@@ -158,12 +158,12 @@ describe('TeamAvailabilityPage', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Colocar Vendedor Vera em Treinamento' }),
     );
-    expect(await screen.findByText(/nao tem permissao para esta acao/i)).toBeInTheDocument();
+    expect(await screen.findByText(/não tem permissão para esta ação/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Colocar Operador Otto em Treinamento' }));
-    expect(await screen.findByText(/usuario esta inativo/i)).toBeInTheDocument();
+    expect(await screen.findByText(/usuário está inativo/i)).toBeInTheDocument();
   });
 
-  it('filtro por estado envia o status e volta para a primeira pagina', async () => {
+  it('filtro por estado envia o status e volta para a primeira página', async () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue(ME_ON);
     vi.mocked(service.listAvailability).mockResolvedValue(LIST);
     const user = userEvent.setup();
@@ -179,15 +179,15 @@ describe('TeamAvailabilityPage', () => {
     );
   });
 
-  it('paginacao: mostra pagina atual e navega', async () => {
+  it('paginacao: mostra página atual e navega', async () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue(ME_ON);
     vi.mocked(service.listAvailability).mockResolvedValue({ ...LIST, total: 45 });
     const user = userEvent.setup();
     renderPage(MANAGER);
 
-    expect(await screen.findByText('Pagina 1 de 3')).toBeInTheDocument();
+    expect(await screen.findByText('Página 1 de 3')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Anterior' })).toBeDisabled();
-    await user.click(screen.getByRole('button', { name: 'Proxima' }));
+    await user.click(screen.getByRole('button', { name: 'Próxima' }));
     await waitFor(() =>
       expect(service.listAvailability).toHaveBeenLastCalledWith({
         page: 2,
@@ -205,8 +205,8 @@ describe('TeamAvailabilityPage', () => {
     const user = userEvent.setup();
     renderPage(MANAGER);
 
-    expect(await screen.findByText(/nao foi possivel carregar a equipe/i)).toBeInTheDocument();
+    expect(await screen.findByText(/não foi possível carregar a equipe/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Tentar novamente' }));
-    expect(await screen.findByText('Nenhum usuario encontrado')).toBeInTheDocument();
+    expect(await screen.findByText('Nenhum usuário encontrado')).toBeInTheDocument();
   });
 });

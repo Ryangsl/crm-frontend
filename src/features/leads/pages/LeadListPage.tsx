@@ -58,7 +58,9 @@ export function LeadListPage() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Leads</h1>
-          <p className="text-sm text-neutral-500">Captação e qualificação de leads do tenant.</p>
+          <p className="text-sm text-neutral-500">
+            Captação e qualificação dos contatos que chegam à empresa.
+          </p>
         </div>
         {hasPermission('leads:create') && (
           <div className="flex flex-wrap gap-2">
@@ -134,7 +136,7 @@ export function LeadListPage() {
       {isError && isOutsideBusinessHours(error) && <OutsideBusinessHoursAlert />}
 
       {isError && !isOutsideBusinessHours(error) && (
-        <Alert tone="danger" title="Nao foi possivel carregar os leads">
+        <Alert tone="danger" title="Não foi possível carregar os leads">
           {error instanceof Error ? error.message : 'Erro desconhecido.'}
           <div className="mt-2">
             <Button size="sm" variant="secondary" onClick={() => void refetch()}>

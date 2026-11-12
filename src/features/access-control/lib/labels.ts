@@ -23,16 +23,16 @@ export function accessControlErrorMessage(error: unknown, fallback: string): str
   if (error instanceof ApiError) {
     switch (error.code) {
       case OUTSIDE_BUSINESS_HOURS_CODE:
-        return 'Acesso indisponivel fora do horario de funcionamento da empresa.';
+        return 'Acesso indisponível fora do horário de funcionamento da empresa.';
       case 'BUSINESS_HOURS_REQUIRED':
-        return 'Configure um horario de funcionamento valido antes de ativar a restricao.';
+        return 'Configure um horário de funcionamento válido antes de ativar a restrição.';
       case 'ACCESS_EXCEPTION_TARGET_NOT_RESTRICTED':
-        return 'Esse usuario nao esta sujeito a restricao por horario; a liberacao nao teria efeito.';
+        return 'Esse usuário não está sujeito a restrição por horário; a liberação não teria efeito.';
       case 'ACCESS_EXCEPTION_EXPIRY_INVALID':
-        return 'A expiracao da liberacao deve estar no futuro.';
+        return 'A expiração da liberação deve estar no futuro.';
       default:
-        if (isPermissionDenied(error)) return 'Voce nao tem permissao para esta acao.';
-        if (error.status === 404) return 'Registro nao encontrado.';
+        if (isPermissionDenied(error)) return 'Você não tem permissão para esta ação.';
+        if (error.status === 404) return 'Registro não encontrado.';
     }
   }
   return fallback;

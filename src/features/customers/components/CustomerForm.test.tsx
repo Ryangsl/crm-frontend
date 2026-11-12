@@ -55,10 +55,10 @@ describe('CustomerForm', () => {
     );
   });
 
-  it('em 409, mostra os candidatos retornados e nao chama onSuccess', async () => {
+  it('em 409, mostra os candidatos retornados e não chama onSuccess', async () => {
     const user = userEvent.setup();
     vi.mocked(customersService.createCustomer).mockRejectedValue(
-      new ApiError(409, 'CUSTOMER_DUPLICATE', 'Ja existe cliente com os dados informados.', [], {
+      new ApiError(409, 'CUSTOMER_DUPLICATE', 'Já existe cliente com os dados informados.', [], {
         candidates: [
           {
             id: 'existing-1',
@@ -76,25 +76,25 @@ describe('CustomerForm', () => {
     await user.type(screen.getByLabelText(/documento/i), '529.982.247-25');
     await user.click(screen.getByRole('button', { name: /criar cliente/i }));
 
-    expect(await screen.findByText(/ja existe cliente com esses dados/i)).toBeInTheDocument();
+    expect(await screen.findByText(/já existe cliente com esses dados/i)).toBeInTheDocument();
     expect(screen.getByText('Cliente Existente')).toBeInTheDocument();
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
-  it('em 403, mostra mensagem de permissao', async () => {
+  it('em 403, mostra mensagem de permissão', async () => {
     const user = userEvent.setup();
     vi.mocked(customersService.createCustomer).mockRejectedValue(
-      new ApiError(403, 'FORBIDDEN', 'Sem permissao.'),
+      new ApiError(403, 'FORBIDDEN', 'Sem permissão.'),
     );
     renderForm();
 
     await user.type(screen.getByLabelText(/^nome$/i), 'Cliente Teste');
     await user.click(screen.getByRole('button', { name: /criar cliente/i }));
 
-    expect(await screen.findByText(/voce nao tem permissao/i)).toBeInTheDocument();
+    expect(await screen.findByText(/você não tem permissão/i)).toBeInTheDocument();
   });
 
-  it('recusa por limite do plano mostra o motivo real, nao falta de permissao (D-085)', async () => {
+  it('recusa por limite do plano mostra o motivo real, não falta de permissão (D-085)', async () => {
     const user = userEvent.setup();
     vi.mocked(customersService.createCustomer).mockRejectedValue(
       new ApiError(403, 'PLAN_LIMIT_REACHED', 'O limite do plano foi atingido.'),
@@ -105,10 +105,10 @@ describe('CustomerForm', () => {
     await user.click(screen.getByRole('button', { name: /criar cliente/i }));
 
     expect(await screen.findByText('O limite do plano foi atingido.')).toBeInTheDocument();
-    expect(screen.queryByText(/nao tem permissao/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/não tem permissão/i)).not.toBeInTheDocument();
   });
 
-  it('em modo edicao, pre-preenche os campos e chama updateCustomer', async () => {
+  it('em modo edição, pre-preenche os campos e chama updateCustomer', async () => {
     const user = userEvent.setup();
     vi.mocked(customersService.updateCustomer).mockResolvedValue({
       ...CUSTOMER,
@@ -120,7 +120,7 @@ describe('CustomerForm', () => {
 
     await user.clear(screen.getByLabelText(/^nome$/i));
     await user.type(screen.getByLabelText(/^nome$/i), 'Nome Editado');
-    await user.click(screen.getByRole('button', { name: /salvar alteracoes/i }));
+    await user.click(screen.getByRole('button', { name: /salvar alterações/i }));
 
     await waitFor(() => expect(onSuccess).toHaveBeenCalled());
     expect(customersService.updateCustomer).toHaveBeenCalledWith(

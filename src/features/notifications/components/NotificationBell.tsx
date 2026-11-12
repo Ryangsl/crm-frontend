@@ -25,10 +25,10 @@ function describe(notification: AppNotification): string {
   if (notification.type === 'lead.assigned') {
     const name = notification.payload.lead_name;
     return typeof name === 'string' && name.trim()
-      ? `Lead atribuido a voce: ${name}`
-      : 'Um lead sem nome foi atribuido a voce';
+      ? `Lead atribuído a você: ${name}`
+      : 'Um lead sem nome foi atribuído a você';
   }
-  return 'Nova notificacao';
+  return 'Nova notificação';
 }
 
 // Destino ao abrir a notificacao: hoje so Lead (unico tipo da v1).
@@ -90,7 +90,7 @@ export function NotificationBell({ align = 'right', className = '' }: Notificati
     <div ref={containerRef} className={`relative ${className}`}>
       <button
         type="button"
-        aria-label={unread > 0 ? `Notificacoes (${unread} nao lidas)` : 'Notificacoes'}
+        aria-label={unread > 0 ? `Notificações (${unread} não lidas)` : 'Notificações'}
         aria-expanded={open}
         aria-haspopup="dialog"
         onClick={() => setOpen((value) => !value)}
@@ -110,13 +110,13 @@ export function NotificationBell({ align = 'right', className = '' }: Notificati
       {open && (
         <div
           role="dialog"
-          aria-label="Notificacoes"
+          aria-label="Notificações"
           className={`border-border-subtle bg-surface absolute top-full z-20 mt-2 flex max-h-96 w-80 max-w-[calc(100vw-2rem)] flex-col gap-2 overflow-y-auto rounded-xl border p-3 shadow-lg ${
             align === 'left' ? 'left-0' : 'right-0'
           }`}
         >
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-neutral-900">Notificacoes</h2>
+            <h2 className="text-sm font-semibold text-neutral-900">Notificações</h2>
             <Button
               size="sm"
               variant="ghost"
@@ -135,7 +135,7 @@ export function NotificationBell({ align = 'right', className = '' }: Notificati
           )}
 
           {list.isError && (
-            <Alert tone="danger" title="Nao foi possivel carregar as notificacoes">
+            <Alert tone="danger" title="Não foi possível carregar as notificações">
               <Button size="sm" variant="secondary" onClick={() => void list.refetch()}>
                 Tentar novamente
               </Button>
@@ -143,7 +143,7 @@ export function NotificationBell({ align = 'right', className = '' }: Notificati
           )}
 
           {!list.isPending && !list.isError && items.length === 0 && (
-            <p className="py-4 text-center text-sm text-neutral-500">Nenhuma notificacao.</p>
+            <p className="py-4 text-center text-sm text-neutral-500">Nenhuma notificação.</p>
           )}
 
           {items.length > 0 && (

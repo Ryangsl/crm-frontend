@@ -86,16 +86,16 @@ export function BusinessHoursForm({ initial, readOnly = false }: BusinessHoursFo
   function validate(): boolean {
     const found: Record<number, string> = {};
     if (windows.length === 0) {
-      setFormError('Adicione pelo menos uma janela de horario.');
+      setFormError('Adicione pelo menos uma janela de horário.');
       setErrors({});
       return false;
     }
     for (const window of windows) {
       if (window.days.length === 0) found[window.key] = 'Selecione pelo menos um dia.';
-      else if (!window.start || !window.end) found[window.key] = 'Informe inicio e fim.';
+      else if (!window.start || !window.end) found[window.key] = 'Informe início e fim.';
       else if (window.start >= window.end)
         found[window.key] =
-          'O inicio deve ser anterior ao fim (janelas que viram a noite nao sao suportadas).';
+          'O início deve ser anterior ao fim (janelas que viram a noite não são suportadas).';
     }
     setErrors(found);
     setFormError(null);
@@ -121,13 +121,13 @@ export function BusinessHoursForm({ initial, readOnly = false }: BusinessHoursFo
       setSaved(true);
     } catch (err) {
       if (isPermissionDenied(err)) {
-        setFormError('Voce nao tem permissao para alterar esta configuracao.');
+        setFormError('Você não tem permissão para alterar esta configuração.');
         return;
       }
       setFormError(
         err instanceof ApiError
           ? err.message
-          : 'Nao foi possivel salvar o horario de funcionamento.',
+          : 'Não foi possível salvar o horário de funcionamento.',
       );
     }
   }
@@ -135,14 +135,14 @@ export function BusinessHoursForm({ initial, readOnly = false }: BusinessHoursFo
   return (
     <form onSubmit={(event) => void handleSubmit(event)} className="flex flex-col gap-4">
       {formError && (
-        <Alert tone="danger" title="Nao foi possivel salvar">
+        <Alert tone="danger" title="Não foi possível salvar">
           {formError}
         </Alert>
       )}
-      {saved && <Alert tone="success">Horario de funcionamento salvo.</Alert>}
+      {saved && <Alert tone="success">Horário de funcionamento salvo.</Alert>}
 
       <Select
-        label="Fuso horario"
+        label="Fuso horário"
         value={timezone}
         disabled={readOnly}
         onChange={(event) => {
@@ -187,7 +187,7 @@ export function BusinessHoursForm({ initial, readOnly = false }: BusinessHoursFo
 
           <div className="grid grid-cols-2 gap-3">
             <Input
-              label={`Inicio (janela ${index + 1})`}
+              label={`Início (janela ${index + 1})`}
               type="time"
               value={window.start}
               disabled={readOnly}

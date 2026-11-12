@@ -62,7 +62,7 @@ async function openTab(): Promise<ApiModule> {
   return import('./api');
 }
 
-describe('renovacao com varias abas (D-091)', () => {
+describe('renovacao com várias abas (D-091)', () => {
   beforeEach(() => {
     vi.unstubAllGlobals();
   });
@@ -70,7 +70,7 @@ describe('renovacao com varias abas (D-091)', () => {
     vi.unstubAllGlobals();
   });
 
-  it('duas abas renovando ao mesmo tempo: as duas ficam com sessao valida, sem reuso detectado', async () => {
+  it('duas abas renovando ao mesmo tempo: as duas ficam com sessão válida, sem reuso detectado', async () => {
     const { state, fetchMock } = fakeServer();
     const locks = fakeLocks();
     vi.stubGlobal('fetch', fetchMock);
@@ -92,7 +92,7 @@ describe('renovacao com varias abas (D-091)', () => {
     expect(tabB.getAccessToken()).toBe(tokenB);
   });
 
-  it('sem a coordenacao, a segunda aba reapresentaria o token velho e derrubaria a sessao', async () => {
+  it('sem a coordenacao, a segunda aba reapresentaria o token velho e derrubaria a sessão', async () => {
     // Documenta o defeito que o Web Lock evita (navegador sem Web Locks cai neste caminho).
     const { state, fetchMock } = fakeServer();
     vi.stubGlobal('fetch', fetchMock);
@@ -106,7 +106,7 @@ describe('renovacao com varias abas (D-091)', () => {
     expect(state.familyRevoked).toBe(true);
   });
 
-  it('na mesma aba, pedidos simultaneos dividem uma unica renovacao', async () => {
+  it('na mesma aba, pedidos simultaneos dividem uma única renovacao', async () => {
     const { state, fetchMock } = fakeServer();
     vi.stubGlobal('fetch', fetchMock);
     vi.stubGlobal('navigator', { ...navigator, locks: fakeLocks() });
@@ -122,7 +122,7 @@ describe('renovacao com varias abas (D-091)', () => {
     expect(state.refreshCalls).toBe(1);
   });
 
-  it('falha na renovacao devolve null e libera o lock para a proxima aba continuar', async () => {
+  it('falha na renovacao devolve null e libera o lock para a próxima aba continuar', async () => {
     const { state, fetchMock } = fakeServer();
     const locks = fakeLocks();
     vi.stubGlobal('navigator', { ...navigator, locks });

@@ -38,31 +38,31 @@ describe('AvailabilitySelector', () => {
     vi.restoreAllMocks();
   });
 
-  it('sem availability:update nem availability:manage: nao renderiza e nem consulta a API', () => {
+  it('sem availability:update nem availability:manage: não renderiza e nem consulta a API', () => {
     renderSelector(['availability:read', 'leads:read']);
     expect(screen.queryByLabelText('Disponibilidade')).not.toBeInTheDocument();
     expect(service.getMyAvailability).not.toHaveBeenCalled();
   });
 
-  it('mecanismo desabilitado: o seletor nao e exibido', async () => {
+  it('mecanismo desabilitado: o seletor não e exibido', async () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue({ ...ME_ON, enabled: false });
     renderSelector(['availability:update']);
     await waitFor(() => expect(service.getMyAvailability).toHaveBeenCalled());
     expect(screen.queryByLabelText('Disponibilidade')).not.toBeInTheDocument();
   });
 
-  it('habilitado: mostra o estado atual e so os 4 estados que o proprio usuario pode escolher', async () => {
+  it('habilitado: mostra o estado atual e só os 4 estados que o próprio usuário pode escolher', async () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue(ME_ON);
     renderSelector(['availability:update']);
 
     const select = await screen.findByLabelText('Disponibilidade');
     expect(select).toHaveValue('available');
     const labels = Array.from(select.querySelectorAll('option')).map((o) => o.textContent);
-    expect(labels).toEqual(['Disponivel', 'Indisponivel', 'Pausa', 'Almoco']); // sem Treinamento
+    expect(labels).toEqual(['Disponível', 'Indisponível', 'Pausa', 'Almoço']); // sem Treinamento
     expect(select).toBeEnabled();
   });
 
-  it('quem tem so availability:manage (Admin/Gerente) tambem altera o proprio estado', async () => {
+  it('quem tem só availability:manage (Admin/Gerente) também altera o próprio estado', async () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue({ ...ME_ON, status: 'unavailable' });
     renderSelector(['availability:manage']);
     expect(await screen.findByLabelText('Disponibilidade')).toHaveValue('unavailable');
@@ -104,7 +104,7 @@ describe('AvailabilitySelector', () => {
     await waitFor(() => expect(service.getMyAvailability).toHaveBeenCalledTimes(2));
   });
 
-  it('erro AVAILABILITY_DISABLED mostra mensagem propria; erro generico tambem', async () => {
+  it('erro AVAILABILITY_DISABLED mostra mensagem própria; erro genérico também', async () => {
     vi.mocked(service.getMyAvailability).mockResolvedValue(ME_ON);
     vi.mocked(service.setMyAvailability)
       .mockRejectedValueOnce(new ApiError(409, 'AVAILABILITY_DISABLED', 'x'))
@@ -117,7 +117,7 @@ describe('AvailabilitySelector', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/foi desabilitada/i);
     await user.selectOptions(screen.getByLabelText('Disponibilidade'), 'lunch');
     await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(/nao foi possivel alterar/i),
+      expect(screen.getByRole('alert')).toHaveTextContent(/não foi possível alterar/i),
     );
   });
 });

@@ -27,13 +27,13 @@ describe('ConversationListPage', () => {
     vi.resetAllMocks();
   });
 
-  it('sem conversations:read mostra aviso e nao consulta a API', () => {
+  it('sem conversations:read mostra aviso e não consulta a API', () => {
     renderWithProviders(<ConversationListPage />, ['leads:read']);
-    expect(screen.getByText(/nao tem permissao para ver conversas/i)).toBeInTheDocument();
+    expect(screen.getByText(/não tem permissão para ver conversas/i)).toBeInTheDocument();
     expect(service.listConversations).not.toHaveBeenCalled();
   });
 
-  it('lista as conversas com titulo do contexto, estado e responsavel; link para o detalhe', async () => {
+  it('lista as conversas com título do contexto, estado e responsável; link para o detalhe', async () => {
     vi.mocked(service.listConversations).mockResolvedValue(page([CONVERSATION, closedLead]));
     renderWithProviders(<ConversationListPage />, ['conversations:read']);
 
@@ -41,8 +41,8 @@ describe('ConversationListPage', () => {
     expect(screen.getByText('Lia Lead')).toBeInTheDocument();
     expect(screen.getByText('Aberta')).toBeInTheDocument();
     expect(screen.getByText('Encerrada')).toBeInTheDocument();
-    expect(screen.getByText(/sem responsavel/i, { selector: 'td' })).toBeInTheDocument();
-    expect(screen.getByText(/com responsavel/i)).toBeInTheDocument();
+    expect(screen.getByText(/sem responsável/i, { selector: 'td' })).toBeInTheDocument();
+    expect(screen.getByText(/com responsável/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /ana cliente/i })).toHaveAttribute(
       'href',
       '/conversations/conv-1',
@@ -61,7 +61,7 @@ describe('ConversationListPage', () => {
     expect(await screen.findByText(/nenhuma conversa encontrada/i)).toBeInTheDocument();
   });
 
-  it('filtros de estado e "sem responsavel" reconsultam a API e voltam para a pagina 1', async () => {
+  it('filtros de estado e "sem responsável" reconsultam a API e voltam para a página 1', async () => {
     vi.mocked(service.listConversations).mockResolvedValue(page([CONVERSATION]));
     const user = userEvent.setup();
     renderWithProviders(<ConversationListPage />, ['conversations:read']);
@@ -73,7 +73,7 @@ describe('ConversationListPage', () => {
         expect.objectContaining({ status: 'closed', page: 1 }),
       ),
     );
-    await user.selectOptions(screen.getByLabelText('Responsavel'), 'unassigned');
+    await user.selectOptions(screen.getByLabelText('Responsável'), 'unassigned');
     await waitFor(() =>
       expect(service.listConversations).toHaveBeenLastCalledWith(
         expect.objectContaining({ status: 'closed', unassigned: true }),
@@ -81,7 +81,7 @@ describe('ConversationListPage', () => {
     );
   });
 
-  it('pagina: Proxima e Anterior', async () => {
+  it('página: Próxima e Anterior', async () => {
     vi.mocked(service.listConversations).mockImplementation(async (params) => ({
       data: [CONVERSATION],
       page: params?.page ?? 1,
@@ -106,7 +106,7 @@ describe('ConversationListPage', () => {
       .mockResolvedValueOnce(page([CONVERSATION]));
     const user = userEvent.setup();
     renderWithProviders(<ConversationListPage />, ['conversations:read']);
-    expect(await screen.findByText(/nao foi possivel carregar as conversas/i)).toBeInTheDocument();
+    expect(await screen.findByText(/não foi possível carregar as conversas/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /tentar novamente/i }));
     expect(await screen.findByText('Ana Cliente')).toBeInTheDocument();
   });
