@@ -75,17 +75,18 @@ export function SummaryItem({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-w-0 items-start gap-3">
-      <span
-        aria-hidden="true"
-        className="bg-surface-muted rounded-control mt-0.5 flex size-8 shrink-0 items-center justify-center text-neutral-500"
-      >
-        <Icon className="size-4" />
-      </span>
-      <div className="min-w-0">
-        <dt className="text-xs text-neutral-500">{label}</dt>
-        <dd className="text-sm break-words text-neutral-900">{children}</dd>
-      </div>
+    // Dentro de <dl> so cabe um nivel de <div> com <dt>/<dd>: o icone vai no <dt>, fora do fluxo.
+    <div className="relative min-w-0 pl-11">
+      <dt className="text-xs text-neutral-500">
+        <span
+          aria-hidden="true"
+          className="bg-surface-muted rounded-control absolute top-0.5 left-0 flex size-8 items-center justify-center"
+        >
+          <Icon className="size-4" />
+        </span>
+        {label}
+      </dt>
+      <dd className="text-sm break-words text-neutral-900">{children}</dd>
     </div>
   );
 }

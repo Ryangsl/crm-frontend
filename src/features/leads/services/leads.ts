@@ -14,6 +14,7 @@ export interface ListLeadsParams {
   limit?: number;
   status?: string;
   owner_id?: string;
+  unassigned?: true;
   source_id?: string;
   q?: string;
 }
@@ -23,7 +24,8 @@ export function listLeads(params: ListLeadsParams = {}): Promise<LeadListRespons
   if (params.page) query.set('page', String(params.page));
   if (params.limit) query.set('limit', String(params.limit));
   if (params.status) query.set('status', params.status);
-  if (params.owner_id) query.set('owner_id', params.owner_id);
+  if (params.unassigned) query.set('unassigned', 'true');
+  else if (params.owner_id) query.set('owner_id', params.owner_id);
   if (params.source_id) query.set('source_id', params.source_id);
   if (params.q) query.set('q', params.q);
   const qs = query.toString();

@@ -58,7 +58,8 @@
 
   /*
    * Estados. A cor usada como texto tem contraste AA; a "mark" so entra em ponto, barra e icone.
-   * Erro: #dc2626 em vez do #ef4444 da referencia, porque texto branco sobre #ef4444 fica em 3,76:1.
+   * Erro: #b91c1c. O #ef4444 da referencia da 3,76:1 com texto branco e o #dc2626 da 4,41:1 como
+   * texto sobre o fundo suave do selo (abaixo de AA).
    */
   --color-success: #047857;
   --color-success-mark: #10b981;
@@ -66,7 +67,7 @@
   --color-warning: #b45309;
   --color-warning-mark: #f59e0b;
   --color-warning-soft: #fffbeb;
-  --color-danger: #dc2626;
+  --color-danger: #b91c1c;
   --color-danger-soft: #fef2f2;
   --color-info-soft: #edf5ff;
 
