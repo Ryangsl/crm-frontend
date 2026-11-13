@@ -12,6 +12,8 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
+import { OwnerFilter } from '@/features/users/components/OwnerFilter';
+import { ownerFilterParams } from '@/features/users/lib/owner-filter';
 import { useUserNames } from '@/features/users/hooks/useUsers';
 import { LeadStatusBadge } from '../components/LeadStatusBadge';
 import { useLeadSourcesQuery, useLeadsQuery } from '../hooks/useLeads';
@@ -27,12 +29,13 @@ const STATUS_OPTIONS: { value: LeadStatus; label: string }[] = [
 ];
 
 export function LeadListPage() {
-  const { hasPermission } = useAuth();
+  const { hasPermission, user } = useAuth();
   const navigate = useNavigate();
 
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
   const [sourceId, setSourceId] = useState('');
+  const [owner, setOwner] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [q, setQ] = useState('');
   const userNames = useUserNames();
@@ -48,8 +51,19 @@ export function LeadListPage() {
     limit: PAGE_SIZE,
     status: status || undefined,
     source_id: sourceId || undefined,
+    ...ownerFilterParams(owner, user?.id),
     q: q || undefined,
   });
+
+  const filtered = Boolean(status || sourceId || owner || q);
+  function clearFilters() {
+    setPage(1);
+    setStatus('');
+    setSourceId('');
+    setOwner('');
+    setSearchInput('');
+    setQ('');
+  }
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.limit)) : 1;
 
@@ -125,6 +139,14 @@ export function LeadListPage() {
             </option>
           ))}
         </Select>
+        <OwnerFilter
+          allowUnassigned
+          value={owner}
+          onChange={(value) => {
+            setPage(1);
+            setOwner(value);
+          }}
+        />
       </form>
 
       {isPending && (
@@ -148,10 +170,18 @@ export function LeadListPage() {
 
       {data && data.data.length === 0 && (
         <EmptyState
-          title="Nenhum lead encontrado"
-          description="Ajuste os filtros ou cadastre um novo lead."
+          title={filtered ? 'Nenhum lead com esses filtros' : 'Nenhum lead cadastrado'}
+          description={
+            filtered
+              ? 'Ajuste a busca ou limpe os filtros para ver todos os leads.'
+              : 'Cadastre o primeiro lead ou importe uma planilha.'
+          }
           action={
-            hasPermission('leads:create') ? (
+            filtered ? (
+              <Button size="sm" variant="secondary" onClick={clearFilters}>
+                Limpar filtros
+              </Button>
+            ) : hasPermission('leads:create') ? (
               <Button writes size="sm" onClick={() => navigate('/leads/new')}>
                 Novo lead
               </Button>

@@ -84,7 +84,7 @@ export function deriveThemeVars(colors: BrandingColors): Record<string, string> 
     contrastRatio(primary, sidebar) >= 1.5 ? primary : mix(sidebar, sidebarInk, 0.2);
   const success = isDark ? '#34d399' : '#047857';
   const warning = isDark ? '#fbbf24' : '#b45309';
-  const danger = isDark ? '#f87171' : '#c81e1e';
+  const danger = isDark ? '#f87171' : '#b91c1c';
 
   return {
     '--color-brand-50': mix(primary, surface, 0.92),

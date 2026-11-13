@@ -4,16 +4,27 @@ import type { FormEvent } from 'react';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { useAuth } from '@/features/auth/useAuth';
 import { isPermissionDenied } from '@/features/plan/lib/labels';
+import { useUserDirectory } from '@/features/users/hooks/useUsers';
 import { ApiError } from '@/services/api';
 import { fromDatetimeLocalValue, toDatetimeLocalValue } from '../lib/datetime';
 import { useCreateTask, useUpdateTask } from '../hooks/useTasks';
 import type { CrmEntityType, Task } from '../types/followUp';
 
+// Prazo sugerido: 9h do dia seguinte. "Agora" faria a tarefa nascer atrasada.
+function nextMorning(): Date {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  date.setHours(9, 0, 0, 0);
+  return date;
+}
+
 interface TaskFormProps {
-  entityType: CrmEntityType;
-  entityId: string;
+  // Sem registro de origem a tarefa e avulsa (criada em Follow-ups).
+  entityType?: CrmEntityType;
+  entityId?: string;
   task?: Task;
   onSuccess: () => void;
   onCancel: () => void;
@@ -23,12 +34,18 @@ export function TaskForm({ entityType, entityId, task, onSuccess, onCancel }: Ta
   const { user } = useAuth();
   const [title, setTitle] = useState(task?.title ?? '');
   const [dueAt, setDueAt] = useState(
-    task ? toDatetimeLocalValue(task.due_at) : toDatetimeLocalValue(new Date().toISOString()),
+    task ? toDatetimeLocalValue(task.due_at) : toDatetimeLocalValue(nextMorning().toISOString()),
   );
+  const [assignedTo, setAssignedTo] = useState(task?.assigned_to ?? user?.id ?? '');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { data: directory } = useUserDirectory();
+  // O proprio usuario vem primeiro; sem o diretorio, a tarefa fica com quem a cria.
+  const colleagues = (directory?.data ?? []).filter(
+    (person) => person.status === 'active' && person.id !== user?.id,
+  );
 
-  const createMutation = useCreateTask(entityType, entityId);
-  const updateMutation = useUpdateTask(entityType, entityId);
+  const createMutation = useCreateTask();
+  const updateMutation = useUpdateTask();
   const submitting = createMutation.isPending || updateMutation.isPending;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -41,15 +58,14 @@ export function TaskForm({ entityType, entityId, task, onSuccess, onCancel }: Ta
       if (task) {
         await updateMutation.mutateAsync({
           taskId: task.id,
-          input: { title: title.trim(), due_at },
+          input: { title: title.trim(), due_at, assigned_to: assignedTo || undefined },
         });
       } else {
         await createMutation.mutateAsync({
           title: title.trim(),
-          assigned_to: user.id,
+          assigned_to: assignedTo || user.id,
           due_at,
-          entity_type: entityType,
-          entity_id: entityId,
+          ...(entityType && entityId ? { entity_type: entityType, entity_id: entityId } : {}),
         });
       }
       onSuccess();
@@ -83,6 +99,25 @@ export function TaskForm({ entityType, entityId, task, onSuccess, onCancel }: Ta
         value={dueAt}
         onChange={(event) => setDueAt(event.target.value)}
       />
+      {colleagues.length > 0 && (
+        <Select
+          label="Responsável"
+          value={assignedTo}
+          onChange={(event) => setAssignedTo(event.target.value)}
+        >
+          {user && <option value={user.id}>Eu</option>}
+          {task &&
+            task.assigned_to !== user?.id &&
+            !colleagues.some((p) => p.id === task.assigned_to) && (
+              <option value={task.assigned_to}>Responsável atual</option>
+            )}
+          {colleagues.map((person) => (
+            <option key={person.id} value={person.id}>
+              {person.name}
+            </option>
+          ))}
+        </Select>
+      )}
 
       <div className="flex gap-2">
         <Button writes type="submit" size="sm" loading={submitting} disabled={submitting}>

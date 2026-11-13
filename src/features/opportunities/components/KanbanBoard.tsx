@@ -58,14 +58,14 @@ export function KanbanBoard({ pipeline, opportunities }: KanbanBoardProps) {
                 )}
               </p>
             )}
-            <div className="flex flex-wrap gap-1 px-1 text-xs text-neutral-500">
+            <div className="flex flex-wrap gap-1 px-1 text-xs text-neutral-600">
               {stage.requires_value && <span>Exige valor</span>}
               {stage.is_won && <span>Etapa de ganho</span>}
               {stage.is_lost && <span>Etapa de perda</span>}
             </div>
 
             {cards.length === 0 ? (
-              <p className="px-1 py-4 text-center text-xs text-neutral-400">Nenhuma oportunidade</p>
+              <p className="px-1 py-4 text-center text-xs text-neutral-600">Nenhuma oportunidade</p>
             ) : (
               cards.map((opportunity) => (
                 <OpportunityCard

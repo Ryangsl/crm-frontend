@@ -75,7 +75,7 @@ describe('LeadListPage', () => {
     vi.mocked(leadsService.listLeads).mockResolvedValue(page());
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
     renderPage(['leads:read']);
-    expect(await screen.findByText(/nenhum lead encontrado/i)).toBeInTheDocument();
+    expect(await screen.findByText(/nenhum lead cadastrado/i)).toBeInTheDocument();
   });
 
   it('mostra estado de erro e permite tentar novamente', async () => {
@@ -100,7 +100,7 @@ describe('LeadListPage', () => {
     vi.mocked(leadsService.listLeads).mockResolvedValue(page());
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
     renderPage(['leads:read']);
-    await screen.findByText(/nenhum lead encontrado/i);
+    await screen.findByText(/nenhum lead cadastrado/i);
     expect(screen.queryByRole('button', { name: /novo lead/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Importar' })).not.toBeInTheDocument();
   });
@@ -119,7 +119,7 @@ describe('LeadListPage', () => {
     vi.mocked(leadsService.listLeads).mockResolvedValue(page());
     vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
     renderPage(['leads:read']);
-    await screen.findByText(/nenhum lead encontrado/i);
+    await screen.findByText(/nenhum lead cadastrado/i);
 
     await user.selectOptions(screen.getByLabelText(/^status$/i), 'qualified');
 
@@ -128,5 +128,40 @@ describe('LeadListPage', () => {
         expect.objectContaining({ status: 'qualified', page: 1 }),
       ),
     );
+  });
+  it('filtro de responsavel: "Meus" envia o proprio id e "Sem responsavel" envia unassigned', async () => {
+    vi.mocked(leadsService.listLeads).mockResolvedValue(page({ data: [LEAD], total: 1 }));
+    vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
+    renderPage(['leads:read']);
+    const select = await screen.findByLabelText('Responsável');
+
+    await userEvent.selectOptions(select, 'Meus');
+    await waitFor(() =>
+      expect(leadsService.listLeads).toHaveBeenLastCalledWith(
+        expect.objectContaining({ owner_id: 'u1' }),
+      ),
+    );
+
+    await userEvent.selectOptions(select, 'Sem responsável');
+    await waitFor(() =>
+      expect(leadsService.listLeads).toHaveBeenLastCalledWith(
+        expect.objectContaining({ unassigned: true }),
+      ),
+    );
+    expect(vi.mocked(leadsService.listLeads).mock.lastCall?.[0]).not.toHaveProperty('owner_id');
+  });
+
+  it('lista vazia com filtro oferece limpar os filtros, nao cadastrar', async () => {
+    vi.mocked(leadsService.listLeads).mockResolvedValue(page());
+    vi.mocked(leadsService.listLeadSources).mockResolvedValue(sourcesPage());
+    renderPage(['leads:read', 'leads:create']);
+    await screen.findByText('Nenhum lead cadastrado');
+
+    await userEvent.selectOptions(screen.getByLabelText('Responsável'), 'Sem responsável');
+    await screen.findByText('Nenhum lead com esses filtros');
+    await userEvent.click(screen.getByRole('button', { name: 'Limpar filtros' }));
+
+    await screen.findByText('Nenhum lead cadastrado');
+    expect(screen.getByLabelText('Responsável')).toHaveValue('');
   });
 });

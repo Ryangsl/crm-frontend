@@ -7,6 +7,16 @@ function queryKey(entityType: CrmEntityType, entityId: string) {
   return ['follow-up', 'tasks', entityType, entityId];
 }
 
+// Uma tarefa aparece no registro de origem e na visao transversal (Follow-ups, chave ['tasks']):
+// toda escrita atualiza as duas.
+function useInvalidateTasks() {
+  const queryClient = useQueryClient();
+  return () => {
+    void queryClient.invalidateQueries({ queryKey: ['follow-up', 'tasks'] });
+    void queryClient.invalidateQueries({ queryKey: ['tasks'] });
+  };
+}
+
 export function useTasksQuery(entityType: CrmEntityType, entityId: string | undefined) {
   return useQuery({
     queryKey: queryKey(entityType, entityId as string),
@@ -16,33 +26,27 @@ export function useTasksQuery(entityType: CrmEntityType, entityId: string | unde
   });
 }
 
-export function useCreateTask(entityType: CrmEntityType, entityId: string) {
-  const queryClient = useQueryClient();
+export function useCreateTask() {
+  const invalidate = useInvalidateTasks();
   return useMutation({
     mutationFn: (input: TaskCreateInput) => createTask(input),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKey(entityType, entityId) });
-    },
+    onSuccess: invalidate,
   });
 }
 
-export function useUpdateTask(entityType: CrmEntityType, entityId: string) {
-  const queryClient = useQueryClient();
+export function useUpdateTask() {
+  const invalidate = useInvalidateTasks();
   return useMutation({
     mutationFn: ({ taskId, input }: { taskId: string; input: TaskUpdateInput }) =>
       updateTask(taskId, input),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKey(entityType, entityId) });
-    },
+    onSuccess: invalidate,
   });
 }
 
-export function useDeleteTask(entityType: CrmEntityType, entityId: string) {
-  const queryClient = useQueryClient();
+export function useDeleteTask() {
+  const invalidate = useInvalidateTasks();
   return useMutation({
     mutationFn: (taskId: string) => deleteTask(taskId),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKey(entityType, entityId) });
-    },
+    onSuccess: invalidate,
   });
 }

@@ -75,7 +75,7 @@ export function SummaryItem({
   children: ReactNode;
 }) {
   return (
-    // Dentro de <dl> so cabe um <div> com <dt>/<dd> como filhos diretos: o icone fica no <dt>, fora do fluxo.
+    // Dentro de <dl> so cabe um nivel de <div> com <dt>/<dd>: o icone vai no <dt>, fora do fluxo.
     <div className="relative min-w-0 pl-11">
       <dt className="text-xs text-neutral-500">
         <span
