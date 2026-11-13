@@ -26,6 +26,25 @@ export function initialLeadValues(lead?: Lead): LeadFormValues {
   };
 }
 
+// Conversao em Cliente novo: os dados do lead entram como valores iniciais do formulario, todos
+// editaveis. Mapeamento do contrato (CustomerCreate): name -> name, document -> document (campo unico,
+// CPF ou CNPJ), phone -> primary_phone, email -> primary_email. Dado ausente vira campo vazio.
+export interface ConvertCustomerValues {
+  name: string;
+  document: string;
+  phone: string;
+  email: string;
+}
+
+export function convertCustomerValues(lead: Lead): ConvertCustomerValues {
+  return {
+    name: lead.name ?? '',
+    document: lead.document ?? '',
+    phone: lead.phone ?? '',
+    email: lead.email ?? '',
+  };
+}
+
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function validateLead(values: LeadFormValues): LeadFormErrors {
