@@ -128,11 +128,12 @@ export function deriveThemeVars(colors: BrandingColors): Record<string, string> 
     '--color-neutral-900': text,
     '--color-neutral-950': text,
 
-    '--color-success': success,
+    // Cor de estado e usada como texto sobre o proprio fundo suave (selos): garante AA nessa combinacao.
+    '--color-success': ensureContrast(success, mix(surface, success, 0.1), AA_TEXT),
     '--color-success-soft': mix(surface, success, 0.1),
-    '--color-warning': warning,
+    '--color-warning': ensureContrast(warning, mix(surface, warning, 0.1), AA_TEXT),
     '--color-warning-soft': mix(surface, warning, 0.1),
-    '--color-danger': danger,
+    '--color-danger': ensureContrast(danger, mix(surface, danger, 0.1), AA_TEXT),
     '--color-danger-soft': mix(surface, danger, 0.1),
     '--color-info-soft': mix(surface, primary, 0.1),
   };

@@ -1,9 +1,9 @@
-/// <reference types="vitest/config" />
 import { fileURLToPath, URL } from 'node:url';
 
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { configDefaults } from 'vitest/config';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // PWA: apenas cache de assets estaticos (D-041). Sem fila de escrita offline —
@@ -66,5 +66,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     css: true,
+    // e2e/ e do Playwright (npm run test:e2e), nao do Vitest.
+    exclude: [...configDefaults.exclude, 'e2e/**'],
   },
 });

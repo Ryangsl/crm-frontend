@@ -26,10 +26,10 @@ Ferramentas: **Vitest** + **Testing Library** (unit/componente) e **jsdom**.
 
 ## O que ainda não existe — e por quê
 
-- **E2E (Playwright)**: [D-020](../crm-spec/docs/00-governance/decision-register.md#d-020--ferramenta-de-e2e-de-frontend)
-  já decidiu a ferramenta, mas os fluxos críticos que a estratégia manda cobrir (login, criar
-  lead, converter em oportunidade, registrar atendimento) só passam a existir da Fase 2 em
-  diante. Montar E2E agora seria testar uma vitrine de componentes.
+- **E2E (Playwright)**: existe desde 12/11/2026 em `e2e/` (`npm run test:e2e`, contra o backend
+  real com o seed, em `http://exemplo.localhost:5173`): fluxo principal e acessibilidade (axe, foco,
+  teclado, 390 px, tema escuro). Ver o bloco "E2E de navegador" do `CLAUDE.md`. No CI roda no
+  `crm-backend`. Ainda sem E2E: registrar atendimento, permissões por papel, importação.
 - **Testes de formulário/validação**: chegam com o primeiro formulário real (Fase 2).
 - **Testes de permissão na UI**: dependem de RBAC no frontend (Fase 2).
 

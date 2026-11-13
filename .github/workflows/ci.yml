@@ -5,7 +5,9 @@
 # crm-spec/docs/09-testing/testing-strategy.md.
 #
 # Os testes do frontend nao usam banco nem API reais (a API e simulada). Os e2e da API rodam no CI do
-# crm-backend; e2e de navegador (Playwright, D-020) ainda nao existem.
+# crm-backend. Os e2e de navegador (Playwright, D-020, pasta e2e/) precisam da API real, que e de um
+# repositorio privado: rodam no job `browser-e2e` do CI do crm-backend, que baixa este repositorio. Aqui
+# a pasta e2e/ so passa por lint e tipos (o build roda o tsc, que a inclui).
 name: CI
 
 on:

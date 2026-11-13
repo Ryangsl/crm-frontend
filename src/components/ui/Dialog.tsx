@@ -12,7 +12,31 @@ interface OverlayProps {
   overlayClassName: string;
 }
 
-// Base de Modal e Drawer: fecha com Esc e no fundo, leva o foco para dentro e devolve ao sair.
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// Tab e Shift+Tab dao a volta dentro do painel: o foco nao escapa para a pagina atras do dialogo.
+function keepFocusInside(event: KeyboardEvent, panel: HTMLElement | null): void {
+  if (!panel) return;
+  const items = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE));
+  if (items.length === 0) {
+    event.preventDefault();
+    return;
+  }
+  const [first, last] = [items[0], items[items.length - 1]];
+  const active = document.activeElement;
+  const outside = !panel.contains(active);
+  if (event.shiftKey && (active === first || active === panel || outside)) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (active === last || outside)) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+// Base de Modal e Drawer: fecha com Esc e no fundo, leva o foco para dentro, mantem o foco
+// dentro enquanto aberto e devolve ao sair.
 function Overlay({ title, onClose, children, panelClassName, overlayClassName }: OverlayProps) {
   const panel = useRef<HTMLDivElement>(null);
 
@@ -21,6 +45,7 @@ function Overlay({ title, onClose, children, panelClassName, overlayClassName }:
     panel.current?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
+      if (event.key === 'Tab') keepFocusInside(event, panel.current);
     };
     document.addEventListener('keydown', onKey);
     return () => {
