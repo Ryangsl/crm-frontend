@@ -292,7 +292,7 @@ export function LeadDetailPage() {
                 {panel === 'convert' && (
                   <Card title="Converter em cliente">
                     <LeadConvertForm
-                      leadId={lead.id}
+                      lead={lead}
                       onSuccess={() => setPanel('none')}
                       onCancel={() => setPanel('none')}
                     />
