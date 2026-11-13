@@ -53,6 +53,7 @@ export interface TaskCreateInput {
 
 export interface TaskUpdateInput {
   title?: string;
+  assigned_to?: string;
   due_at?: string;
   status?: TaskStatus;
 }

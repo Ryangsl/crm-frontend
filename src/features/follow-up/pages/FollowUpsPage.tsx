@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Alert } from '@/components/ui/Alert';
@@ -10,6 +10,9 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
 import { useUserNames } from '@/features/users/hooks/useUsers';
+import { ApiError } from '@/services/api';
+import { TaskForm } from '../components/TaskForm';
+import { useUpdateTask } from '../hooks/useTasks';
 import { listScheduledAppointments, listScheduledTasks } from '../services/followUp';
 import type { CrmEntityType, Task } from '../types/followUp';
 
@@ -49,11 +52,16 @@ function TaskGroup({
   tasks,
   badge,
   names,
+  onComplete,
+  completingId,
 }: {
   title: string;
   tasks: Task[];
   badge?: 'danger' | 'info';
   names: Map<string, string>;
+  // Ausente = sem permissao para concluir.
+  onComplete?: (task: Task) => void;
+  completingId: string | null;
 }) {
   if (tasks.length === 0) return null;
   return (
@@ -74,7 +82,21 @@ function TaskGroup({
                 {names.get(task.assigned_to) ? ` · ${names.get(task.assigned_to)}` : ''}
               </p>
             </div>
-            <EntityLink type={task.entity_type} id={task.entity_id} />
+            <div className="flex items-center gap-3">
+              <EntityLink type={task.entity_type} id={task.entity_id} />
+              {onComplete && (
+                <Button
+                  writes
+                  size="sm"
+                  variant="secondary"
+                  loading={completingId === task.id}
+                  aria-label={`Concluir: ${task.title}`}
+                  onClick={() => onComplete(task)}
+                >
+                  Concluir
+                </Button>
+              )}
+            </div>
           </li>
         ))}
       </ul>
@@ -82,23 +104,32 @@ function TaskGroup({
   );
 }
 
-// Visao transversal de tarefas pendentes e proximos compromissos. So consulta: criar, editar e concluir
-// continuam no registro de origem (Cliente, Lead ou Oportunidade).
+// Visao transversal de tarefas pendentes e proximos compromissos. Aqui se cria tarefa avulsa e se
+// conclui tarefa; editar e excluir continuam no registro de origem. Compromisso nao tem titulo no
+// contrato, entao so faz sentido criado dentro de um Cliente, Lead ou Oportunidade.
 export function FollowUpsPage() {
-  const { hasPermission } = useAuth();
+  const { hasPermission, user } = useAuth();
+  const [scope, setScope] = useState<'mine' | 'all'>('mine');
+  const [creating, setCreating] = useState(false);
+  const [completingId, setCompletingId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const updateTask = useUpdateTask();
+  const canCreate = hasPermission('tasks:create');
+  const canComplete = hasPermission('tasks:update');
+  const mine = scope === 'mine' ? user?.id : undefined;
   const canTasks = hasPermission('tasks:read');
   const canAppointments = hasPermission('appointments:read');
   const names = useUserNames();
   const now = useMemo(() => new Date(), []);
 
   const tasks = useQuery({
-    queryKey: ['tasks', 'pending'],
-    queryFn: () => listScheduledTasks({ status: 'pending' }),
+    queryKey: ['tasks', 'pending', mine ?? 'all'],
+    queryFn: () => listScheduledTasks({ status: 'pending', assigned_to: mine }),
     enabled: canTasks,
   });
   const appointments = useQuery({
-    queryKey: ['appointments', 'upcoming', now.toISOString().slice(0, 10)],
-    queryFn: () => listScheduledAppointments({ starts_from: now.toISOString() }),
+    queryKey: ['appointments', 'upcoming', now.toISOString().slice(0, 10), mine ?? 'all'],
+    queryFn: () => listScheduledAppointments({ starts_from: now.toISOString(), user_id: mine }),
     enabled: canAppointments,
   });
 
@@ -107,12 +138,64 @@ export function FollowUpsPage() {
     a.starts_at.localeCompare(b.starts_at),
   );
 
+  async function complete(task: Task) {
+    setActionError(null);
+    setCompletingId(task.id);
+    try {
+      await updateTask.mutateAsync({ taskId: task.id, input: { status: 'done' } });
+    } catch (err) {
+      setActionError(err instanceof ApiError ? err.message : 'Não foi possível concluir a tarefa.');
+    } finally {
+      setCompletingId(null);
+    }
+  }
+  const onComplete = canComplete ? (task: Task) => void complete(task) : undefined;
+
   return (
     <div className="flex flex-col gap-4">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Follow-ups</h1>
-        <p className="text-sm text-neutral-500">Tarefas pendentes e próximos compromissos.</p>
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">Follow-ups</h1>
+          <p className="text-sm text-neutral-500">Tarefas pendentes e próximos compromissos.</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div role="group" aria-label="De quem" className="flex gap-1">
+            <Button
+              size="sm"
+              variant={scope === 'mine' ? 'primary' : 'secondary'}
+              aria-pressed={scope === 'mine'}
+              onClick={() => setScope('mine')}
+            >
+              Meus
+            </Button>
+            <Button
+              size="sm"
+              variant={scope === 'all' ? 'primary' : 'secondary'}
+              aria-pressed={scope === 'all'}
+              onClick={() => setScope('all')}
+            >
+              Da equipe
+            </Button>
+          </div>
+          {canTasks && canCreate && !creating && (
+            <Button writes onClick={() => setCreating(true)}>
+              Nova tarefa
+            </Button>
+          )}
+        </div>
       </header>
+
+      {creating && (
+        <Card title="Nova tarefa">
+          <TaskForm onSuccess={() => setCreating(false)} onCancel={() => setCreating(false)} />
+        </Card>
+      )}
+
+      {actionError && (
+        <Alert tone="danger" title="Não foi possível completar a ação">
+          {actionError}
+        </Alert>
+      )}
 
       {!canTasks && !canAppointments && (
         <Alert tone="warning" title="Sem permissão">
@@ -138,14 +221,43 @@ export function FollowUpsPage() {
             )}
             {tasks.data && tasks.data.data.length === 0 && (
               <EmptyState
-                title="Nenhuma tarefa pendente"
-                description="As tarefas são criadas no registro do Cliente, Lead ou Oportunidade."
+                title={
+                  scope === 'mine' ? 'Você não tem tarefa pendente' : 'Nenhuma tarefa pendente'
+                }
+                description="Crie uma tarefa aqui ou no registro de um Cliente, Lead ou Oportunidade."
+                action={
+                  canCreate && !creating ? (
+                    <Button writes size="sm" onClick={() => setCreating(true)}>
+                      Nova tarefa
+                    </Button>
+                  ) : undefined
+                }
               />
             )}
             <div className="flex flex-col gap-4">
-              <TaskGroup title="Atrasadas" tasks={groups.overdue} badge="danger" names={names} />
-              <TaskGroup title="Hoje" tasks={groups.today} badge="info" names={names} />
-              <TaskGroup title="Próximas" tasks={groups.upcoming} names={names} />
+              <TaskGroup
+                title="Atrasadas"
+                tasks={groups.overdue}
+                badge="danger"
+                names={names}
+                onComplete={onComplete}
+                completingId={completingId}
+              />
+              <TaskGroup
+                title="Hoje"
+                tasks={groups.today}
+                badge="info"
+                names={names}
+                onComplete={onComplete}
+                completingId={completingId}
+              />
+              <TaskGroup
+                title="Próximas"
+                tasks={groups.upcoming}
+                names={names}
+                onComplete={onComplete}
+                completingId={completingId}
+              />
             </div>
           </Card>
         )}
@@ -166,7 +278,10 @@ export function FollowUpsPage() {
               </Alert>
             )}
             {appointments.data && upcoming.length === 0 && (
-              <EmptyState title="Nenhum compromisso agendado" />
+              <EmptyState
+                title="Nenhum compromisso agendado"
+                description="Agende no registro do Cliente, Lead ou Oportunidade."
+              />
             )}
             <ul className="divide-border-subtle divide-y">
               {upcoming.map((appointment) => (

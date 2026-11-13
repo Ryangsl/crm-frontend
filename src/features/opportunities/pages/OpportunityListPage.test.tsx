@@ -38,7 +38,7 @@ describe('OpportunityListPage', () => {
     mockPipelines();
     vi.mocked(service.listOpportunities).mockResolvedValue(page());
     renderWithProviders(<OpportunityListPage />, { permissions: ['opportunities:read'] });
-    expect(await screen.findByText(/nenhuma oportunidade encontrada/i)).toBeInTheDocument();
+    expect(await screen.findByText(/nenhuma oportunidade cadastrada/i)).toBeInTheDocument();
   });
 
   it('mostra erro da API', async () => {
@@ -71,7 +71,7 @@ describe('OpportunityListPage', () => {
     const { unmount } = renderWithProviders(<OpportunityListPage />, {
       permissions: ['opportunities:read'],
     });
-    await screen.findByText(/nenhuma oportunidade encontrada/i);
+    await screen.findByText(/nenhuma oportunidade cadastrada/i);
     expect(screen.queryByRole('button', { name: 'Nova oportunidade' })).not.toBeInTheDocument();
     unmount();
 
@@ -89,7 +89,7 @@ describe('OpportunityListPage', () => {
     mockPipelines();
     vi.mocked(service.listOpportunities).mockResolvedValue(page());
     renderWithProviders(<OpportunityListPage />, { permissions: ['opportunities:read'] });
-    await screen.findByText(/nenhuma oportunidade encontrada/i);
+    await screen.findByText(/nenhuma oportunidade cadastrada/i);
 
     expect(screen.getByLabelText('Etapa')).toBeDisabled(); // depende de um pipeline escolhido.
     await user.selectOptions(await screen.findByLabelText('Pipeline'), 'p1');

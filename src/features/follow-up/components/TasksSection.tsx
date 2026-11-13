@@ -26,8 +26,8 @@ const STATUS_LABEL: Record<Task['status'], string> = {
 export function TasksSection({ entityType, entityId }: TasksSectionProps) {
   const { hasPermission } = useAuth();
   const { data: tasks, isPending, isError, error, refetch } = useTasksQuery(entityType, entityId);
-  const updateMutation = useUpdateTask(entityType, entityId);
-  const deleteMutation = useDeleteTask(entityType, entityId);
+  const updateMutation = useUpdateTask();
+  const deleteMutation = useDeleteTask();
 
   const [mode, setMode] = useState<{ kind: 'create' } | { kind: 'edit'; task: Task } | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);

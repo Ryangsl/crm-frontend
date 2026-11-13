@@ -9,6 +9,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
+import { OwnerFilter } from '@/features/users/components/OwnerFilter';
+import { ownerFilterParams } from '@/features/users/lib/owner-filter';
 import { OpportunityStatusBadge } from '../components/OpportunityStatusBadge';
 import { useOpportunitiesQuery, usePipelinesQuery } from '../hooks/useOpportunities';
 import { formatMoney } from '../lib/money';
@@ -16,13 +18,14 @@ import { formatMoney } from '../lib/money';
 const PAGE_SIZE = 20;
 
 export function OpportunityListPage() {
-  const { hasPermission } = useAuth();
+  const { hasPermission, user } = useAuth();
   const navigate = useNavigate();
 
   const [page, setPage] = useState(1);
   const [pipelineId, setPipelineId] = useState('');
   const [stageId, setStageId] = useState('');
   const [status, setStatus] = useState('');
+  const [owner, setOwner] = useState('');
 
   const { data: pipelines } = usePipelinesQuery();
   const stageNames = useMemo(
@@ -40,7 +43,17 @@ export function OpportunityListPage() {
     pipeline_id: pipelineId || undefined,
     stage_id: stageId || undefined,
     status: status || undefined,
+    owner_id: ownerFilterParams(owner, user?.id).owner_id,
   });
+
+  const filtered = Boolean(pipelineId || stageId || status || owner);
+  function clearFilters() {
+    setPage(1);
+    setPipelineId('');
+    setStageId('');
+    setStatus('');
+    setOwner('');
+  }
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.limit)) : 1;
 
@@ -109,6 +122,13 @@ export function OpportunityListPage() {
           <option value="won">Ganha</option>
           <option value="lost">Perdida</option>
         </Select>
+        <OwnerFilter
+          value={owner}
+          onChange={(value) => {
+            setPage(1);
+            setOwner(value);
+          }}
+        />
       </div>
 
       {isPending && (
@@ -130,10 +150,20 @@ export function OpportunityListPage() {
 
       {data && data.data.length === 0 && (
         <EmptyState
-          title="Nenhuma oportunidade encontrada"
-          description="Ajuste os filtros ou cadastre uma nova oportunidade."
+          title={
+            filtered ? 'Nenhuma oportunidade com esses filtros' : 'Nenhuma oportunidade cadastrada'
+          }
+          description={
+            filtered
+              ? 'Limpe os filtros para ver todas as oportunidades.'
+              : 'Uma oportunidade nasce de um cliente: registre a primeira negociação.'
+          }
           action={
-            hasPermission('opportunities:create') ? (
+            filtered ? (
+              <Button size="sm" variant="secondary" onClick={clearFilters}>
+                Limpar filtros
+              </Button>
+            ) : hasPermission('opportunities:create') ? (
               <Button writes size="sm" onClick={() => navigate('/opportunities/new')}>
                 Nova oportunidade
               </Button>
