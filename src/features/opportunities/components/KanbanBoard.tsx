@@ -51,7 +51,7 @@ export function KanbanBoard({ pipeline, opportunities }: KanbanBoardProps) {
               </span>
             </header>
             {cards.some((card) => card.value !== null) && (
-              <p className="px-1 text-xs text-neutral-500 tabular-nums">
+              <p className="px-1 text-xs text-neutral-600 tabular-nums">
                 Total:{' '}
                 {formatMoney(
                   cards.reduce((sum, card) => sum + Number(card.value ?? 0), 0).toFixed(2),

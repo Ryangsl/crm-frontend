@@ -86,6 +86,9 @@ const ADMIN_ITEMS: NavItem[] = [
   { to: '/plan', label: 'Plano', Icon: Gauge, end: true },
 ];
 
+// Na barra lateral o contorno de foco usa a tinta da barra: a cor da marca pode nao contrastar com ela.
+const SIDEBAR_FOCUS = '[&_:focus-visible]:outline-sidebar-ink';
+
 // Barra inferior: so o que cabe sem cortar. O restante fica em "Mais".
 const BOTTOM_ITEMS = ['/', '/leads', '/customers', '/pipeline'];
 
@@ -308,7 +311,9 @@ function AppShellLayout() {
 
   return (
     <div className="flex h-dvh overflow-hidden">
-      <aside className="bg-sidebar hidden w-64 shrink-0 overflow-y-auto lg:block">
+      <aside
+        className={`bg-sidebar hidden w-64 shrink-0 overflow-y-auto lg:block ${SIDEBAR_FOCUS}`}
+      >
         <SidebarContent />
       </aside>
 
@@ -340,7 +345,11 @@ function AppShellLayout() {
       <BottomNav onMore={() => setDrawerOpen(true)} />
 
       {drawerOpen && (
-        <Drawer title="Menu" onClose={() => setDrawerOpen(false)} className="bg-sidebar">
+        <Drawer
+          title="Menu"
+          onClose={() => setDrawerOpen(false)}
+          className={`bg-sidebar ${SIDEBAR_FOCUS}`}
+        >
           <button
             type="button"
             aria-label="Fechar menu"

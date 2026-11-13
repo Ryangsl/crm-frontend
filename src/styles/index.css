@@ -58,7 +58,8 @@
 
   /*
    * Estados. A cor usada como texto tem contraste AA; a "mark" so entra em ponto, barra e icone.
-   * Erro: #dc2626 em vez do #ef4444 da referencia, porque texto branco sobre #ef4444 fica em 3,76:1.
+   * Erro: #c81e1e em vez do #ef4444 da referencia: texto branco sobre #ef4444 fica em 3,76:1, e o
+   * #dc2626 usado antes dava 4,41:1 como texto pequeno sobre danger-soft (selo de estado).
    */
   --color-success: #047857;
   --color-success-mark: #10b981;
@@ -66,7 +67,7 @@
   --color-warning: #b45309;
   --color-warning-mark: #f59e0b;
   --color-warning-soft: #fffbeb;
-  --color-danger: #dc2626;
+  --color-danger: #c81e1e;
   --color-danger-soft: #fef2f2;
   --color-info-soft: #edf5ff;
 

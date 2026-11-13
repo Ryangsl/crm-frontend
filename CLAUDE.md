@@ -20,7 +20,7 @@ agente de frontend está em
 | Autenticação na UI | `[PENDENTE — sem fase associada]` | Bearer em memória + refresh por cookie httpOnly (ADR-008); constrói quando a UI de negócio começar, não amarrado a um número de fase |
 | RBAC na UI | `[PENDENTE — sem fase associada]` | idem acima |
 | Telas de negócio (leads, pipeline, atendimento) | `[PENDENTE]` | Fases 3 e 4 |
-| E2E (Playwright) | `[PENDENTE]` | D-020 decidiu a ferramenta; os fluxos só existem na Fase 2 — ver `test.md` |
+| E2E (Playwright) | `[CONCLUÍDO — fluxo principal + acessibilidade]` | `e2e/`, `npm run test:e2e`, contra o backend real; no CI roda no job `browser-e2e` do `crm-backend` — ver o bloco "E2E de navegador" abaixo |
 | Paleta de marca | `[BLOQUEADO]` | D-043 — validação de negócio; hoje há paleta neutra em tokens |
 
 ## FASES 3–4 — ESTADO E REGRAS DA UI (resumo; fonte de verdade: `crm-spec/PROJECT-CONTEXT.md`)
@@ -69,6 +69,12 @@ agente de frontend está em
 
 **Várias abas (D-091):** toda renovação de sessão passa por `refreshAccessToken()` em `services/api.ts`, que serializa as renovações **entre abas** com Web Lock (`navigator.locks`) e dentro da aba com uma promise única. Não crie outro caminho de `POST /v1/auth/refresh`. Entrar/sair é avisado às outras abas por BroadcastChannel no `AuthProvider` (sem token na mensagem). Nada de token em `localStorage`/`sessionStorage`. Testes: `services/api.multi-tab.test.ts`, `AuthProvider.multi-tab.test.tsx`.
 
+**E2E de navegador (Playwright, D-020):** pasta `e2e/` (fora do Vitest; coberta por ESLint e `tsc`). Precisa do backend real com o seed e do frontend em `http://exemplo.localhost:5173`: `npm run test:e2e` (ou `E2E_WEB_SERVER=1 npm run test:e2e` para o Playwright subir o Vite; `E2E_BASE_URL` troca o endereço). Um worker só; cada grupo entra uma vez e reutiliza a página (o refresh é rotacionado, então não se copia sessão entre contextos). Em desenvolvimento, o backend limita logins (20/min por endereço): rodar a suíte várias vezes seguidas pode pedir `RATE_LIMIT_LOGIN_MAX` maior no backend, como o CI faz.
+- `01-main-flow.spec.ts`: login → Lead (nome, telefone, origem) → qualificar → converter em Cliente novo → Oportunidade → ganhar → "Ganha" na tela, inclusive após recarregar. Dados com sufixo único por execução.
+- `02-accessibility.spec.ts`: axe (WCAG 2 A e AA) em 15 telas autenticadas + diálogo aberto, em quatro identidades (padrão clara, **tema escuro**, personalizada clara, personalizada escura), e no login (sempre identidade padrão: a da empresa só vale após entrar). Mais: foco visível (contorno ≥ 2 px e contraste ≥ 3:1 com o fundo), diálogo (foco entra, fica dentro, Esc fecha, foco volta), menu por teclado, "Mais" no celular e 390 px sem rolagem horizontal.
+- **Tema escuro no teste:** `e2e/support/branding.ts` responde ao `GET /v1/branding` com `page.route` (aplicar de verdade exige `branding:manage`, da plataforma). O caminho exercitado é o real do frontend (`BrandingApplier` → `deriveThemeVars`); gravação e validação no backend ficam com os e2e da API. Cores de estado do tema (`success`/`warning`/`danger`) passam por `ensureContrast` contra o próprio fundo suave; na barra lateral o contorno de foco usa `sidebar-ink`.
+- Seletores só por papel e rótulo. Mudou rótulo de botão ou campo usado pela suíte: ajuste o spec no mesmo PR. Tela nova entra na lista `SCREENS`. No CI a suíte roda no `crm-backend` (job `browser-e2e`), não aqui: o backend é privado.
+
 ## Antes de implementar qualquer coisa
 
 1. [Decision Register](../crm-spec/docs/00-governance/decision-register.md) — o que está
@@ -86,6 +92,7 @@ npm run dev     # http://localhost:5173 (backend precisa estar em :3000)
 npm test        # Vitest
 npm run lint
 npm run build   # typecheck + build (gera sw.js e manifest)
+npm run test:e2e  # Playwright; precisa do backend real e do frontend em exemplo.localhost:5173
 ```
 
 ## O que nunca fazer aqui
