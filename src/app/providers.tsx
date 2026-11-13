@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { AuthProvider } from '../features/auth/AuthProvider';
+import { MonitoringUserSync } from '../features/monitoring/MonitoringUserSync';
 import { UiProvider } from './UiProvider';
 
 // Estado de servidor fica no TanStack Query; estado de UI no UiProvider (D-018); sessao
@@ -21,6 +22,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <MonitoringUserSync />
         <UiProvider>{children}</UiProvider>
       </AuthProvider>
     </QueryClientProvider>
