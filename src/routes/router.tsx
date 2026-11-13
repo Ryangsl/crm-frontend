@@ -7,6 +7,7 @@ import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage';
 import { AccountPage } from '../features/account/pages/AccountPage';
 import { HomePage } from '../app/pages/HomePage';
 import { NotFoundPage } from '../app/pages/NotFoundPage';
+import { RouteErrorScreen } from '../features/monitoring/RouteErrorScreen';
 import { StatusPage } from '../features/status/pages/StatusPage';
 import { CustomerListPage } from '../features/customers/pages/CustomerListPage';
 import { CustomerNewPage } from '../features/customers/pages/CustomerNewPage';
@@ -39,12 +40,19 @@ import { LeadSourcesPage } from '../features/leads/pages/LeadSourcesPage';
 import { AvailabilitySettingsPage } from '../features/availability/pages/AvailabilitySettingsPage';
 import { PipelinesSettingsPage } from '../features/pipelines/pages/PipelinesSettingsPage';
 
+// D-101: erro de renderizacao em qualquer tela cai no `errorElement` da rota de topo (tela de erro
+// com "Recarregar" e reporte, se a captura estiver ligada).
 export const router = createBrowserRouter([
-  { path: '/login', element: <LoginPage /> },
+  { path: '/login', element: <LoginPage />, errorElement: <RouteErrorScreen /> },
   // D-064: link de redefinicao de senha (publico, no endereco da empresa).
-  { path: '/redefinir-senha', element: <ResetPasswordPage /> },
+  {
+    path: '/redefinir-senha',
+    element: <ResetPasswordPage />,
+    errorElement: <RouteErrorScreen />,
+  },
   {
     element: <ProtectedRoute />,
+    errorElement: <RouteErrorScreen />,
     children: [
       {
         path: '/',

@@ -35,6 +35,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        // D-101: o SDK de captura de erros so e baixado com VITE_SENTRY_DSN. Fora do precache, para a
+        // captura desligada nao custar nem o download em segundo plano do service worker.
+        globIgnores: ['**/sentry-reporter-*.js'],
       },
     }),
   ],
