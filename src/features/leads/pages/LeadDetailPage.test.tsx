@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -190,6 +190,36 @@ describe('LeadDetailPage', () => {
     renderPage(converted, ['leads:read']);
     await screen.findAllByText('Convertido');
     expect(screen.queryByRole('button', { name: 'Criar oportunidade' })).not.toBeInTheDocument();
+  });
+
+  it('converter em novo cliente: cancelar e reabrir volta aos dados do lead', async () => {
+    const user = userEvent.setup();
+    renderPage(
+      newLead({ status: 'qualified', name: 'Maria Souza', phone: '+5511988887777', email: null }),
+      ['leads:read', 'leads:update'],
+    );
+
+    async function openNewCustomer() {
+      await user.click(await screen.findByRole('button', { name: 'Converter' }));
+      await user.click(screen.getByRole('button', { name: 'Novo cliente' }));
+      const form = screen.getByRole('button', { name: 'Novo cliente' }).closest('form');
+      if (!form) throw new Error('formulario de conversao nao encontrado');
+      return within(form);
+    }
+
+    let form = await openNewCustomer();
+    expect(form.getByLabelText(/^Nome/)).toHaveValue('Maria Souza');
+    await user.clear(form.getByLabelText(/^Nome/));
+    await user.type(form.getByLabelText(/^Nome/), 'Outro nome');
+    await user.clear(form.getByLabelText('Telefone'));
+    await user.click(form.getByRole('button', { name: 'Cancelar' }));
+    expect(screen.queryByRole('button', { name: 'Novo cliente' })).not.toBeInTheDocument();
+
+    form = await openNewCustomer();
+    expect(form.getByLabelText(/^Nome/)).toHaveValue('Maria Souza');
+    expect(form.getByLabelText('Telefone')).toHaveValue('+5511988887777');
+    expect(form.getByLabelText('E-mail')).toHaveValue('');
+    expect(leadsService.convertLead).not.toHaveBeenCalled();
   });
 
   it('lead ainda não convertido não oferece "Criar oportunidade"', async () => {

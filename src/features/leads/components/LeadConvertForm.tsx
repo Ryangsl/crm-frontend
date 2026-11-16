@@ -10,10 +10,11 @@ import { isPermissionDenied } from '@/features/plan/lib/labels';
 import { ApiError } from '@/services/api';
 import { describeCustomerValidation, toE164 } from '@/features/customers/lib/customer-input';
 import { useConvertLead } from '../hooks/useLeadMutations';
+import { convertCustomerValues } from '../lib/lead-input';
 import type { ConvertLeadInput, Lead } from '../types/lead';
 
 interface LeadConvertFormProps {
-  leadId: string;
+  lead: Lead;
   onSuccess: (lead: Lead) => void;
   onCancel: () => void;
 }
@@ -23,7 +24,9 @@ type Mode = 'existing' | 'new';
 // BR-04: converter vincula o lead a um Cliente, novo ou existente, resolvido por
 // deduplicacao (BR-08/D-067) do lado do backend — este formulario so decide QUAL das duas
 // vias usar; a garantia de nao duplicar cliente e sempre do servidor.
-export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertFormProps) {
+// "Novo cliente" abre com os dados do lead (so valores iniciais, editaveis). O detalhe do lead
+// desmonta o formulario ao cancelar, entao reabrir volta aos dados do lead.
+export function LeadConvertForm({ lead, onSuccess, onCancel }: LeadConvertFormProps) {
   const [mode, setMode] = useState<Mode>('existing');
 
   const [query, setQuery] = useState('');
@@ -31,10 +34,12 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
   const [results, setResults] = useState<Customer[] | null>(null);
   const [selected, setSelected] = useState<Customer | null>(null);
 
-  const [name, setName] = useState('');
-  const [document, setDocument] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  const [prefill] = useState(() => convertCustomerValues(lead));
+  const [name, setName] = useState(prefill.name);
+  const [document, setDocument] = useState(prefill.document);
+  const [phone, setPhone] = useState(prefill.phone);
+  const [email, setEmail] = useState(prefill.email);
+  const hasPrefill = Object.values(prefill).some(Boolean);
   const [duplicates, setDuplicates] = useState<
     {
       id: string;
@@ -46,7 +51,7 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
   >([]);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const convertMutation = useConvertLead(leadId);
+  const convertMutation = useConvertLead(lead.id);
 
   async function handleSearch() {
     if (!query.trim()) return;
@@ -134,6 +139,7 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
           type="button"
           size="sm"
           variant={mode === 'existing' ? 'primary' : 'secondary'}
+          aria-pressed={mode === 'existing'}
           onClick={() => setMode('existing')}
         >
           Cliente existente
@@ -142,6 +148,7 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
           type="button"
           size="sm"
           variant={mode === 'new' ? 'primary' : 'secondary'}
+          aria-pressed={mode === 'new'}
           onClick={() => setMode('new')}
         >
           Novo cliente
@@ -204,6 +211,12 @@ export function LeadConvertForm({ leadId, onSuccess, onCancel }: LeadConvertForm
 
       {mode === 'new' && (
         <div className="flex flex-col gap-3">
+          {hasPrefill && (
+            <p className="text-sm text-neutral-600">
+              Os dados do lead já vêm preenchidos. Revise e altere o que precisar antes de
+              converter.
+            </p>
+          )}
           <Input
             label="Nome"
             required

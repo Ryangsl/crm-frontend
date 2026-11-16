@@ -52,12 +52,14 @@ test('qualifica o lead', async () => {
 test('converte o lead criando um cliente', async () => {
   await page.getByRole('button', { name: 'Converter', exact: true }).click();
   await page.getByRole('button', { name: 'Novo cliente' }).click();
-  // O formulario de conversao nao herda os dados do lead: o cliente e preenchido aqui.
+  // O formulario de conversao vem preenchido com os dados do lead (o telefone ja em E.164); o cliente
+  // e criado com eles, sem digitar de novo.
   const form = page
     .locator('form')
     .filter({ has: page.getByRole('button', { name: 'Novo cliente' }) });
-  await form.getByLabel('Nome').fill(LEAD_NAME);
-  await form.getByLabel('Telefone').fill(PHONE);
+  await expect(form.getByLabel('Nome')).toHaveValue(LEAD_NAME);
+  await expect(form.getByLabel('Telefone')).toHaveValue(`+55${PHONE}`);
+  await expect(form.getByLabel('E-mail')).toHaveValue('');
   await form.getByRole('button', { name: 'Converter', exact: true }).click();
 
   await expect(page.getByRole('button', { name: 'Criar oportunidade' })).toBeVisible();
